@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_[Ss]tore
+testing.R
+header_example.R
+*mothur*
+needs.txt

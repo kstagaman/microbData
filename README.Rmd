@@ -1,0 +1,32 @@
+---
+title: "microbData Package"
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
+---
+
+The purpose of this package is to provide tools to make management of microbiome data (both amplicon and shotgun sequencing) easy in R. It introduces a new object class, `microbData` that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The microbData object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, microbData objects utilize the power of `data.table`s for fast filtering, summarizing and merging.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = 'asis')
+```
+
+## Installation
+
+```{r install, eval=FALSE}
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+remotes::install_github("kstagaman/microbData")
+```
+
+## Tutorial
+
+### Creating a `microbData` object
+
+```{r data-and-creation}
+library(microbData)
+
+```
+
