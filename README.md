@@ -42,53 +42,7 @@ remotes::install_github("kstagaman/microbData")
 
 ``` r
 library(microbData)
-```
 
-    ## Loading required package: ape
-
-    ## Loading required package: data.table
-
-    ## Loading required package: GUniFrac
-
-    ## Loading required package: magrittr
-
-    ## Loading required package: picante
-
-    ## Loading required package: vegan
-
-    ## Loading required package: permute
-
-    ## Loading required package: lattice
-
-    ## This is vegan 2.6-2
-
-    ## Loading required package: nlme
-
-    ## Loading required package: rlang
-
-    ## 
-    ## Attaching package: 'rlang'
-
-    ## The following object is masked from 'package:magrittr':
-    ## 
-    ##     set_names
-
-    ## The following object is masked from 'package:data.table':
-    ## 
-    ##     :=
-
-    ## Loading required package: stringr
-
-    ## Loading required package: usedist
-
-    ## 
-    ## Attaching package: 'microbData'
-
-    ## The following object is masked from 'package:vegan':
-    ## 
-    ##     rarefy
-
-``` r
 ## load data
 data("metadata_dt")  # creates metadata.dt
 setkey(metadata.dt, Sample)
@@ -109,40 +63,60 @@ mD1 <- microbData(
 print(mD1)
 ```
 
-Sample Metadata: 46 samples with 1 covariates Preview: Key: <Sample>
-Sample Exposure <char> <fctr> 1: A01 no 2: A02 no 3: A03 no 4: A04 no
-
-Feature Abundances: 2327 features Preview:
-TACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTGGATAAGTTAGATGTGAAAGCCCCGGGCTCAACCTGGGAATTG
-A01 15593 A02 17508 A03 20974 A04 2565
-TACGTATGTCGCAAGCGTTATCCGGATTTATTGGGCGTAAAGCGCGTCTAGGCGGAAAAATAAGTCTGATGTTAAAATGCGGGGCTCAACTCCGTATTGC
-A01 12323 A02 874 A03 14247 A04 0
-TACGGAGGATCCAAGCGTTATCCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGTCTTGTAAGTCAGTGGTGAAAGCCCATCGCTCAACGGTGGAACGG
-A01 4446 A02 235 A03 5542 A04 0
-TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTATGCAAGACAGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG
-A01 3807 A02 181 A03 4087 A04 105
-
-Feature Assignments: 6 levels assigned Preview: Key: <ASV> ASV <char> 1:
-AAAAATGTTTTGACATAAAACACATAAGGATAATACACAGTGATCGATCAAAAAGGGTCATATTTTAATTATGGTGGGAAAAGAATTCTGTTTTTTTATT
-2:
-AACAGAGGGTGCAAGCGTTATCCGGAATTACTGGGTTTAAAGGGTGCGTAGGCGGTTTGATAAGTCAGTTGTGAAAGGCAGTCGCTTAACGATTGGATTG
-3:
-AACATAGAGTATAAGACTAAAAGAGAGAATAGAATAAGGTAACAAGATATAAAGAAAGAAGAGAAGAAGAAGAGAATAACGATAAAATGTGTAAGAGCAA
-4:
-AACATAGGGGGCAAGCGTTGTCCGGAATCACTGGGCGTAAAGGGCGCGCAGGCGGTTTTTTAAGTCAGGTGTGAAAGTTCGGGGCTCAACCCCGTGATGG
-Kingdom Phylum Class <char> <char> <char> 1: <NA> <NA> <NA> 2: Bacteria
-Bacteroidetes Bacteroidia 3: Bacteria <NA> <NA> 4: Bacteria Firmicutes
-Clostridia
-
-Phylogentic Tree: 2327 tips 2326 internal nodes
-
-Sample Names: A01, A02, A03,…, H12
-
-Feature Names:
-TACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTGGATAAGTTAGATGTGAAAGCCCCGGGCTCAACCTGGGAATTG,
-TACGTATGTCGCAAGCGTTATCCGGATTTATTGGGCGTAAAGCGCGTCTAGGCGGAAAAATAAGTCTGATGTTAAAATGCGGGGCTCAACTCCGTATTGC,
-TACGGAGGATCCAAGCGTTATCCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGTCTTGTAAGTCAGTGGTGAAAGCCCATCGCTCAACGGTGGAACGG,…,
-AACCAGCACCTCGAGTGGTCAGGAGGTTTATTGGGCCTAAAGCATCCGTAGCCGGTTGCATAAGTTTTCGGTTAAATCTATGCGCTCAACGTACAGGCCG
+    ## Sample Metadata: 46 samples with 1 covariates
+    ## Preview:
+    ## Key: <Sample>
+    ##    Sample Exposure
+    ##    <char>   <fctr>
+    ## 1:    A01       no
+    ## 2:    A02       no
+    ## 3:    A03       no
+    ## 4:    A04       no
+    ## 
+    ## Feature Abundances: 2327 features
+    ## Preview:
+    ##     TACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTGGATAAGTTAGATGTGAAAGCCCCGGGCTCAACCTGGGAATTG
+    ## A01                                                                                                15593
+    ## A02                                                                                                17508
+    ## A03                                                                                                20974
+    ## A04                                                                                                 2565
+    ##     TACGTATGTCGCAAGCGTTATCCGGATTTATTGGGCGTAAAGCGCGTCTAGGCGGAAAAATAAGTCTGATGTTAAAATGCGGGGCTCAACTCCGTATTGC
+    ## A01                                                                                                12323
+    ## A02                                                                                                  874
+    ## A03                                                                                                14247
+    ## A04                                                                                                    0
+    ##     TACGGAGGATCCAAGCGTTATCCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGTCTTGTAAGTCAGTGGTGAAAGCCCATCGCTCAACGGTGGAACGG
+    ## A01                                                                                                 4446
+    ## A02                                                                                                  235
+    ## A03                                                                                                 5542
+    ## A04                                                                                                    0
+    ##     TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTATGCAAGACAGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG
+    ## A01                                                                                                 3807
+    ## A02                                                                                                  181
+    ## A03                                                                                                 4087
+    ## A04                                                                                                  105
+    ## 
+    ## Feature Assignments: 6 levels assigned
+    ## Preview:
+    ## Key: <ASV>
+    ##                                                                                                     ASV
+    ##                                                                                                  <char>
+    ## 1: AAAAATGTTTTGACATAAAACACATAAGGATAATACACAGTGATCGATCAAAAAGGGTCATATTTTAATTATGGTGGGAAAAGAATTCTGTTTTTTTATT
+    ## 2: AACAGAGGGTGCAAGCGTTATCCGGAATTACTGGGTTTAAAGGGTGCGTAGGCGGTTTGATAAGTCAGTTGTGAAAGGCAGTCGCTTAACGATTGGATTG
+    ## 3: AACATAGAGTATAAGACTAAAAGAGAGAATAGAATAAGGTAACAAGATATAAAGAAAGAAGAGAAGAAGAAGAGAATAACGATAAAATGTGTAAGAGCAA
+    ## 4: AACATAGGGGGCAAGCGTTGTCCGGAATCACTGGGCGTAAAGGGCGCGCAGGCGGTTTTTTAAGTCAGGTGTGAAAGTTCGGGGCTCAACCCCGTGATGG
+    ##     Kingdom        Phylum       Class
+    ##      <char>        <char>      <char>
+    ## 1:     <NA>          <NA>        <NA>
+    ## 2: Bacteria Bacteroidetes Bacteroidia
+    ## 3: Bacteria          <NA>        <NA>
+    ## 4: Bacteria    Firmicutes  Clostridia
+    ## 
+    ## Phylogentic Tree: 2327 tips 2326 internal nodes
+    ## 
+    ## Sample Names: A01, A02, A03,..., H12
+    ## 
+    ## Feature Names: TACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTGGATAAGTTAGATGTGAAAGCCCCGGGCTCAACCTGGGAATTG, TACGTATGTCGCAAGCGTTATCCGGATTTATTGGGCGTAAAGCGCGTCTAGGCGGAAAAATAAGTCTGATGTTAAAATGCGGGGCTCAACTCCGTATTGC, TACGGAGGATCCAAGCGTTATCCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGTCTTGTAAGTCAGTGGTGAAAGCCCATCGCTCAACGGTGGAACGG,..., AACCAGCACCTCGAGTGGTCAGGAGGTTTATTGGGCCTAAAGCATCCGTAGCCGGTTGCATAAGTTTTCGGTTAAATCTATGCGCTCAACGTACAGGCCG
 
 ``` r
 ## View individual tables
@@ -165,24 +139,38 @@ mD2 <- remove.eukarya(mD = mD1) %>%
 print(mD2)
 ```
 
-Sample Metadata: 46 samples with 1 covariates Preview: Key: <Sample>
-Sample Exposure <char> <fctr> 1: A01 no 2: A02 no 3: A03 no 4: A04 no
-
-Feature Abundances: 1462 features Preview: ASV0001 ASV0002 ASV0003
-ASV0004 A01 15593 12323 4446 3807 A02 17508 874 235 181 A03 20974 14247
-5542 4087 A04 2565 0 0 105
-
-Feature Assignments: 6 levels assigned Preview: Kingdom Phylum Class
-Order <char> <char> <char> <char> 1: Bacteria Proteobacteria
-Gammaproteobacteria Aeromonadales 2: Bacteria Fusobacteria Fusobacteriia
-Fusobacteriales 3: Bacteria Bacteroidetes Bacteroidia Flavobacteriales
-4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
-
-Phylogentic Tree: 1462 tips 1461 internal nodes
-
-Sample Names: A01, A02, A03,…, H12
-
-Feature Names: ASV0001, ASV0002, ASV0003,…, ASV1462
+    ## Sample Metadata: 46 samples with 1 covariates
+    ## Preview:
+    ## Key: <Sample>
+    ##    Sample Exposure
+    ##    <char>   <fctr>
+    ## 1:    A01       no
+    ## 2:    A02       no
+    ## 3:    A03       no
+    ## 4:    A04       no
+    ## 
+    ## Feature Abundances: 1462 features
+    ## Preview:
+    ##     ASV0001 ASV0002 ASV0003 ASV0004
+    ## A01   15593   12323    4446    3807
+    ## A02   17508     874     235     181
+    ## A03   20974   14247    5542    4087
+    ## A04    2565       0       0     105
+    ## 
+    ## Feature Assignments: 6 levels assigned
+    ## Preview:
+    ##     Kingdom         Phylum               Class                 Order
+    ##      <char>         <char>              <char>                <char>
+    ## 1: Bacteria Proteobacteria Gammaproteobacteria         Aeromonadales
+    ## 2: Bacteria   Fusobacteria       Fusobacteriia       Fusobacteriales
+    ## 3: Bacteria  Bacteroidetes         Bacteroidia      Flavobacteriales
+    ## 4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
+    ## 
+    ## Phylogentic Tree: 1462 tips 1461 internal nodes
+    ## 
+    ## Sample Names: A01, A02, A03,..., H12
+    ## 
+    ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
 
 ### Deal with uneven sampling
 
@@ -204,32 +192,47 @@ mD3 <- rarefy(mD2)
     ## Rarefying to: 13000
     ## Random seed: 10403
     ## Number of samples dropped: 18
-    ## Number of features dropped: 686
+    ## Number of features dropped: 682
 
 ``` r
 print(mD3)
 ```
 
-Sample Metadata: 28 samples with 1 covariates Preview: Key: <Sample>
-Sample Exposure <char> <fctr> 1: A01 no 2: A02 no 3: A03 no 4: A05 no
-
-Feature Abundances: 1462 features Preview: ASV0001 ASV0002 ASV0003
-ASV0004 A01 3933 3214 1169 1037 A02 11067 616 140 116 A03 4219 2883 1186
-818 A05 1492 0 0 0
-
-Feature Assignments: 6 levels assigned Preview: Kingdom Phylum Class
-Order <char> <char> <char> <char> 1: Bacteria Proteobacteria
-Gammaproteobacteria Aeromonadales 2: Bacteria Fusobacteria Fusobacteriia
-Fusobacteriales 3: Bacteria Bacteroidetes Bacteroidia Flavobacteriales
-4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
-
-Phylogentic Tree: 1462 tips 1461 internal nodes
-
-Sample Names: A01, A02, A03,…, H12
-
-Feature Names: ASV0001, ASV0002, ASV0003,…, ASV1462
-
-Other Data: Abundances rarefied: 13000
+    ## Sample Metadata: 28 samples with 1 covariates
+    ## Preview:
+    ## Key: <Sample>
+    ##    Sample Exposure
+    ##    <char>   <fctr>
+    ## 1:    A01       no
+    ## 2:    A02       no
+    ## 3:    A03       no
+    ## 4:    A05       no
+    ## 
+    ## Feature Abundances: 1462 features
+    ## Preview:
+    ##     ASV0001 ASV0002 ASV0003 ASV0004
+    ## A01    3939    3082    1202     945
+    ## A02   11088     561     168     102
+    ## A03    4403    2905    1113     798
+    ## A05    1501       0       0       0
+    ## 
+    ## Feature Assignments: 6 levels assigned
+    ## Preview:
+    ##     Kingdom         Phylum               Class                 Order
+    ##      <char>         <char>              <char>                <char>
+    ## 1: Bacteria Proteobacteria Gammaproteobacteria         Aeromonadales
+    ## 2: Bacteria   Fusobacteria       Fusobacteriia       Fusobacteriales
+    ## 3: Bacteria  Bacteroidetes         Bacteroidia      Flavobacteriales
+    ## 4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
+    ## 
+    ## Phylogentic Tree: 1462 tips 1461 internal nodes
+    ## 
+    ## Sample Names: A01, A02, A03,..., H12
+    ## 
+    ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
+    ## 
+    ## Other Data:
+    ##   Abundances rarefied: 13000
 
 Notice, also, the default behavior is to add a note to the Other Data
 slot that the abundances have been rarefied and to what depth.
@@ -244,45 +247,53 @@ mD4 <- alpha.diversity(mD3) %>% # we'll use the default metrics
   beta.diversity(metrics = c("Canberra", "0.5 UniFrac"), ncores = 2)
 ```
 
-    ## Loading required package: foreach
-
-    ## Loading required package: doParallel
-
-    ## Loading required package: iterators
-
-    ## Loading required package: parallel
-
-Canberra 0.5 UniFrac
+    ## Canberra
+    ## 0.5 UniFrac
 
 ``` r
 print(mD4)
 ```
 
-Sample Metadata: 28 samples with 5 covariates Preview: Key: <Sample>
-Sample Exposure Shannon Simpson <char> <fctr> <num> <num> 1: A01 no
-2.7304019 0.8307820 2: A02 no 0.8865699 0.2726707 3: A03 no 2.8580137
-0.8311423 4: A05 no 2.1465017 0.7686043
-
-Feature Abundances: 1462 features Preview: ASV0001 ASV0002 ASV0003
-ASV0004 A01 3933 3214 1169 1037 A02 11067 616 140 116 A03 4219 2883 1186
-818 A05 1492 0 0 0
-
-Feature Assignments: 6 levels assigned Preview: Kingdom Phylum Class
-Order <char> <char> <char> <char> 1: Bacteria Proteobacteria
-Gammaproteobacteria Aeromonadales 2: Bacteria Fusobacteria Fusobacteriia
-Fusobacteriales 3: Bacteria Bacteroidetes Bacteroidia Flavobacteriales
-4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
-
-Phylogentic Tree: 1462 tips 1461 internal nodes
-
-Distance Matrices: List of 2; names: Canberra, 0.5 UniFrac
-
-Sample Names: A01, A02, A03,…, H12
-
-Feature Names: ASV0001, ASV0002, ASV0003,…, ASV1462
-
-Other Data: Abundances rarefied: 13000 Alpha.metrics: Chao1, Shannon,
-Simpson, Phylogenetic Beta.metrics: Canberra, 0.5 UniFrac
+    ## Sample Metadata: 28 samples with 5 covariates
+    ## Preview:
+    ## Key: <Sample>
+    ##    Sample Exposure   Shannon   Simpson
+    ##    <char>   <fctr>     <num>     <num>
+    ## 1:    A01       no 2.8020692 0.8359077
+    ## 2:    A02       no 0.8878638 0.2702615
+    ## 3:    A03       no 2.8008716 0.8222141
+    ## 4:    A05       no 2.1402417 0.7680521
+    ## 
+    ## Feature Abundances: 1462 features
+    ## Preview:
+    ##     ASV0001 ASV0002 ASV0003 ASV0004
+    ## A01    3939    3082    1202     945
+    ## A02   11088     561     168     102
+    ## A03    4403    2905    1113     798
+    ## A05    1501       0       0       0
+    ## 
+    ## Feature Assignments: 6 levels assigned
+    ## Preview:
+    ##     Kingdom         Phylum               Class                 Order
+    ##      <char>         <char>              <char>                <char>
+    ## 1: Bacteria Proteobacteria Gammaproteobacteria         Aeromonadales
+    ## 2: Bacteria   Fusobacteria       Fusobacteriia       Fusobacteriales
+    ## 3: Bacteria  Bacteroidetes         Bacteroidia      Flavobacteriales
+    ## 4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
+    ## 
+    ## Phylogentic Tree: 1462 tips 1461 internal nodes
+    ## 
+    ## Distance Matrices: List of 2;
+    ##  names: Canberra, 0.5 UniFrac
+    ## 
+    ## Sample Names: A01, A02, A03,..., H12
+    ## 
+    ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
+    ## 
+    ## Other Data:
+    ##   Abundances rarefied: 13000
+    ##   Alpha.metrics: Chao1, Shannon, Simpson, Phylogenetic
+    ##   Beta.metrics: Canberra, 0.5 UniFrac
 
 We’ve added the alpha-diversity metrics to the Metadata table, and for
 the beta-diversity results, we have a new slot, Distance Matrices, which
@@ -324,32 +335,48 @@ mD5 <- ordinate(mD4, method = "dbRDA", formula = ~ Exposure)
 print(mD5)
 ```
 
-Sample Metadata: 28 samples with 5 covariates Preview: Key: <Sample>
-Sample Exposure Shannon Simpson <char> <fctr> <num> <num> 1: A01 no
-2.7304019 0.8307820 2: A02 no 0.8865699 0.2726707 3: A03 no 2.8580137
-0.8311423 4: A05 no 2.1465017 0.7686043
-
-Feature Abundances: 1462 features Preview: ASV0001 ASV0002 ASV0003
-ASV0004 A01 3933 3214 1169 1037 A02 11067 616 140 116 A03 4219 2883 1186
-818 A05 1492 0 0 0
-
-Feature Assignments: 6 levels assigned Preview: Kingdom Phylum Class
-Order <char> <char> <char> <char> 1: Bacteria Proteobacteria
-Gammaproteobacteria Aeromonadales 2: Bacteria Fusobacteria Fusobacteriia
-Fusobacteriales 3: Bacteria Bacteroidetes Bacteroidia Flavobacteriales
-4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
-
-Phylogentic Tree: 1462 tips 1461 internal nodes
-
-Distance Matrices: List of 2; names: Canberra, 0.5 UniFrac
-
-Sample Names: A01, A02, A03,…, H12
-
-Feature Names: ASV0001, ASV0002, ASV0003,…, ASV1462
-
-Other Data: Abundances rarefied: 13000 Alpha.metrics: Chao1, Shannon,
-Simpson, Phylogenetic Beta.metrics: Canberra, 0.5 UniFrac Ordinations:
-List of 2; names: Canberra_dbRDA, 0.5 UniFrac_dbRDA
+    ## Sample Metadata: 28 samples with 5 covariates
+    ## Preview:
+    ## Key: <Sample>
+    ##    Sample Exposure   Shannon   Simpson
+    ##    <char>   <fctr>     <num>     <num>
+    ## 1:    A01       no 2.8020692 0.8359077
+    ## 2:    A02       no 0.8878638 0.2702615
+    ## 3:    A03       no 2.8008716 0.8222141
+    ## 4:    A05       no 2.1402417 0.7680521
+    ## 
+    ## Feature Abundances: 1462 features
+    ## Preview:
+    ##     ASV0001 ASV0002 ASV0003 ASV0004
+    ## A01    3939    3082    1202     945
+    ## A02   11088     561     168     102
+    ## A03    4403    2905    1113     798
+    ## A05    1501       0       0       0
+    ## 
+    ## Feature Assignments: 6 levels assigned
+    ## Preview:
+    ##     Kingdom         Phylum               Class                 Order
+    ##      <char>         <char>              <char>                <char>
+    ## 1: Bacteria Proteobacteria Gammaproteobacteria         Aeromonadales
+    ## 2: Bacteria   Fusobacteria       Fusobacteriia       Fusobacteriales
+    ## 3: Bacteria  Bacteroidetes         Bacteroidia      Flavobacteriales
+    ## 4: Bacteria Proteobacteria Gammaproteobacteria Betaproteobacteriales
+    ## 
+    ## Phylogentic Tree: 1462 tips 1461 internal nodes
+    ## 
+    ## Distance Matrices: List of 2;
+    ##  names: Canberra, 0.5 UniFrac
+    ## 
+    ## Sample Names: A01, A02, A03,..., H12
+    ## 
+    ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
+    ## 
+    ## Other Data:
+    ##   Abundances rarefied: 13000
+    ##   Alpha.metrics: Chao1, Shannon, Simpson, Phylogenetic
+    ##   Beta.metrics: Canberra, 0.5 UniFrac
+    ##   Ordinations: List of 2;
+    ##  names: Canberra_dbRDA, 0.5 UniFrac_dbRDA
 
 ``` r
 ord.dts <- ordination.coords(mD5, constraint.coords = TRUE)
