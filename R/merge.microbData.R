@@ -3,7 +3,7 @@
 #' @description Merge two microbData objects.
 #' @param mD1 required; a microbData object you want to merge.
 #' @param mD2 required; a microbData object you want to merge.
-#' @seealso \code{\link[microbData{microbData}}
+#' @seealso \code{\link[microbData]{microbData}}
 #' @export
 
 merge.microbData <- function(mD1, mD2) {

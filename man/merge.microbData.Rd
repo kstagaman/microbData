@@ -15,5 +15,5 @@
 Merge two microbData objects.
 }
 \seealso{
-\code{\link[microbData{microbData}}
+\code{\link[microbData]{microbData}}
 }
