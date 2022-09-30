@@ -24,5 +24,5 @@ Suggests:
   foreach,
   doParallel,
   seqinr,
-  zCompositions}
+  zCompositions
 RoxygenNote: 7.2.1
