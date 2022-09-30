@@ -1,4 +1,3 @@
-#' @name subset.features
 #' @title Keep, Drop, or Filter Features in a microbData object
 #' @description Functions to specify specific features to keep/drop by name or to filter features based on variable(s) in the Metadata
 #' @aliases keep.features

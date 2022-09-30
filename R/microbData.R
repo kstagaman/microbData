@@ -11,8 +11,6 @@
 #' @param other.data list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be inlcuded in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the microbData package.
 #' @seealso \code{\link{head}}
 #' @export
-#' @examples
-#'
 
 microbData <- function(
     metadata,

@@ -50,6 +50,7 @@ setOldClass("phylo")
 # the component data classes is not available, in which case NULL will be used
 # instead.
 ################################################################################
+setOldClass("dist")
 #' @keywords internal
 setClassUnion("data.tableOrNULL", c("data.table", "NULL"))
 #' @keywords internal
@@ -58,6 +59,7 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 #' @keywords internal
 setClassUnion("listOrNULL", c("list", "NULL"))
+library
 #' @keywords internal
 setClassUnion("listOrDistOrNULL", c("list", "dist", "NULL"))
 #' @keywords internal

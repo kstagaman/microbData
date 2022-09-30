@@ -1,4 +1,3 @@
-#' @name subset.samples
 #' @title Keep, Drop, or Filter Samples in a microbData object
 #' @description Functions to specify specific samples to keep/drop by name or to filter samples based on variable(s) in the Metadata
 #' @aliases keep.samples

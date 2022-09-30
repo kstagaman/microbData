@@ -1,4 +1,3 @@
-#' @name update.microbData
 #' @title Add data to appropriate slot of a microbData object
 #' @description Functions adding features, phylogeny, distance matrices, and other data to an established microbData object.
 #' @aliases add.distance.matrices

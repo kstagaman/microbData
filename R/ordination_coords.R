@@ -11,7 +11,7 @@
 #' @param combine logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.
 #' @seealso \code{\link{}}
 #' @export
-# mD = mD6
+
 ordination.coords <- function(
     mD = NULL,
     ord.list.name = "Ordinations",

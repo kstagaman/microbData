@@ -6,8 +6,6 @@
 #' @param fasttree.path haracter; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.
 #' @seealso \code{\link{generate.tool.command}}, \code{\link{system}}
 #' @export
-#' @examples
-#'
 
 run.FastTree2 <- function(aligned.seqs.file, output.file, fasttree.path = NULL, log.file = NULL, ncores = 1) {
   if (ncores < 1) {

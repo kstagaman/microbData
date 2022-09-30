@@ -1,13 +1,11 @@
 #' @name numbered.features
-#' @title
-#' @description
+#' @title Replace feature IDs with an arbitrary prefix and numbers
+#' @description This function replaces the feature names in a microbData object with IDs including a prefix and then numerals, e.g. "ASV0001", "ASV0002", ..., "ASV1234".
 #' @param mD required; microbData object from which data will be read.
 #' @param prefix required; character string to append to numeric IDs, e.g., "ASV", "KO".
 #' @param old.IDs.file character; name of file to write old IDs (in FASTA, CSV, or RDS format inferred from extention: must be ".fa", ".fasta", ".csv", or ".rds") to. NULL will not save IDs to a file. Default is NULL.
 #' @seealso \code{\link[microbData]{update.feature.names}}
 #' @export
-#' @examples
-#'
 
 numbered.features <- function(mD, prefix, old.IDs.file = NULL) {
   if (prefix == "" | length(prefix) == 0 | is.logical(prefix)) {

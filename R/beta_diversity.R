@@ -1,6 +1,6 @@
 #' @name beta.diversity
-#' @title
-#' @description
+#' @title Estimate Beta-diversity
+#' @description This function estimates beta-diversity (see `metrics`) from the abundances table in a given microbData object. It returns a distance matrix (or list of distance matrices).
 #' @param mD required; microbData object from which data will be read.
 #' @param metrics character; a vector of beta-diveristy metrics to be estimated from the Abundances table in the microbData object. Supported metrics include "Manhattan", "Euclidean", "Canberra", "Clark", "Bray-Curtis", "Kulczynski", "Jaccard", "Gower", "Alt Gower", "Morisita", "Horn", "Mountford", "Raup", "Binomial", "Chao", "Cao", "Mahalanobis", "Chisq", "Chord", "Aitchison", "Robust Aitchison", "Sorensen" (binary Bray-Curtis), and any UniFrac distance with an alpha (abundance weighting parameter) between 0 and 1, inclusive. Alpha can be specified by putting in the metric name with a space before "UniFrac", e.g., "0.2 UniFrac". "W UniFrac" (weighted UniFrac) is equivalent to "1 UniFrac" and "U UniFrac" (unweighted UniFrac) is equivalent to "0 UniFrac". The default metrics are "Sorensen", "Canberra", "Bray-Curtis", "W UniFrac", "0.5 UniFrac", and "U UniFrac".
 #' @param presence.absence logical; should abundance data be calculated on presence/absence data rather than abundance counts? This only applies to metrics supported by \code{\link[vegan]{vegdist}}. `metric = "Bray-Curtis"` with `presence.absence = TRUE` is equivalent to `metric = "Sorensen"` (which will ignore the `presence.absence` argument). Default is FALSE.
@@ -8,9 +8,6 @@
 #' @param update.mD logical; should this function return a new microbData object with the beta-diversity distance matrices and `metrics` added to Other.data (TRUE) or just the list of the beta-diversity distance matrices (FALSE)? Default is TRUE.
 #' @seealso \code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
 #' @export
-#' @examples
-#'
-
 
 beta.diversity <- function(
     mD,

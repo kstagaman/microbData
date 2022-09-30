@@ -1,4 +1,3 @@
-#' @name transform.counts
 #' @title Transform Feature Counts
 #' @description Functions for transforming feature counts in a microbData object.
 #' @aliases transform.counts

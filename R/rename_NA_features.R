@@ -1,14 +1,11 @@
 #' @name rename.NA.features
-#' @title
-#' @description
+#' @title Rename NA Feature Assignments
+#' @description This function searches through the Features table of a microbData object and replaces any NA assignments with a more descriptive term based on the higher order assignment provided. This prevents unrelated features lacking labels from getting grouped together simply because they're labelled "NA".
 #' @param mD required; microbData object to read from and write to.
-#' @param force.split logical; should the lowest feature assignment (e.g. ASV) be appended to replacement assigment? If TRUE, this will prevent features that have NAs at the same assigment level from receiving identical assigments (keeping separate during future glomming). If FALSE, NAs will be replaced by a string including the previous level assigment and the current assignment level. Default is FALSE.
+#' @param force.split logical; should the lowest feature assignment (e.g. ASV) be appended to replacement assignment? If TRUE, this will prevent features that have NAs at the same assignment level from receiving identical assignments (keeping separate during future glomming). If FALSE, NAs will be replaced by a string including the previous level assignment and the current assignment level. Default is FALSE.
 #' @param level.order character; a vector specifying the hierarchical ordering of the assignment levels. Must be identical to, or a subset of the column names in the Feature Assignments table. If NULL, the order will be inferred as Feature column lowest and the rest in order as the table columns. Default is NULL.
 #' @seealso \code{\link{}}
 #' @export
-#' @examples
-#'
-
 
 rename.NA.features <- function(mD, force.split = FALSE, level.order = NULL) {
   feature.tbl <- copy(mD@Features)

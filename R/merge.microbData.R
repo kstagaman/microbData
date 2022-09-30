@@ -5,8 +5,6 @@
 #' @param mD2 required; a microbData object you want to merge.
 #' @seealso \code{\link{}}
 #' @export
-#' @examples
-#'
 
 merge.microbData <- function(mD1, mD2) {
   if (mD1@Sample.col != mD2@Sample.col) {

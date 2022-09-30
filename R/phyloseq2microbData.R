@@ -7,8 +7,6 @@
 #' @param ... additional arguments to pass to \code{\link[microbData]{numbered.features}} and/or \code{\link[microbData]{rename.NA.taxa}}.
 #' @seealso \code{\link[phyloseq]{phyloseq}}, \code{\link[microbData]{numbered.features}}, \code{\link[microbData]{rename.NA.taxa}}
 #' @export
-#' @examples
-#'
 
 phyloseq2microbData <- function(
     physeq,

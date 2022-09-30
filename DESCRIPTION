@@ -25,3 +25,4 @@ Suggests:
   doParallel,
   seqinr,
   zCompositions}
+RoxygenNote: 7.2.1

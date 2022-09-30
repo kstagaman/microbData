@@ -1,14 +1,11 @@
 #' @name alpha.diversity
-#' @title
-#' @description
+#' @title Estimate Alpha-diversity
+#' @description This function take a microbData object and estimates alpha-diversity (see `metrics`) from the abundance table.
 #' @param mD required; microbData object from which data will be read.
 #' @param metrics character; a vector of alpha-diveristy metrics to be estimated from the Abundances table in the microbData object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the microbData object), and "Fisher".
 #' @param update.mD logical; should this function return a new microbData object with the alpha-diversity results added to the Metadata table and add `metrics` to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.
 #' @seealso \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, \code{\link[picante]{pd}}
 #' @export
-#' @examples
-#'
-
 
 alpha.diversity <- function(
     mD,

@@ -1,4 +1,3 @@
-#' @name guide.seqs
 #' @title Dealing with Guide Seqs
 #' @description Functions for add and remove guide seqs from FASTAs, alignments, and trees.
 #' @param asv.seqs.file required; FASTA file containing ASV sequences.

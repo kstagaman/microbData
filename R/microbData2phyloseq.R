@@ -3,8 +3,6 @@
 #' @description Convert a microbData object to a phyloseq object
 #' @param mD required; the microbData object to be converted to a phyloseq object.
 #' @export
-#' @examples
-#'
 
 microbData2phyloseq <- function(mD) {
   require(phyloseq)

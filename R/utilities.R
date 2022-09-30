@@ -1,4 +1,3 @@
-#' @name utilities
 #' @title Utility Functions
 #' @description Functions to do quick, helpful things
 #' @aliases nsamples
