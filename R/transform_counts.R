@@ -103,10 +103,10 @@ rarefy <- function(
     mD.res <- mD.rar
   }
   if (update.mD) {
-    mD.res <- add.other.data(x = rarefy.to, name = "Abundances rarefied", mD = mD)
+    mD.res <- add.other.data(x = rarefy.to, name = "Abundances rarefied", mD = mD.rar)
     return(mD.res)
   } else {
-    retunr(mD.res@Abundances)
+    return(mD.res@Abundances)
   }
 }
 

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, results = 'asis')
 
 ```{r install, eval=FALSE}
 if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
+  install.packages("remotes")
 }
 remotes::install_github("kstagaman/microbData")
 ```
@@ -28,5 +28,145 @@ remotes::install_github("kstagaman/microbData")
 ```{r data-and-creation}
 library(microbData)
 
+## load data
+data("metadata_dt")  # creates metadata.dt
+setkey(metadata.dt, Sample)
+data("asv_mat")      # creates asv.mat
+data("taxonomy_dt")  # creates taxonomy.dt
+setkey(taxonomy.dt, ASV)
+data("phylogeny")    # creates phylogeny
+
+
+## create microbData object
+
+mD1 <- microbData(
+  metadata = metadata.dt,
+  abundances = asv.mat,
+  features = taxonomy.dt, 
+  phylogeny = phylogeny
+)
+print(mD1)
+
+## View individual tables
+# View(get.metadata(mD1))
+# View(get.abundances(mD1))
+# View(get.features(mD1))
+# View(get.phylogeny(mD1))
 ```
 
+We have a lot of ASVs assigned to Eukarya, so let's get rid of those first. Also notice that our ASV IDs are sequences, which can be unwieldy to deal with, and can cause issues with memory usage for really large data sets. Finally, there are NA assignments in the Features table. So we're going to run a couple steps to clean things up.
+
+```{r rename-features-and-assignments}
+mD2 <- remove.eukarya(mD = mD1) %>% 
+  numbered.features(prefix = "ASV") %>% 
+  rename.NA.features()
+print(mD2)
+```
+
+### Deal with uneven sampling
+
+There are multiple ways to deal with the fact that not all samples are sequenced to the same depth. The most common method to account for this is rarefaction. Others include center-log ratio transformation and variance stabilization of counts. The package can apply all of these methods to abundance counts (see `?microbData::transform.counts`), as well as let the user apply their own function to abundances. Here, we will do some rarefaction. The default behavior for this function is to rarefy to the lowest sample sum greater than 10,000. This minimum can be changed, or you can specify an exact number to rarefy to. See `?microbData::rarefy`.
+
+```{r rarefy}
+mD3 <- rarefy(mD2)
+print(mD3)
+```
+
+Notice, also, the default behavior is to add a note to the Other Data slot that the abundances have been rarefied and to what depth.
+
+### Estimate diversity
+
+Now, as with most microbiome analyses, we'll estimate alpha- and beta-diversity
+
+```{r alpha-and-beta}
+mD4 <- alpha.diversity(mD3) %>% # we'll use the default metrics
+  beta.diversity(metrics = c("Canberra", "0.5 UniFrac"), ncores = 2)
+print(mD4)
+```
+
+We've added the alpha-diversity metrics to the Metadata table, and for the beta-diversity results, we have a new slot, Distance Matrices, which contains a list of the `dist` objects.
+
+### Plot results
+
+#### Alpha-diversity
+
+```{r plot-alpha, results='markup'}
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+theme_set(theme_cowplot())
+
+plot.dt <- melt(
+  get.metadata(mD4), 
+  measure.vars = get.other.data(mD = mD4, location = "Alpha.metrics"), 
+  # measure.vars = mD4@Other.data$Alpha.metrics # alternative syntax
+  variable.name = "Alpha.metric",
+  value.name = "Score"
+)
+
+ggplot(plot.dt, aes(x = Exposure, y = Score)) +
+  geom_quasirandom() + 
+  stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", color = "blue") + 
+  facet_wrap(~ Alpha.metric, scales = "free_y")
+```
+
+#### Beta-diversity
+
+Before we can plot, we need to ordinate from the distance matrices. Then we can plot.
+
+```{r ordinate}
+mD5 <- ordinate(mD4, method = "dbRDA", formula = ~ Exposure)
+print(mD5)
+```
+
+```{r plot-beta, results='markup'}
+ord.dts <- ordination.coords(mD5, constraint.coords = TRUE)
+names(ord.dts$Centroids)[2] <- ord.dts$Centroids$Variable[1]
+
+# some fussing about to make nice axis labels on a faceted plot
+# (there's probably a less verbose way to do this)
+label.pad <- 1.1
+ord.dts$Axis.labs[
+  Axis == "Axis1", 
+  `:=`(
+    Axis1 = ord.dts$Samples[, .(A1 = max(Axis1) * label.pad), by = Beta.metric]$A1,
+    Axis2 = ord.dts$Samples[, .(A2 = min(Axis2) * label.pad), by = Beta.metric]$A2
+  )
+]
+ord.dts$Axis.labs[
+  Axis == "Axis2", 
+  `:=`(
+    Axis1 = ord.dts$Samples[, .(A1 = min(Axis1) * label.pad), by = Beta.metric]$A1,
+    Axis2 = ord.dts$Samples[, .(A2 = max(Axis2) * label.pad), by = Beta.metric]$A2
+  )
+]
+ord.dts$Axis.labs[
+  , `:=`(
+    Angle = ifelse(Axis == "Axis1", 0, 90),
+    Vjust = ifelse(Axis == "Axis1", 1, 0)
+  )
+]
+
+# plotting
+ggplot(ord.dts$Samples, aes(x = Axis1, y = Axis2)) +
+  geom_point(aes(color = Exposure)) +
+  geom_point(data = ord.dts$Centroids, aes(color = Exposure), shape = 3, size = 4) + 
+  geom_text(
+    data = ord.dts$Axis.labs,
+    aes(label = Label, angle = Angle, vjust = Vjust),
+    hjust = 1,
+    color = "gray40"
+  ) +
+  facet_wrap(~ Beta.metric, scales = "free") +
+  theme(
+    axis.title = element_blank(), 
+    legend.position = "top"
+  )
+```
+
+
+## Use data in with other tools.
+
+While I tried to cover the very basic analyses that most people run on microbiome data in the package, the reality is that I can't cover everything, and there will always be new tools that come out. Thus, my goal was to make it very easy for people to pull the appropriate tables out of the `microbData` object and use them *as is* with other tools. Additionally, with functions like `add.other.data`, you can store data or notes in the `microbData` object so you can track steps and results that are not covered here.
+
+I've included a couple tools for converting a `microbData` to other formats, for example `microbData2phyloseq` and `microbData2DESeq`. If other formats become popular, I will happily add other converting functions. 

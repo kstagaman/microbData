@@ -61,7 +61,7 @@ alpha.diversity <- function(
     }
   }
   if (pd.metric %in% metrics) {
-    res.dt <- picante::pd(samp = mD@Abundances, mD@Phylogeny) %>%
+    res.dt <- picante::pd(samp = mD@Abundances, tree = mD@Phylogeny) %>%
       as.data.table(keep.rownames = mD@Sample.col)
     res.dt[, SR := NULL]
     names(res.dt)[2] <- pd.metric

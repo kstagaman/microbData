@@ -54,8 +54,8 @@ ordination.coords <- function(
     sections <- NULL
     if (combine) {
       if (str_detect(names(ord.list)[i], "NMDS$|PCoA$|dbRDA$")) {
-        dist.name <- str_split(names(ord.list)[i], "\\.") %>% unlist() %>% head(1)
-        ord.type <- str_split(names(ord.list)[i], "\\.") %>% unlist() %>% tail(1)
+        dist.name <- str_split(names(ord.list)[i], "\\_") %>% unlist() %>% head(1)
+        ord.type <- str_split(names(ord.list)[i], "\\_") %>% unlist() %>% tail(1)
       } else {
         ord.class <- class(ord.list[[i]])
         ord.type <- ifelse(
@@ -160,30 +160,29 @@ ordination.coords <- function(
       }
     }
     if (ord.type == "dbRDA" & constraint.coords) {
-      scale <- vegan::ordiArrowMul(smpl.mat)
-      if (!is.null(ord$CCA$biplot)) {
-        sections[["Vectors"]] <- as.data.table(ord$CCA$biplot, keep.rownames = "Old")
-        sections[["Vectors"]][
-          , Variable := str_extract(Old, paste(names(metadata), collapse = "|"))
-        ]
-        setcolorder(sections[["Vectors"]], ncol(sections[["Vectors"]]))
-        if (combine) {
-          sections[["Vectors"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
-        }
+      sections[["Vectors"]] <- scores(ord, display = "bp") %>%
+        as.data.table(keep.rownames = "Old")
+      sections[["Vectors"]][
+        , Variable := str_extract(Old, paste(names(metadata), collapse = "|"))
+      ]
+      setcolorder(sections[["Vectors"]], ncol(sections[["Vectors"]]))
+      replace.cols <- str_which(names(sections[["Vectors"]]), paste(orig.axis.names, collapse = "|"))
+      names(sections[["Vectors"]])[replace.cols] <- c("Axis1", "Axis2")
+      if (combine) {
+        sections[["Vectors"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
       }
-      if (!is.null(ord$CCA$centroids)) {
-        sections[["Centroids"]] <- as.data.table(
-          ord$CCA$centroids,
-          keep.rownames = "Class"
-          )
-        sections[["Centroids"]][
-          , Variable := str_extract(Class, paste(names(metadata), collapse = "|"))
-        ]
-        sections[["Centroids"]][, Class := str_remove(Class, paste0("^", Variable))]
-        setcolorder(sections[["Centroids"]], ncol(sections[["Centroids"]]))
-        if (combine) {
-          sections[["Centroids"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
-        }
+
+      sections[["Centroids"]] <- scores(ord, display = "cn") %>%
+        as.data.table(keep.rownames = "Class")
+      sections[["Centroids"]][
+        , Variable := str_extract(Class, paste(names(metadata), collapse = "|"))
+      ]
+      sections[["Centroids"]][, Class := str_remove(Class, paste0("^", Variable))]
+      setcolorder(sections[["Centroids"]], ncol(sections[["Centroids"]]))
+      replace.cols <- str_which(names(sections[["Centroids"]]), paste(orig.axis.names, collapse = "|"))
+      names(sections[["Centroids"]])[replace.cols] <- c("Axis1", "Axis2")
+      if (combine) {
+        sections[["Centroids"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
       }
     }
     return(sections)

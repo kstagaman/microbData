@@ -37,6 +37,6 @@ numbered.features <- function(mD, prefix, old.IDs.file = NULL) {
       )
     }
   }
-  update.feature.names(mD, new.names = new.ids) %>%
+  update.feature.names(mD = mD, new.names = new.ids) %>%
     return()
 }

@@ -17,7 +17,7 @@ ordinate(
 \arguments{
 \item{mD}{required; microbData object from which data will be read.}
 
-\item{method}{character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".}
+\item{method}{character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[vegan]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".}
 
 \item{formula}{formula; in the form of e.g., `~ Var1 + Var2 * Var3`. This is only required for and used by the dbRDA method. Default is NULL.}
 

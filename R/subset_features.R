@@ -3,12 +3,13 @@
 #' @aliases keep.features
 #' @aliases drop.features
 #' @aliases filter.features
+#' @aliases remove.eukarya
 #' @param mD required; the microbData object to be updated.
 #' @param features character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
-#' @param ... logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Class != "Mitochondria"`.
+#' @param ... logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Family != "Mitochondria"`.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 
-
+####################################
 #' @name keep.features
 #' @title Keep Features
 #' @description Create a new microbData objects with just the specified features
@@ -34,16 +35,18 @@ keep.features <- function(mD, features) {
   if (!all(to.keep %in% mD@Feature.names)) {
     rlang::abort("One or more of the features supplied to `features' is not in the microbData Feature Names")
   }
-  mD@Abundances <- mD@Abundances[, to.keep]
-  mD@Features <- copy(mD@Features)[to.keep]
+  keep.order <- order(colSums(mD@Abundances[, to.keep]), decreasing = T)
+  mD@Abundances <- mD@Abundances[, to.keep[keep.order]]
+  mD@Features <- copy(mD@Features)[to.keep[keep.order]]
   if (!is.null(mD@Phylogeny)) {
-    to.drop <- to.keep[!{mD@Feature.names %in% to.keep}]
+    to.drop <- mD@Feature.names[!{mD@Feature.names %in% to.keep}]
     mD@Phylogeny <- ape::drop.tip(mD@Phylogeny, tip = to.drop)
   }
-  mD@Feature.names <- to.keep
+  mD@Feature.names <- to.keep[keep.order]
   return(mD)
 }
 
+####################################
 #' @name drop.features
 #' @title Drop Features
 #' @description Create a new microbData objects without the specified features
@@ -81,6 +84,7 @@ drop.features <- function(mD, features) {
   return(mD)
 }
 
+####################################
 #' @name filter.features
 #' @title Filter Features
 #' @description Create a new microbData objects with features that match the filter
@@ -93,3 +97,16 @@ filter.features <- function(mD, ...) {
     return()
 }
 
+####################################
+#' @name remove.eukarya
+#' @title Remove ASVs with eukaryotic taxonomic assignments
+#' @description Create a new microbData objects without ASVs assignment to eukaryotic taxonomy
+#' @rdname subset.features
+#' @export
+
+remove.eukarya <- function(mD) {
+  euks <- "(Kingdom == 'Bacteria' | Kingdom == 'Archaea') & Order != 'Chloroplast' & Family != 'Mitochondria'"
+  copy(mD@Features)[eval(parse(text = euks))][[mD@Feature.col]] %>%
+    keep.features(mD = mD, features = .) %>%
+    return()
+}

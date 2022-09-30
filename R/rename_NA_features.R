@@ -57,5 +57,5 @@ rename.NA.features <- function(mD, force.split = FALSE, level.order = NULL) {
     feature.tbl[[col]] <- curr.col
   }
   mD@Features <- feature.tbl
-
+  return(mD)
 }

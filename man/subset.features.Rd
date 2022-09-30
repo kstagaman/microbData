@@ -4,6 +4,7 @@
 \alias{keep.features}
 \alias{drop.features}
 \alias{filter.features}
+\alias{remove.eukarya}
 \title{Keep, Drop, or Filter Features in a microbData object}
 \usage{
 keep.features(mD, features)
@@ -11,13 +12,15 @@ keep.features(mD, features)
 drop.features(mD, features)
 
 filter.features(mD, ...)
+
+remove.eukarya(mD)
 }
 \arguments{
 \item{mD}{required; the microbData object to be updated.}
 
 \item{features}{character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.}
 
-\item{...}{logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Class != "Mitochondria"`.}
+\item{...}{logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Family != "Mitochondria"`.}
 }
 \description{
 Functions to specify specific features to keep/drop by name or to filter features based on variable(s) in the Metadata
@@ -27,6 +30,8 @@ Create a new microbData objects with just the specified features
 Create a new microbData objects without the specified features
 
 Create a new microbData objects with features that match the filter
+
+Create a new microbData objects without ASVs assignment to eukaryotic taxonomy
 }
 \seealso{
 \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}

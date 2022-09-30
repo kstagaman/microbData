@@ -2,7 +2,7 @@
 #' @title Create an Ordination
 #' @description Create an ordination from a microbData object. The microbData must have Distance Matrices (can be created with \code{\link[microbData]{beta.diversity}}), and an ordination will be created for each matrix unless otherwise specified.
 #' @param mD required; microbData object from which data will be read.
-#' @param method character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".
+#' @param method character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[vegan]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".
 #' @param formula formula; in the form of e.g., `~ Var1 + Var2 * Var3`. This is only required for and used by the dbRDA method. Default is NULL.
 #' @param only.for character or integer; a vector of the names or the indices of the matrices contained in the Distance.matrices slot of the microbData. If NULL, will make an ordination for all matrices. Default is NULL.
 #' @param include.feature.scores logical; some ordination methods, like "NMDS" and "dbRDA" allow feature (often referred to a 'species') scores as well as site scores. If true, these will be calculated. Default is FALSE.
@@ -65,7 +65,7 @@ ordinate <- function(
     }
     return(ord)
   })
-  names(ord.list) <- paste0(names(ord.list), ".", method)
+  names(ord.list) <- paste0(names(ord.list), "_", method)
   if (update.mD) {
     add.other.data(x = ord.list, name = "Ordinations", mD = mD) %>% return()
   } else {

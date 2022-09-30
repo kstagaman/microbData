@@ -77,7 +77,7 @@ beta.diversity <- function(
     registerDoParallel(cl, usable.cores)
     dist.list <- foreach::foreach(
       metric = metrics,
-      .final = function(x) setNames(x, names(metrics))
+      .final = function(x) setNames(x, metrics)
     ) %dopar% {
       if (metric %in% vegdist.metric.names$My.name) {
         orig.pa <- presence.absence

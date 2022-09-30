@@ -7,7 +7,7 @@
 
 update.feature.names <- function(mD, new.names) {
   if (!is.null(mD@Feature.names)) {
-    if (length(old.names) != length(new.names)) {
+    if (length(mD@Feature.names) != length(new.names)) {
       rlang::abort(
         "The length of the vector `new.names' is not equal to the length of the original Feature Names."
       )
@@ -18,7 +18,10 @@ update.feature.names <- function(mD, new.names) {
       New = new.names
     ) %>% setkey(Old)
     colnames(mD@Abundances) <- names.dt[colnames(mD@Abundances)]$New
+    mD@Abundances <- mD@Abundances[, sort(colnames(mD@Abundances))]
     mD@Features[[mD@Feature.col]] <- names.dt[mD@Features[[mD@Feature.col]]]$New
+    setkeyv(mD@Features, mD@Feature.col)
+    mD@Features[new.names]
     mD@Phylogeny$tip.label <- names.dt[mD@Phylogeny$tip.label]$New
     mD@Feature.names <- names.dt[mD@Feature.names]$New
   } else {

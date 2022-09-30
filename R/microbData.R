@@ -120,13 +120,13 @@ microbData <- function(
     }
   }
   if (is.null(feature.names)) {
-    feature.names <- sort(colnames(abundances))
+    feature.names <- colnames(abundances)[order(colSums(abundances), decreasing = T)]
   }
   return(
     new(
       "microbData",
       Metadata = metadata,
-      Abundances = abundances,
+      Abundances = abundances[, order(colSums(abundances), decreasing = T)],
       Features = features,
       Phylogeny = phylogeny,
       Distance.matrices = distance.matrices,
