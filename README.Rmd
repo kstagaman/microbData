@@ -29,12 +29,12 @@ remotes::install_github("kstagaman/microbData")
 library(microbData)
 
 ## load data
-data("metadata_dt")  # creates metadata.dt
-setkey(metadata.dt, Sample)
-data("asv_mat")      # creates asv.mat
-data("taxonomy_dt")  # creates taxonomy.dt
-setkey(taxonomy.dt, ASV)
-data("phylogeny")    # creates phylogeny
+data("metadata_dt")  # loads example metadata.dt
+setkey(metadata.dt, Sample) # this will tell microbData that this column contains our sample names
+data("asv_mat")      # loads example asv.mat
+data("taxonomy_dt")  # loads example taxonomy.dt
+setkey(taxonomy.dt, ASV) # this will tell microbData that this column contains our feature names
+data("phylogeny")    # loads example phylogeny
 
 
 ## create microbData object
@@ -165,7 +165,7 @@ ggplot(ord.dts$Samples, aes(x = Axis1, y = Axis2)) +
 ```
 
 
-## Use data in with other tools.
+## Using `microbData` in with other tools
 
 While I tried to cover the very basic analyses that most people run on microbiome data in the package, the reality is that I can't cover everything, and there will always be new tools that come out. Thus, my goal was to make it very easy for people to pull the appropriate tables out of the `microbData` object and use them *as is* with other tools. Additionally, with functions like `add.other.data`, you can store data or notes in the `microbData` object so you can track steps and results that are not covered here.
 

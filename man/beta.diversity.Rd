@@ -24,9 +24,19 @@ beta.diversity(
 
 \item{update.mD}{logical; should this function return a new microbData object with the beta-diversity distance matrices and `metrics` added to Other.data (TRUE) or just the list of the beta-diversity distance matrices (FALSE)? Default is TRUE.}
 }
+\value{
+Either a `microbData` object with the results add to the Distance.matrices slot and the names of the metrics recorded in the Other.data slot, OR a named list of the distance matrices.
+}
 \description{
 This function estimates beta-diversity (see `metrics`) from the abundances table in a given microbData object. It returns a distance matrix (or list of distance matrices).
 }
+\details{
+The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a `microbData` object.
+}
 \seealso{
 \code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
+#' @examples
+data("mD_rar")
+mD.new <- beta.diversity(mD.rar, metrics = c("Bray-Curtis", "Canberra"))
+print(mD.new)
 }

@@ -16,6 +16,9 @@
 #' @param slot.name required for `get.microbData`; the name of the slot (e.g., Metadata, Abundances, ...) you wish to extract from the `mD`. To see what slot names are valid, use the function \code{\link{slotNames}} on the mD.
 #' @param as.DT logical; for `get.microbData` and `get.abundances`. The Abundances table is the only one stored as a matrix in the microbData. However, if you would like to retrieve it and convert it to a data.table, you can set this to TRUE. Default is FALSE.
 #' @param location required for `get.other.data`; the index or name of the list element to get from the Other.data slot.
+#' @details There are two ways to access slots in an object that has them. One can use the `slot` function or the `@` operator. These functions provide wrappers for these two basic functions that make code a bit more human readable. The `get.microbData` function is included in case users want to programmatically grab data from a slot (i.e., store the slot name in a variable and use that to retrieve the data). These functions also have an option to coerce the results in to a `data.table` if it is not already stored as that class.
+#' @details The rest of the functions are equivalent to using the `@` operator. For example `get.metadata(mD)` is the same as `mD@Metadata`. Neither should cause the user any problem, it is just a matter of preference.
+#' @details The `get.covariate.names` function is a little bit different in that it doesn't grab an object from a slot, but rather returns the column names from the Metadata table (excluding the sample IDs column).
 #' @seealso \code{\link{slot}}, \code{\link{\@}}
 
 ####################################

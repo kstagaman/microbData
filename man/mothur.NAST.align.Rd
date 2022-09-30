@@ -21,7 +21,7 @@ mothur.NAST.align(
 
 \item{output.dir}{character; path to output directory. Default is `getwd()`.}
 
-\item{ncores}{integer; the number of cores for `mothur`}
+\item{ncores}{integer; the number of cores for `mothur`.}
 }
 \description{
 Uses the `align.seqs` function from `mothur` (requires install: https://mothur.org/wiki/installation/)

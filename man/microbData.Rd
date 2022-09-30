@@ -32,6 +32,55 @@ microbData(
 
 \item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the microbData package.}
 }
+\value{
+A `microbData` object.
+}
 \description{
 Creates an object with associated microbiome data of class `microbData`
+}
+\details{
+This function creates a `microbData` object that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The microbData object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, microbData objects utilize the power of `data.table`s for fast filtering, summarizing and merging.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{Metadata}}{A `data.table` containing values for the covariates associated with each sample.}
+
+\item{\code{Abundances}}{A `matrix` with abundance counts for each feature, e.g., ASVs, KOs, etc.}
+
+\item{\code{Features}}{A `data.table` containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
+
+\item{\code{Phylogeny}}{A phylogenetic tree for features.}
+
+\item{\code{Distance.matrices}}{A distance matrix or a list of distance matrices for beta-diversity between each sample.}
+
+\item{\code{Sample.names}}{A vector of the sample IDs (if not supplied directly, taken from the key column in the Metadata table).}
+
+\item{\code{Feature.names}}{A vector of the feature IDs (if not supplied directly, taken from the column names in the Abundances table).}
+
+\item{\code{Sample.col}}{A character string that identifies the column in the Metadata table that contains the sample names (primarily use internally, for consistency).}
+
+\item{\code{Feature.col}}{A character string that identifies the column in the Features table that contains the feature names (primarily use internally, for consistency).}
+
+\item{\code{Other.data}}{A list of any other elements you want to associate with this data. Many of the functions in this package add information to this slot for tracking steps and results.}
+}}
+
+\examples{
+## load data
+data("metadata_dt")  # loads example metadata.dt
+setkey(metadata.dt, Sample) # this will tell microbData that this column contains our sample names
+data("asv_mat")      # loads example asv.mat
+data("taxonomy_dt")  # loads example taxonomy.dt
+setkey(taxonomy.dt, ASV) # this will tell microbData that this column contains our feature names
+data("phylogeny")    # loads example phylogeny
+
+## create microbData object
+
+mD1 <- microbData(
+  metadata = metadata.dt,
+  abundances = asv.mat,
+  features = taxonomy.dt,
+  phylogeny = phylogeny
+)
+print(mD1)
 }

@@ -75,6 +75,13 @@ Get the specific IDs of samples in a microbData object.
 
 Get the column names from the Metadata (minus sample column name) in a microbData object.
 }
+\details{
+There are two ways to access slots in an object that has them. One can use the `slot` function or the `@` operator. These functions provide wrappers for these two basic functions that make code a bit more human readable. The `get.microbData` function is included in case users want to programmatically grab data from a slot (i.e., store the slot name in a variable and use that to retrieve the data). These functions also have an option to coerce the results in to a `data.table` if it is not already stored as that class.
+
+The rest of the functions are equivalent to using the `@` operator. For example `get.metadata(mD)` is the same as `mD@Metadata`. Neither should cause the user any problem, it is just a matter of preference.
+
+The `get.covariate.names` function is a little bit different in that it doesn't grab an object from a slot, but rather returns the column names from the Metadata table (excluding the sample IDs column).
+}
 \seealso{
 \code{\link{slot}}, \code{\link{\@}}
 }

@@ -6,7 +6,13 @@
 #' @param presence.absence logical; should abundance data be calculated on presence/absence data rather than abundance counts? This only applies to metrics supported by \code{\link[vegan]{vegdist}}. `metric = "Bray-Curtis"` with `presence.absence = TRUE` is equivalent to `metric = "Sorensen"` (which will ignore the `presence.absence` argument). Default is FALSE.
 #' @param ncores integer; number of cores to use. 1 will run beta-diversity estimation serially. >1 will run beta-diversity estimation in parallel; this will ultimately only use a number of cores equal to the number of diversity metrics supplied. Default is 1.
 #' @param update.mD logical; should this function return a new microbData object with the beta-diversity distance matrices and `metrics` added to Other.data (TRUE) or just the list of the beta-diversity distance matrices (FALSE)? Default is TRUE.
+#' @details The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a `microbData` object.
+#' @returns Either a `microbData` object with the results add to the Distance.matrices slot and the names of the metrics recorded in the Other.data slot, OR a named list of the distance matrices.
 #' @seealso \code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
+#' #' @examples
+#' data("mD_rar")
+#' mD.new <- beta.diversity(mD.rar, metrics = c("Bray-Curtis", "Canberra"))
+#' print(mD.new)
 #' @export
 
 beta.diversity <- function(

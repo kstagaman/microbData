@@ -17,3 +17,13 @@
 #'
 #' @format A phylo with example phylogenetic tree for the ASVs
 "phylogeny"
+
+#' Example Unrarefied microbData
+#'
+#' @format A microbData object with unrarefied counts
+"mD.raw"
+
+#' Example Rarefied microbData
+#'
+#' @format A microbData object with rarefied counts
+"mD.rar"

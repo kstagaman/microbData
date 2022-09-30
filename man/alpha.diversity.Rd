@@ -17,8 +17,19 @@ alpha.diversity(
 
 \item{update.mD}{logical; should this function return a new microbData object with the alpha-diversity results added to the Metadata table and add `metrics` to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.}
 }
+\value{
+A `microbData` object with estimated alpha-diversity scores added to the Metadata table, OR a table of the estimated alpha-diversity scores for each sample.
+}
 \description{
 This function take a microbData object and estimates alpha-diversity (see `metrics`) from the abundance table.
+}
+\details{
+This function utilizes \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, and/or \code{\link[picante]{pd}} to estimate common alpha-diversity metrics for microbial data.
+}
+\examples{
+data("mD_rar")
+mD.new <- alpha.diversity(mD.rar)
+print(mD.new)
 }
 \seealso{
 \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, \code{\link[picante]{pd}}
