@@ -8,7 +8,7 @@
 #' @param include.feature.scores logical; some ordination methods, like "NMDS" and "dbRDA" allow feature (often referred to a 'species') scores as well as site scores. If true, these will be calculated. Default is FALSE.
 #' @param update.mD logical; should this function return a new microbData object with the ordinations list (called "Ordinations") added to Other.data (TRUE) or just a list of the results (FALSE)? Default is TRUE.
 #' @param ... other arguments passed to ordination methods. See their documentation for appropriate arguments.
-#' @seealso \code{\link{}}
+#' @seealso \code{\link[ape]{pcoa}}, \code{\link[vegan]{metaMDS}}, \code{\link[vegan]{capscale}}, \code{\link[ape]{pcoa}},  \code{\link[vegan]{sppscores}}
 #' @export
 
 ordinate <- function(

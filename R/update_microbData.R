@@ -12,7 +12,7 @@
 #' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to microbData object in the appropriate (usually Other.data) slot.
 #' @param name required for `add.other.data`; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
 #' @param replace logical; for `add.other.data`. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.
-#' @seealso \code{\link[microbData]{microbData}}
+#' @seealso \code{\link[microbData]{microbData}}, \code{\link{slot}}
 
 ####################################
 #' @name add.distance.matrices

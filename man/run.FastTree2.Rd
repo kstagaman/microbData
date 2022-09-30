@@ -17,11 +17,11 @@ run.FastTree2(
 
 \item{output.file}{required; file name to write output, should have the '.nwk' extension. If not, it will be added.}
 
-\item{fasttree.path}{haracter; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.}
+\item{fasttree.path}{character; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.}
 }
 \description{
 Build an approximately-maximum-likelihood with FastTree2 (http://www.microbesonline.org/fasttree/)
 }
 \seealso{
-\code{\link{generate.tool.command}}, \code{\link{system}}
+\code{\link[microbData]{generate.tool.command}}, \code{\link{system}}
 }

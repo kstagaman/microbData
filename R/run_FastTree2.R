@@ -3,8 +3,8 @@
 #' @description Build an approximately-maximum-likelihood with FastTree2 (http://www.microbesonline.org/fasttree/)
 #' @param aligned.seqs.file required; FASTA file containing aligned sequences to build tree with.
 #' @param output.file required; file name to write output, should have the '.nwk' extension. If not, it will be added.
-#' @param fasttree.path haracter; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.
-#' @seealso \code{\link{generate.tool.command}}, \code{\link{system}}
+#' @param fasttree.path character; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.
+#' @seealso \code{\link[microbData]{generate.tool.command}}, \code{\link{system}}
 #' @export
 
 run.FastTree2 <- function(aligned.seqs.file, output.file, fasttree.path = NULL, log.file = NULL, ncores = 1) {

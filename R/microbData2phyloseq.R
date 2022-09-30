@@ -2,6 +2,7 @@
 #' @title MicrobData to Phyloseq
 #' @description Convert a microbData object to a phyloseq object
 #' @param mD required; the microbData object to be converted to a phyloseq object.
+#' @seealso \code{\link[phyloseq]{phyloseq}}
 #' @export
 
 microbData2phyloseq <- function(mD) {

@@ -18,7 +18,7 @@ microbData(
 \arguments{
 \item{metadata}{required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `sample.names` will be set from the keyed column.}
 
-\item{abundances}{required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as rownames since that is more often the required orientation for other tools.}
+\item{abundances}{required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.}
 
 \item{features}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `feature.names` will be set from the keyed column. Default is NULL.}
 
@@ -30,11 +30,8 @@ microbData(
 
 \item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from `abundances`. Default is NULL.}
 
-\item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be inlcuded in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the microbData package.}
+\item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the microbData package.}
 }
 \description{
 Creates an object with associated microbiome data of class `microbData`
-}
-\seealso{
-\code{\link{head}}
 }

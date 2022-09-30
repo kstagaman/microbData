@@ -3,7 +3,6 @@
 #' @description A simple way to replace the feature names in a microbData object.
 #' @param mD required; microbData object to read from and write to.
 #' @param new.names required; a character vector of new feature names. This vector must be the same length as the original Feature Names and in the same order.
-#' @seealso \code{\link{}}
 #' @export
 
 update.feature.names <- function(mD, new.names) {

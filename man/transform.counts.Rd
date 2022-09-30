@@ -79,5 +79,5 @@ Transform feature counts using the variance-stabilized method. This function req
 Transform feature counts to relative abundance. This function is the equivalent of `transform.counts(mD = mD, f = function(x) x / sum(x))`, but because it's a popular method of transformation, it has its own wrapper here.
 }
 \seealso{
-\code{\link{}}
+\code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}
 }

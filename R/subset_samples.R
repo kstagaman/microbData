@@ -6,7 +6,7 @@
 #' @param mD required; the microbData object to be updated.
 #' @param samples character or logical; a vector of sample names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Sample Names slot.
 #' @param ... logical expression(s) by which to filter samples based on Metadata, e.g. `Weight > 10 & Genotype != "WT"`.
-#' @seealso \code{\link[microbData]{microbData}}
+#' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}
 
 
 #' @name keep.samples

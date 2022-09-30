@@ -16,6 +16,3 @@ rename.NA.features(mD, force.split = FALSE, level.order = NULL)
 \description{
 This function searches through the Features table of a microbData object and replaces any NA assignments with a more descriptive term based on the higher order assignment provided. This prevents unrelated features lacking labels from getting grouped together simply because they're labelled "NA".
 }
-\seealso{
-\code{\link{}}
-}

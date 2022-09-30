@@ -19,7 +19,7 @@
 #' @param method character; for `center.log.ratio`. Choose one of: count zero multiplicative ("CZM"); geometric Bayesian multiplicative ("GBM"); square root BM ("SQ"); Bayes-Laplace BM ("BL"); user-specified hyper-parameters ("user"). (See \code{\link[zCompositions]{cmultRepl}}). Default is "CZM"
 #' @param lab numeric or character; for `center.log.ratio`, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.
 #' @param design formula or matrix; required for `variance.stabilize`, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.
-#' @seealso \code{\link{}}
+#' @seealso \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}
 #' @export
 
 ####################################

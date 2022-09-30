@@ -29,5 +29,5 @@ Create a new microbData objects without the specified features
 Create a new microbData objects with features that match the filter
 }
 \seealso{
-\code{\link[microbData]{microbData}}
+\code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 }

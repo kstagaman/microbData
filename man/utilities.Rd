@@ -32,5 +32,5 @@ Get the total abundance of all features for each sample in a microbData object.
 Get the total abundance of each features across all samples in a microbData object.
 }
 \seealso{
-\code{\link[microbData]{microbData}}
+\code{\link[microbData]{microbData}}, \code{\link{colSums}}, \code{\link{rowSums}}
 }

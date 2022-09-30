@@ -4,7 +4,6 @@
 #' @param mD required; microbData object to read from and write to.
 #' @param force.split logical; should the lowest feature assignment (e.g. ASV) be appended to replacement assignment? If TRUE, this will prevent features that have NAs at the same assignment level from receiving identical assignments (keeping separate during future glomming). If FALSE, NAs will be replaced by a string including the previous level assignment and the current assignment level. Default is FALSE.
 #' @param level.order character; a vector specifying the hierarchical ordering of the assignment levels. Must be identical to, or a subset of the column names in the Feature Assignments table. If NULL, the order will be inferred as Feature column lowest and the rest in order as the table columns. Default is NULL.
-#' @seealso \code{\link{}}
 #' @export
 
 rename.NA.features <- function(mD, force.split = FALSE, level.order = NULL) {
@@ -42,7 +41,10 @@ rename.NA.features <- function(mD, force.split = FALSE, level.order = NULL) {
           paste,
           c(
             cbind(
-              str_remove_all(prev.col[to.replace], paste(replacing.feature.names, collapse = "|")),
+              str_remove_all(
+                prev.col[to.replace],
+                paste(replacing.feature.names, collapse = "|")
+              ),
               replacing.feature.names,
             ),
             sep = "_"

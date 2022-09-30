@@ -6,7 +6,7 @@
 #' @aliases feature.sums
 #' @param mD required; the microbData object to be updated.
 #' @param sort character; either "increasing", "decreasing", or NULL. Increasing will set `sort(decreasing = FALSE)` and decreasing will set `sort(decreasing = TRUE)`. NULL will not sort output. Default is NULL.
-#' @seealso \code{\link[microbData]{microbData}}
+#' @seealso \code{\link[microbData]{microbData}}, \code{\link{colSums}}, \code{\link{rowSums}}
 
 #' @name nsamples
 #' @title Number of Samples

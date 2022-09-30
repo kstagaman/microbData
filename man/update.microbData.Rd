@@ -44,5 +44,5 @@ Add a phylogenetic to an already created microbData object
 Add a vector, list, etc... to an already created microbData object in the Other.data slot
 }
 \seealso{
-\code{\link[microbData]{microbData}}
+\code{\link[microbData]{microbData}}, \code{\link{slot}}
 }

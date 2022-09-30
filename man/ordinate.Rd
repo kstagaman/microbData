@@ -33,5 +33,5 @@ ordinate(
 Create an ordination from a microbData object. The microbData must have Distance Matrices (can be created with \code{\link[microbData]{beta.diversity}}), and an ordination will be created for each matrix unless otherwise specified.
 }
 \seealso{
-\code{\link{}}
+\code{\link[ape]{pcoa}}, \code{\link[vegan]{metaMDS}}, \code{\link[vegan]{capscale}}, \code{\link[ape]{pcoa}},  \code{\link[vegan]{sppscores}}
 }

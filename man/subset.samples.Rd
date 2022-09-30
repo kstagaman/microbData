@@ -29,5 +29,5 @@ Create a new microbData objects without the specified samples
 Create a new microbData objects with samples that match the filter
 }
 \seealso{
-\code{\link[microbData]{microbData}}
+\code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}
 }

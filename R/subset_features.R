@@ -6,7 +6,7 @@
 #' @param mD required; the microbData object to be updated.
 #' @param features character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
 #' @param ... logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Class != "Mitochondria"`.
-#' @seealso \code{\link[microbData]{microbData}}
+#' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 
 
 #' @name keep.features

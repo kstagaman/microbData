@@ -14,6 +14,3 @@
 \description{
 A simple way to replace the feature names in a microbData object.
 }
-\seealso{
-\code{\link{}}
-}

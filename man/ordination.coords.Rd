@@ -37,5 +37,5 @@ ordination.coords(
 Get the appropriate coordinates to plot the results of one or more ordinations. This also returns axis labels with percentage variance explained for relevant ordination methods (i.e., for all supported methods but NMDS).
 }
 \seealso{
-\code{\link{}}
+\code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}
 }

@@ -12,3 +12,6 @@ microbData2phyloseq(mD)
 \description{
 Convert a microbData object to a phyloseq object
 }
+\seealso{
+\code{\link[phyloseq]{phyloseq}}
+}

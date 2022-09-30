@@ -9,7 +9,7 @@
 #' #' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no `mD` and `feature.coords` is TRUE. Default is NULL.
 #' @param constraint.coords logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.
 #' @param combine logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.
-#' @seealso \code{\link{}}
+#' @seealso \code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}
 #' @export
 
 ordination.coords <- function(
@@ -111,7 +111,10 @@ ordination.coords <- function(
           setkeyv(metadata, smpl.col.name)
         }
       }
-      sections[["Samples"]] <- as.data.table(smpl.mat, keep.rownames = smpl.col.name) %>%
+      sections[["Samples"]] <- as.data.table(
+        smpl.mat,
+        keep.rownames = smpl.col.name
+      ) %>%
         setkeyv(smpl.col.name) %>%
         merge(metadata)
     } else {
@@ -169,7 +172,10 @@ ordination.coords <- function(
         }
       }
       if (!is.null(ord$CCA$centroids)) {
-        sections[["Centroids"]] <- as.data.table(ord$CCA$centroids, keep.rownames = "Class")
+        sections[["Centroids"]] <- as.data.table(
+          ord$CCA$centroids,
+          keep.rownames = "Class"
+          )
         sections[["Centroids"]][
           , Variable := str_extract(Class, paste(names(metadata), collapse = "|"))
         ]
