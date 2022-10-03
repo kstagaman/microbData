@@ -11,8 +11,9 @@ microbData Package
   - <a href="#estimate-diversity" id="toc-estimate-diversity">Estimate
     diversity</a>
   - <a href="#plot-results" id="toc-plot-results">Plot results</a>
-- <a href="#use-data-in-with-other-tools"
-  id="toc-use-data-in-with-other-tools">Use data in with other tools.</a>
+- <a href="#using-microbdata-in-with-other-tools"
+  id="toc-using-microbdata-in-with-other-tools">Using
+  <code>microbData</code> in with other tools</a>
 
 The purpose of this package is to provide tools to make management of
 microbiome data (both amplicon and shotgun sequencing) easy in R. It
@@ -44,12 +45,12 @@ remotes::install_github("kstagaman/microbData")
 library(microbData)
 
 ## load data
-data("metadata_dt")  # creates metadata.dt
-setkey(metadata.dt, Sample)
-data("asv_mat")      # creates asv.mat
-data("taxonomy_dt")  # creates taxonomy.dt
-setkey(taxonomy.dt, ASV)
-data("phylogeny")    # creates phylogeny
+data("metadata_dt")  # loads example metadata.dt
+setkey(metadata.dt, Sample) # this will tell microbData that this column contains our sample names
+data("asv_mat")      # loads example asv.mat
+data("taxonomy_dt")  # loads example taxonomy.dt
+setkey(taxonomy.dt, ASV) # this will tell microbData that this column contains our feature names
+data("phylogeny")    # loads example phylogeny
 
 
 ## create microbData object
@@ -192,7 +193,7 @@ mD3 <- rarefy(mD2)
     ## Rarefying to: 13000
     ## Random seed: 10403
     ## Number of samples dropped: 18
-    ## Number of features dropped: 682
+    ## Number of features dropped: 684
 
 ``` r
 print(mD3)
@@ -211,10 +212,10 @@ print(mD3)
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3939    3082    1202     945
-    ## A02   11088     561     168     102
-    ## A03    4403    2905    1113     798
-    ## A05    1501       0       0       0
+    ## A01    3981    3241    1139     977
+    ## A02   11139     557     153     130
+    ## A03    4309    2924    1082     819
+    ## A05    1420       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -257,20 +258,20 @@ print(mD4)
     ## Sample Metadata: 28 samples with 5 covariates
     ## Preview:
     ## Key: <Sample>
-    ##    Sample Exposure   Shannon   Simpson
-    ##    <char>   <fctr>     <num>     <num>
-    ## 1:    A01       no 2.8020692 0.8359077
-    ## 2:    A02       no 0.8878638 0.2702615
-    ## 3:    A03       no 2.8008716 0.8222141
-    ## 4:    A05       no 2.1402417 0.7680521
+    ##    Sample Exposure  Shannon   Simpson
+    ##    <char>   <fctr>    <num>     <num>
+    ## 1:    A01       no 2.735710 0.8286525
+    ## 2:    A02       no 0.862923 0.2635847
+    ## 3:    A03       no 2.823123 0.8263305
+    ## 4:    A05       no 2.124319 0.7633306
     ## 
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3939    3082    1202     945
-    ## A02   11088     561     168     102
-    ## A03    4403    2905    1113     798
-    ## A05    1501       0       0       0
+    ## A01    3981    3241    1139     977
+    ## A02   11139     557     153     130
+    ## A03    4309    2924    1082     819
+    ## A05    1420       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -338,20 +339,20 @@ print(mD5)
     ## Sample Metadata: 28 samples with 5 covariates
     ## Preview:
     ## Key: <Sample>
-    ##    Sample Exposure   Shannon   Simpson
-    ##    <char>   <fctr>     <num>     <num>
-    ## 1:    A01       no 2.8020692 0.8359077
-    ## 2:    A02       no 0.8878638 0.2702615
-    ## 3:    A03       no 2.8008716 0.8222141
-    ## 4:    A05       no 2.1402417 0.7680521
+    ##    Sample Exposure  Shannon   Simpson
+    ##    <char>   <fctr>    <num>     <num>
+    ## 1:    A01       no 2.735710 0.8286525
+    ## 2:    A02       no 0.862923 0.2635847
+    ## 3:    A03       no 2.823123 0.8263305
+    ## 4:    A05       no 2.124319 0.7633306
     ## 
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3939    3082    1202     945
-    ## A02   11088     561     168     102
-    ## A03    4403    2905    1113     798
-    ## A05    1501       0       0       0
+    ## A01    3981    3241    1139     977
+    ## A02   11139     557     153     130
+    ## A03    4309    2924    1082     819
+    ## A05    1420       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -382,30 +383,6 @@ print(mD5)
 ord.dts <- ordination.coords(mD5, constraint.coords = TRUE)
 names(ord.dts$Centroids)[2] <- ord.dts$Centroids$Variable[1]
 
-# some fussing about to make nice axis labels on a faceted plot
-# (there's probably a less verbose way to do this)
-label.pad <- 1.1
-ord.dts$Axis.labs[
-  Axis == "Axis1", 
-  `:=`(
-    Axis1 = ord.dts$Samples[, .(A1 = max(Axis1) * label.pad), by = Beta.metric]$A1,
-    Axis2 = ord.dts$Samples[, .(A2 = min(Axis2) * label.pad), by = Beta.metric]$A2
-  )
-]
-ord.dts$Axis.labs[
-  Axis == "Axis2", 
-  `:=`(
-    Axis1 = ord.dts$Samples[, .(A1 = min(Axis1) * label.pad), by = Beta.metric]$A1,
-    Axis2 = ord.dts$Samples[, .(A2 = max(Axis2) * label.pad), by = Beta.metric]$A2
-  )
-]
-ord.dts$Axis.labs[
-  , `:=`(
-    Angle = ifelse(Axis == "Axis1", 0, 90),
-    Vjust = ifelse(Axis == "Axis1", 1, 0)
-  )
-]
-
 # plotting
 ggplot(ord.dts$Samples, aes(x = Axis1, y = Axis2)) +
   geom_point(aes(color = Exposure)) +
@@ -425,7 +402,7 @@ ggplot(ord.dts$Samples, aes(x = Axis1, y = Axis2)) +
 
 ![](README_files/figure-gfm/plot-beta-1.png)<!-- -->
 
-## Use data in with other tools.
+## Using `microbData` in with other tools
 
 While I tried to cover the very basic analyses that most people run on
 microbiome data in the package, the reality is that I can’t cover
