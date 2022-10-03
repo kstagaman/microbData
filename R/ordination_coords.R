@@ -124,6 +124,15 @@ ordination.coords <- function(
 
     if (combine) {
       sections[["Samples"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
+      label.pad <- 1.1
+      sections[["Axis.labs"]][
+        , `:=`(
+          Axis1 = c(max(sections[["Samples"]]$Axis1) * label.pad, min(sections[["Samples"]]$Axis1) * label.pad),
+          Axis2 = c(min(sections[["Samples"]]$Axis2) * label.pad, max(sections[["Samples"]]$Axis2) * label.pad),
+          Angle = ifelse(Axis == "Axis1", 0, 90),
+          Vjust = ifelse(Axis == "Axis1", 1, 0)
+        )
+      ]
     }
 
     if (feature.coords) {

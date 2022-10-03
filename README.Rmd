@@ -123,30 +123,6 @@ print(mD5)
 ord.dts <- ordination.coords(mD5, constraint.coords = TRUE)
 names(ord.dts$Centroids)[2] <- ord.dts$Centroids$Variable[1]
 
-# some fussing about to make nice axis labels on a faceted plot
-# (there's probably a less verbose way to do this)
-label.pad <- 1.1
-ord.dts$Axis.labs[
-  Axis == "Axis1", 
-  `:=`(
-    Axis1 = ord.dts$Samples[, .(A1 = max(Axis1) * label.pad), by = Beta.metric]$A1,
-    Axis2 = ord.dts$Samples[, .(A2 = min(Axis2) * label.pad), by = Beta.metric]$A2
-  )
-]
-ord.dts$Axis.labs[
-  Axis == "Axis2", 
-  `:=`(
-    Axis1 = ord.dts$Samples[, .(A1 = min(Axis1) * label.pad), by = Beta.metric]$A1,
-    Axis2 = ord.dts$Samples[, .(A2 = max(Axis2) * label.pad), by = Beta.metric]$A2
-  )
-]
-ord.dts$Axis.labs[
-  , `:=`(
-    Angle = ifelse(Axis == "Axis1", 0, 90),
-    Vjust = ifelse(Axis == "Axis1", 1, 0)
-  )
-]
-
 # plotting
 ggplot(ord.dts$Samples, aes(x = Axis1, y = Axis2)) +
   geom_point(aes(color = Exposure)) +
