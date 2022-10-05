@@ -1,17 +1,17 @@
-#' @title Keep, Drop, or Filter Samples in a microbData object
+#' @title Keep, Drop, or Filter Samples in a \code{microbData} object
 #' @description Functions to specify specific samples to keep/drop by name or to filter samples based on variable(s) in the Metadata
 #' @aliases keep.samples
 #' @aliases drop.samples
 #' @aliases filter.samples
-#' @param mD required; the microbData object to be updated.
+#' @param mD required; the \code{microbData} object to be updated.
 #' @param samples character or logical; a vector of sample names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Sample Names slot.
-#' @param ... logical expression(s) by which to filter samples based on Metadata, e.g. `Weight > 10 & Genotype != "WT"`.
+#' @param ... logical expression(s) by which to filter samples based on Metadata, e.g. \code{Weight > 10 & Genotype != "WT"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}
 
 
 #' @name keep.samples
 #' @title Keep Samples
-#' @description Create a new microbData objects with just the specified samples
+#' @description Create a new \code{microbData} objects with just the specified samples
 #' @rdname subset.samples
 #' @export
 
@@ -52,7 +52,7 @@ keep.samples <- function(mD, samples) {
 
 #' @name drop.samples
 #' @title Drop Samples
-#' @description Create a new microbData objects without the specified samples
+#' @description Create a new \code{microbData} objects without the specified samples
 #' @rdname subset.samples
 #' @export
 
@@ -93,7 +93,7 @@ drop.samples <- function(mD, samples) {
 
 #' @name filter.samples
 #' @title Filter Samples
-#' @description Create a new microbData objects with samples that match the filter
+#' @description Create a new \code{microbData} objects with samples that match the filter
 #' @rdname subset.samples
 #' @export
 

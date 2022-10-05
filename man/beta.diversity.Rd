@@ -14,24 +14,24 @@ beta.diversity(
 )
 }
 \arguments{
-\item{mD}{required; microbData object from which data will be read.}
+\item{mD}{required; \code{microbData} object from which data will be read.}
 
-\item{metrics}{character; a vector of beta-diveristy metrics to be estimated from the Abundances table in the microbData object. Supported metrics include "Manhattan", "Euclidean", "Canberra", "Clark", "Bray-Curtis", "Kulczynski", "Jaccard", "Gower", "Alt Gower", "Morisita", "Horn", "Mountford", "Raup", "Binomial", "Chao", "Cao", "Mahalanobis", "Chisq", "Chord", "Aitchison", "Robust Aitchison", "Sorensen" (binary Bray-Curtis), and any UniFrac distance with an alpha (abundance weighting parameter) between 0 and 1, inclusive. Alpha can be specified by putting in the metric name with a space before "UniFrac", e.g., "0.2 UniFrac". "W UniFrac" (weighted UniFrac) is equivalent to "1 UniFrac" and "U UniFrac" (unweighted UniFrac) is equivalent to "0 UniFrac". The default metrics are "Sorensen", "Canberra", "Bray-Curtis", "W UniFrac", "0.5 UniFrac", and "U UniFrac".}
+\item{metrics}{character; a vector of beta-diveristy metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Manhattan", "Euclidean", "Canberra", "Clark", "Bray-Curtis", "Kulczynski", "Jaccard", "Gower", "Alt Gower", "Morisita", "Horn", "Mountford", "Raup", "Binomial", "Chao", "Cao", "Mahalanobis", "Chisq", "Chord", "Aitchison", "Robust Aitchison", "Sorensen" (binary Bray-Curtis), and any UniFrac distance with an alpha (abundance weighting parameter) between 0 and 1, inclusive. Alpha can be specified by putting in the metric name with a space before "UniFrac", e.g., "0.2 UniFrac". "W UniFrac" (weighted UniFrac) is equivalent to "1 UniFrac" and "U UniFrac" (unweighted UniFrac) is equivalent to "0 UniFrac". The default metrics are "Sorensen", "Canberra", "Bray-Curtis", "W UniFrac", "0.5 UniFrac", and "U UniFrac".}
 
-\item{presence.absence}{logical; should abundance data be calculated on presence/absence data rather than abundance counts? This only applies to metrics supported by \code{\link[vegan]{vegdist}}. `metric = "Bray-Curtis"` with `presence.absence = TRUE` is equivalent to `metric = "Sorensen"` (which will ignore the `presence.absence` argument). Default is FALSE.}
+\item{presence.absence}{logical; should abundance data be calculated on presence/absence data rather than abundance counts? This only applies to metrics supported by \code{\link[vegan]{vegdist}}. \code{metric = "Bray-Curtis"} with \code{presence.absence = TRUE} is equivalent to \code{metric = "Sorensen"} (which will ignore the \code{presence.absence} argument). Default is FALSE.}
 
 \item{ncores}{integer; number of cores to use. 1 will run beta-diversity estimation serially. >1 will run beta-diversity estimation in parallel; this will ultimately only use a number of cores equal to the number of diversity metrics supplied. Default is 1.}
 
-\item{update.mD}{logical; should this function return a new microbData object with the beta-diversity distance matrices and `metrics` added to Other.data (TRUE) or just the list of the beta-diversity distance matrices (FALSE)? Default is TRUE.}
+\item{update.mD}{logical; should this function return a new \code{microbData} object with the beta-diversity distance matrices and \code{metrics} added to Other.data (TRUE) or just the list of the beta-diversity distance matrices (FALSE)? Default is TRUE.}
 }
 \value{
-Either a `microbData` object with the results add to the Distance.matrices slot and the names of the metrics recorded in the Other.data slot, OR a named list of the distance matrices.
+Either a \code{microbData} object with the results add to the Distance.matrices slot and the names of the metrics recorded in the Other.data slot, OR a named list of the distance matrices.
 }
 \description{
-This function estimates beta-diversity (see `metrics`) from the abundances table in a given microbData object. It returns a distance matrix (or list of distance matrices).
+This function estimates beta-diversity (see \code{metrics}) from the abundances table in a given \code{microbData} object. It returns a distance matrix (or list of distance matrices).
 }
 \details{
-The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a `microbData` object.
+The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a \code{microbData} object.
 }
 \seealso{
 \code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}

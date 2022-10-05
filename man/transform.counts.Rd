@@ -37,46 +37,46 @@ variance.stabilize(mD, design, update.mD = TRUE)
 relative.abundance(mD, update.mD = TRUE)
 }
 \arguments{
-\item{mD}{required; the microbData object with feature counts to be transformed.}
+\item{mD}{required; the \code{microbData} object with feature counts to be transformed.}
 
-\item{f}{required for `transform.counts`; a function that can be applied to the samples (rows) of the Abundance table.}
+\item{f}{required for \code{transform.counts}; a function that can be applied to the samples (rows) of the Abundance table.}
 
-\item{update.mD}{logical; should this function return a new microbData object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.}
+\item{update.mD}{logical; should this function return a new \code{microbData} object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.}
 
-\item{min.abund}{integer; for `rarefy`, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if `min.abund = 10000` and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For `center.log.ratio`, the interger to pass to the `min.reads` argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.}
+\item{min.abund}{integer; for \code{rarefy}, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if \code{min.abund = 10000} and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For \code{center.log.ratio}, the interger to pass to the \code{min.reads} argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.}
 
-\item{exactly.to}{integer; for `rarefy`, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes `min.abund`. Samples with total reads lower than this number will be dropped. Default is NULL.}
+\item{exactly.to}{integer; for \code{rarefy}, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes \code{min.abund}. Samples with total reads lower than this number will be dropped. Default is NULL.}
 
-\item{trim.features}{logical; for `rarefy`, should features that are no longer present in any samples after rarefaction be dropped from the microbData object? Default is TRUE.}
+\item{trim.features}{logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.}
 
-\item{user.seed}{integer; for `rarefy`, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL}
+\item{user.seed}{integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL}
 
 \item{quiet}{logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.}
 
-\item{min.prop}{numeric; for `center.log.ratio`, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.}
+\item{min.prop}{numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.}
 
-\item{min.occur}{numeric; for `center.log.ratio`, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.}
+\item{min.occur}{numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.}
 
-\item{smpls.by.row}{logical; for `center.log.ratio`, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.}
+\item{smpls.by.row}{logical; for \code{center.log.ratio}, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.}
 
-\item{method}{character; for `center.log.ratio`. Choose one of: count zero multiplicative ("CZM"); geometric Bayesian multiplicative ("GBM"); square root BM ("SQ"); Bayes-Laplace BM ("BL"); user-specified hyper-parameters ("user"). (See \code{\link[zCompositions]{cmultRepl}}). Default is "CZM"}
+\item{method}{character; for \code{center.log.ratio}. Choose one of: count zero multiplicative ("CZM"); geometric Bayesian multiplicative ("GBM"); square root BM ("SQ"); Bayes-Laplace BM ("BL"); user-specified hyper-parameters ("user"). (See \code{\link[zCompositions]{cmultRepl}}). Default is "CZM"}
 
-\item{lab}{numeric or character; for `center.log.ratio`, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.}
+\item{lab}{numeric or character; for \code{center.log.ratio}, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.}
 
-\item{design}{formula or matrix; required for `variance.stabilize`, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.}
+\item{design}{formula or matrix; required for \code{variance.stabilize}, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.}
 }
 \description{
-Functions for transforming feature counts in a microbData object.
+Functions for transforming feature counts in a \code{microbData} object.
 
-Supply a custom function with which to transform feature counts in a microbData object.
+Supply a custom function with which to transform feature counts in a \code{microbData} object.
 
-Rarefy feature counts in a microbData object to the same depth.
+Rarefy feature counts in a \code{microbData} object to the same depth.
 
 Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \code{\link{zCompositions}}.
 
 Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
 
-Transform feature counts to relative abundance. This function is the equivalent of `transform.counts(mD = mD, f = function(x) x / sum(x))`, but because it's a popular method of transformation, it has its own wrapper here.
+Transform feature counts to relative abundance. This function is the equivalent of \code{transform.counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
 }
 \seealso{
 \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}

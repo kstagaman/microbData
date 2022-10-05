@@ -7,10 +7,10 @@
 microbData2phyloseq(mD)
 }
 \arguments{
-\item{mD}{required; the microbData object to be converted to a phyloseq object.}
+\item{mD}{required; the \code{microbData} object to be converted to a phyloseq object.}
 }
 \description{
-Convert a microbData object to a phyloseq object
+Convert a \code{microbData} object to a phyloseq object
 }
 \seealso{
 \code{\link[phyloseq]{phyloseq}}

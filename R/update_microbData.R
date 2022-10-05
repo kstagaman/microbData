@@ -1,26 +1,26 @@
-#' @title Add or replace data in appropriate slot of a microbData object
-#' @description Functions for adding/replacing metadata, abundances, features, phylogeny, distance matrices, and other data to an established microbData object.
+#' @title Add or replace data in appropriate slot of a \code{microbData} object
+#' @description Functions for adding/replacing metadata, abundances, features, phylogeny, distance matrices, and other data to an established \code{microbData} object.
 #' @aliases replace.metadata
 #' @aliases replace.abundances
 #' @aliases add.distance.matrices
 #' @aliases add.features
 #' @aliases add.other.data
 #' @aliases add.phylogeny
-#' @param mD required; the microbData object to be updated.
-#' @param new.tbl required for `replace.metadata` and `replace.abundances`; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
-#' @param distance.matrices required for `add.distance.matrices`; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
-#' @param features required for `add.features`; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `feature.names` will be set from the keyed column.
-#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from `features`. Default is NULL.
-#' @param phylo required for `add.phylogeny`; phylo, a phylogenetic tree object.
-#' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to microbData object in the appropriate (usually Other.data) slot.
-#' @param name required for `add.other.data`; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
-#' @param replace logical; for `add.other.data`. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.
+#' @param mD required; the \code{microbData} object to be updated.
+#' @param new.tbl required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
+#' @param distance.matrices required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
+#' @param features required for \code{add.features}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
+#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{features}. Default is NULL.
+#' @param phylo required for \code{add.phylogeny}; phylo, a phylogenetic tree object.
+#' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.
+#' @param name required for \code{add.other.data}; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
+#' @param replace logical; for \code{add.other.data}. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link{slot}}
 
 ####################################
 #' @name replace.metadata
 #' @title Replace Metadata
-#' @description Replace the data.table in the Metadata slot of a microbData object with a new one
+#' @description Replace the data.table in the Metadata slot of a \code{microbData} object with a new one
 #' @rdname update.microbData
 #' @export
 
@@ -52,7 +52,7 @@ replace.metadata <- function(mD, new.tbl) {
 ####################################
 #' @name replace.abundances
 #' @title Replace Abundances Table
-#' @description Replace the matrix in the Abundances slot of a microbData object with a new one
+#' @description Replace the matrix in the Abundances slot of a \code{microbData} object with a new one
 #' @rdname update.microbData
 #' @export
 
@@ -81,7 +81,7 @@ replace.abundances <- function(mD, new.tbl) {
 ####################################
 #' @name add.distance.matrices
 #' @title Add Distance Matrices
-#' @description Add one or a list of distance matrices to an already created microbData object
+#' @description Add one or a list of distance matrices to an already created \code{microbData} object
 #' @rdname update.microbData
 #' @export
 
@@ -113,7 +113,7 @@ add.distance.matrices <- function(mD, distance.matrices) {
 ####################################
 #' @name add.features
 #' @title Add Features Table
-#' @description Add a features table to an already created microbData object
+#' @description Add a features table to an already created \code{microbData} object
 #' @rdname update.microbData
 #' @export
 
@@ -150,8 +150,8 @@ add.features <- function(mD, features, feature.names = NULL) {
 
 ####################################
 #' @name add.phylogeny
-#' @title Add a Phylogenetic Tree to microbData Object
-#' @description Add a phylogenetic to an already created microbData object
+#' @title Add a Phylogenetic Tree to \code{microbData} Object
+#' @description Add a phylogenetic to an already created \code{microbData} object
 #' @rdname update.microbData
 #' @export
 
@@ -176,8 +176,8 @@ add.phylogeny <- function(mD, phylo) {
 
 ####################################
 #' @name add.other.data
-#' @title Add Other.data to a microbData Object
-#' @description Add a vector, list, etc... to an already created microbData object in the Other.data slot
+#' @title Add Other.data to a \code{microbData} Object
+#' @description Add a vector, list, etc... to an already created \code{microbData} object in the Other.data slot
 #' @rdname update.microbData
 #' @export
 

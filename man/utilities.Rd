@@ -16,20 +16,20 @@ sample.sums(mD, sort = NULL)
 feature.sums(mD, sort = NULL)
 }
 \arguments{
-\item{mD}{required; the microbData object to be updated.}
+\item{mD}{required; the \code{microbData} object to be updated.}
 
-\item{sort}{character; either "increasing", "decreasing", or NULL. Increasing will set `sort(decreasing = FALSE)` and decreasing will set `sort(decreasing = TRUE)`. NULL will not sort output. Default is NULL.}
+\item{sort}{character; either "increasing", "decreasing", or NULL. Increasing will set \code{sort(decreasing = FALSE)} and decreasing will set \code{sort(decreasing = TRUE)}. NULL will not sort output. Default is NULL.}
 }
 \description{
 Functions to do quick, helpful things
 
-Get the number of samples in a microbData object.
+Get the number of samples in a \code{microbData} object.
 
-Get the number of features in a microbData object.
+Get the number of features in a \code{microbData} object.
 
-Get the total abundance of all features for each sample in a microbData object.
+Get the total abundance of all features for each sample in a \code{microbData} object.
 
-Get the total abundance of each features across all samples in a microbData object.
+Get the total abundance of each features across all samples in a \code{microbData} object.
 }
 \seealso{
 \code{\link[microbData]{microbData}}, \code{\link{colSums}}, \code{\link{rowSums}}

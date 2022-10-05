@@ -2,7 +2,7 @@
 % Please edit documentation in R/microbData.R
 \name{microbData}
 \alias{microbData}
-\title{Create a `microbData` object}
+\title{Create a \code{microbData} object}
 \usage{
 microbData(
   metadata,
@@ -16,39 +16,39 @@ microbData(
 )
 }
 \arguments{
-\item{metadata}{required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `sample.names` will be set from the keyed column.}
+\item{metadata}{required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{sample.names} will be set from the keyed column.}
 
 \item{abundances}{required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.}
 
-\item{features}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `feature.names` will be set from the keyed column. Default is NULL.}
+\item{features}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.}
 
 \item{phylogeny}{phylo; a phylogenetic tree of features (taxonomic). Default is NULL.}
 
 \item{distance.matrices}{dist or list; a single distance matrix of class "dist" or a list of distance matrices. Default is NULL.}
 
-\item{sample.names}{character; a vector of the sample names. If not provided directly here, will be inferred from `metadata`. Default is NULL.}
+\item{sample.names}{character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.}
 
-\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from `abundances`. Default is NULL.}
+\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.}
 
-\item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the microbData package.}
+\item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the \code{microbData} package.}
 }
 \value{
-A `microbData` object.
+A \code{microbData} object.
 }
 \description{
-Creates an object with associated microbiome data of class `microbData`
+Creates an object with associated microbiome data of class \code{microbData}
 }
 \details{
-This function creates a `microbData` object that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The microbData object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, microbData objects utilize the power of `data.table`s for fast filtering, summarizing and merging.
+This function creates a \code{microbData} object that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The \code{microbData} object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, \code{microbData} objects utilize the power of \code{data.table}s for fast filtering, summarizing and merging.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{Metadata}}{A `data.table` containing values for the covariates associated with each sample.}
+\item{\code{Metadata}}{A \code{data.table} containing values for the covariates associated with each sample.}
 
-\item{\code{Abundances}}{A `matrix` with abundance counts for each feature, e.g., ASVs, KOs, etc.}
+\item{\code{Abundances}}{A \code{matrix} with abundance counts for each feature, e.g., ASVs, KOs, etc.}
 
-\item{\code{Features}}{A `data.table` containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
+\item{\code{Features}}{A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
 
 \item{\code{Phylogeny}}{A phylogenetic tree for features.}
 
@@ -68,10 +68,10 @@ This function creates a `microbData` object that is designed to make it simple f
 \examples{
 ## load data
 data("metadata_dt")  # loads example metadata.dt
-setkey(metadata.dt, Sample) # this will tell microbData that this column contains our sample names
+setkey(metadata.dt, Sample) # this will tell \code{microbData} that this column contains our sample names
 data("asv_mat")      # loads example asv.mat
 data("taxonomy_dt")  # loads example taxonomy.dt
-setkey(taxonomy.dt, ASV) # this will tell microbData that this column contains our feature names
+setkey(taxonomy.dt, ASV) # this will tell \code{microbData} that this column contains our feature names
 data("phylogeny")    # loads example phylogeny
 
 ## create microbData object

@@ -1,12 +1,12 @@
 #' @name ordination.coords
 #' @title Get Plotting Coordinates from (an) Ordination(s)
 #' @description Get the appropriate coordinates to plot the results of one or more ordinations. This also returns axis labels with percentage variance explained for relevant ordination methods (i.e., for all supported methods but NMDS).
-#' @param mD microbData; a microbData object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if `ord.list` and `metadata` are NULL. Default is NULL.
-#' @param ord.list.name character; required if `mD` has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".
-#' @param ord.list list; a list of ordinations, required if `mD` is NULL. This list **must** be named if `combine` is TRUE. Default is NULL.
+#' @param mD microbData; a \code{microbData} object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.
+#' @param ord.list.name character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".
+#' @param ord.list list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.
 #' @param metadata array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.
 #' @param feature.coords logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' #' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no `mD` and `feature.coords` is TRUE. Default is NULL.
+#' #' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.
 #' @param constraint.coords logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.
 #' @param combine logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.
 #' @seealso \code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}

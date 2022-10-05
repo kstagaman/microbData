@@ -2,7 +2,7 @@
 % Please edit documentation in R/phyloseq2microbData.R
 \name{phyloseq2microbData}
 \alias{phyloseq2microbData}
-\title{Phyloseq to MicrobData}
+\title{Phyloseq to microbData}
 \usage{
 phyloseq2microbData(
   physeq,
@@ -12,16 +12,16 @@ phyloseq2microbData(
 )
 }
 \arguments{
-\item{physeq}{required; the phyloseq object to be converted to a microbData object.}
+\item{physeq}{required; the phyloseq object to be converted to a \code{microbData} object.}
 
-\item{feature.prefix}{character; If NULL, feature IDs will remain unchanged. If a character, will be the prefix followed by integers to re-ID features. E.g., if `feature.prefix = "ASV"`, features will be renamed "ASV001", "ASV002", ...with \code{\link[numbered.features]{numbered.features}}. The number of zeroes in the IDs will be determined by the total number of features. Default is NULL.}
+\item{feature.prefix}{character; If NULL, feature IDs will remain unchanged. If a character, will be the prefix followed by integers to re-ID features. E.g., if \code{feature.prefix = "ASV"}, features will be renamed "ASV001", "ASV002", ...with \code{\link[numbered.features]{numbered.features}}. The number of zeroes in the IDs will be determined by the total number of features. Default is NULL.}
 
 \item{rename.NA.features}{logical; if FALSE, NAs in the Feature Assignments table will be ignored. If TRUE, NAs in the Feature Assignments table will be renamed with \code{\link[microbData]{rename.NA.taxa}}. Default is FALSE}
 
 \item{...}{additional arguments to pass to \code{\link[microbData]{numbered.features}} and/or \code{\link[microbData]{rename.NA.taxa}}.}
 }
 \description{
-Convert a phyloseq object to a microbData object
+Convert a phyloseq object to a \code{microbData} object
 }
 \seealso{
 \code{\link[phyloseq]{phyloseq}}, \code{\link[microbData]{numbered.features}}, \code{\link[microbData]{rename.NA.taxa}}

@@ -7,14 +7,14 @@
 numbered.features(mD, prefix, old.IDs.file = NULL)
 }
 \arguments{
-\item{mD}{required; microbData object from which data will be read.}
+\item{mD}{required; \code{microbData} object from which data will be read.}
 
 \item{prefix}{required; character string to append to numeric IDs, e.g., "ASV", "KO".}
 
 \item{old.IDs.file}{character; name of file to write old IDs (in FASTA, CSV, or RDS format inferred from extention: must be ".fa", ".fasta", ".csv", or ".rds") to. NULL will not save IDs to a file. Default is NULL.}
 }
 \description{
-This function replaces the feature names in a microbData object with IDs including a prefix and then numerals, e.g. "ASV0001", "ASV0002", ..., "ASV1234".
+This function replaces the feature names in a \code{microbData} object with IDs including a prefix and then numerals, e.g. "ASV0001", "ASV0002", ..., "ASV1234".
 }
 \seealso{
 \code{\link[microbData]{update.feature.names}}

@@ -7,7 +7,7 @@
 \alias{add.features}
 \alias{add.other.data}
 \alias{add.phylogeny}
-\title{Add or replace data in appropriate slot of a microbData object}
+\title{Add or replace data in appropriate slot of a \code{microbData} object}
 \usage{
 replace.metadata(mD, new.tbl)
 
@@ -22,38 +22,38 @@ add.phylogeny(mD, phylo)
 add.other.data(mD, name, x, replace = FALSE)
 }
 \arguments{
-\item{mD}{required; the microbData object to be updated.}
+\item{mD}{required; the \code{microbData} object to be updated.}
 
-\item{new.tbl}{required for `replace.metadata` and `replace.abundances`; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.}
+\item{new.tbl}{required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.}
 
-\item{distance.matrices}{required for `add.distance.matrices`; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".}
+\item{distance.matrices}{required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".}
 
-\item{features}{required for `add.features`; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), `feature.names` will be set from the keyed column.}
+\item{features}{required for \code{add.features}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.}
 
-\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from `features`. Default is NULL.}
+\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{features}. Default is NULL.}
 
-\item{phylo}{required for `add.phylogeny`; phylo, a phylogenetic tree object.}
+\item{phylo}{required for \code{add.phylogeny}; phylo, a phylogenetic tree object.}
 
-\item{name}{required for `add.other.data`; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").}
+\item{name}{required for \code{add.other.data}; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").}
 
-\item{x}{required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to microbData object in the appropriate (usually Other.data) slot.}
+\item{x}{required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.}
 
-\item{replace}{logical; for `add.other.data`. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.}
+\item{replace}{logical; for \code{add.other.data}. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.}
 }
 \description{
-Functions for adding/replacing metadata, abundances, features, phylogeny, distance matrices, and other data to an established microbData object.
+Functions for adding/replacing metadata, abundances, features, phylogeny, distance matrices, and other data to an established \code{microbData} object.
 
-Replace the data.table in the Metadata slot of a microbData object with a new one
+Replace the data.table in the Metadata slot of a \code{microbData} object with a new one
 
-Replace the matrix in the Abundances slot of a microbData object with a new one
+Replace the matrix in the Abundances slot of a \code{microbData} object with a new one
 
-Add one or a list of distance matrices to an already created microbData object
+Add one or a list of distance matrices to an already created \code{microbData} object
 
-Add a features table to an already created microbData object
+Add a features table to an already created \code{microbData} object
 
-Add a phylogenetic to an already created microbData object
+Add a phylogenetic to an already created \code{microbData} object
 
-Add a vector, list, etc... to an already created microbData object in the Other.data slot
+Add a vector, list, etc... to an already created \code{microbData} object in the Other.data slot
 }
 \seealso{
 \code{\link[microbData]{microbData}}, \code{\link{slot}}

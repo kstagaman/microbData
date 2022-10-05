@@ -7,12 +7,12 @@
 \method{merge}{microbData}(mD1, mD2)
 }
 \arguments{
-\item{mD1}{required; a microbData object you want to merge.}
+\item{mD1}{required; a \code{microbData} object you want to merge.}
 
-\item{mD2}{required; a microbData object you want to merge.}
+\item{mD2}{required; a \code{microbData} object you want to merge.}
 }
 \description{
-Merge two microbData objects.
+Merge two \code{microbData} objects.
 }
 \seealso{
 \code{\link[microbData]{microbData}}

@@ -5,7 +5,7 @@
 #' @param function.name character; name of function if building a mothur command. Default is NULL.
 #' @param tool.syntax character; what syntax to use for building the tool command. Options include "python", "bash", or "mothur". Default is "python".
 #' @param no.double.dashes logical; some command line tools don't use double dashes for flag names longer than 1 character. Setting this to true gives all flags a single dash prefix. Default is FALSE.
-#' @param ... other commands to pass to appropriate tool. Names must match short or long version found in that tool's help page. If the flag takes no argument in the tool, pass "flag" to the argument. E.g. for bash command `ls -l` you could run `generate.tool.command(tool = "ls", l = "flag")`.
+#' @param ... other commands to pass to appropriate tool. Names must match short or long version found in that tool's help page. If the flag takes no argument in the tool, pass "flag" to the argument. E.g. for bash command \code{ls -l} you could run \code{generate.tool.command(tool = "ls", l = "flag")}.
 #' @details This function is primarily run internally, but is available to the user as a wrapper for running other command line tools outside of R.
 #' @seealso \code{\link{system}}, \code{\link{list2}}
 #' @export

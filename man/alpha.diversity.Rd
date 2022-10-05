@@ -11,17 +11,17 @@ alpha.diversity(
 )
 }
 \arguments{
-\item{mD}{required; microbData object from which data will be read.}
+\item{mD}{required; \code{microbData} object from which data will be read.}
 
-\item{metrics}{character; a vector of alpha-diveristy metrics to be estimated from the Abundances table in the microbData object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the microbData object), and "Fisher".}
+\item{metrics}{character; a vector of alpha-diveristy metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the \code{microbData} object), and "Fisher".}
 
-\item{update.mD}{logical; should this function return a new microbData object with the alpha-diversity results added to the Metadata table and add `metrics` to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.}
+\item{update.mD}{logical; should this function return a new \code{microbData} object with the alpha-diversity results added to the Metadata table and add \code{metrics} to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.}
 }
 \value{
-A `microbData` object with estimated alpha-diversity scores added to the Metadata table, OR a table of the estimated alpha-diversity scores for each sample.
+A \code{microbData} object with estimated alpha-diversity scores added to the Metadata table, OR a table of the estimated alpha-diversity scores for each sample.
 }
 \description{
-This function take a microbData object and estimates alpha-diversity (see `metrics`) from the abundance table.
+This function take a \code{microbData} object and estimates alpha-diversity (see `metrics`) from the abundance table.
 }
 \details{
 This function utilizes \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, and/or \code{\link[picante]{pd}} to estimate common alpha-diversity metrics for microbial data.

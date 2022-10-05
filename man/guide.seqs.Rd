@@ -23,7 +23,7 @@ remove.guide.seqs(guide.seq.ids, full.tree.file, asvs.only.tree.file)
 
 \item{keep.guide.ids}{logical; whether to return a vector containing guide sequence IDs for later removal from output. Default is TRUE}
 
-\item{guide.seq.ids}{required; a charater vector of the guide sequence IDs, usually from running `add.guide.seqs`.}
+\item{guide.seq.ids}{required; a charater vector of the guide sequence IDs, usually from running \code{add.guide.seqs}.}
 
 \item{full.tree.file}{required; the file containing the phylogenetic tree containing both ASV and guide sequence IDs in Newick format.}
 

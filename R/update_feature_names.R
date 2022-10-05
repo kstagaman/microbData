@@ -1,7 +1,7 @@
 #' @name update.feature.names
 #' @title Update Feature Names
-#' @description A simple way to replace the feature names in a microbData object.
-#' @param mD required; microbData object to read from and write to.
+#' @description A simple way to replace the feature names in a \code{microbData} object.
+#' @param mD required; \code{microbData} object to read from and write to.
 #' @param new.names required; a character vector of new feature names. This vector must be the same length as the original Feature Names and in the same order.
 #' @export
 

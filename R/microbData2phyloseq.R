@@ -1,7 +1,7 @@
 #' @name microbData2phyloseq
 #' @title MicrobData to Phyloseq
-#' @description Convert a microbData object to a phyloseq object
-#' @param mD required; the microbData object to be converted to a phyloseq object.
+#' @description Convert a \code{microbData} object to a phyloseq object
+#' @param mD required; the \code{microbData} object to be converted to a phyloseq object.
 #' @seealso \code{\link[phyloseq]{phyloseq}}
 #' @export
 

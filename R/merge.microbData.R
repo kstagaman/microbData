@@ -1,8 +1,8 @@
 #' @name merge.microbData
 #' @title Merge Two MicrobDatas
-#' @description Merge two microbData objects.
-#' @param mD1 required; a microbData object you want to merge.
-#' @param mD2 required; a microbData object you want to merge.
+#' @description Merge two \code{microbData} objects.
+#' @param mD1 required; a \code{microbData} object you want to merge.
+#' @param mD2 required; a \code{microbData} object you want to merge.
 #' @seealso \code{\link[microbData]{microbData}}
 #' @export
 

@@ -4,13 +4,13 @@
 #' @aliases nfeatures
 #' @aliases sample.sums
 #' @aliases feature.sums
-#' @param mD required; the microbData object to be updated.
-#' @param sort character; either "increasing", "decreasing", or NULL. Increasing will set `sort(decreasing = FALSE)` and decreasing will set `sort(decreasing = TRUE)`. NULL will not sort output. Default is NULL.
+#' @param mD required; the \code{microbData} object to be updated.
+#' @param sort character; either "increasing", "decreasing", or NULL. Increasing will set \code{sort(decreasing = FALSE)} and decreasing will set \code{sort(decreasing = TRUE)}. NULL will not sort output. Default is NULL.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link{colSums}}, \code{\link{rowSums}}
 
 #' @name nsamples
 #' @title Number of Samples
-#' @description Get the number of samples in a microbData object.
+#' @description Get the number of samples in a \code{microbData} object.
 #' @rdname utilities
 #' @export
 
@@ -21,7 +21,7 @@ nsamples <- function(mD) {
 
 #' @name nfeatures
 #' @title Number of Features
-#' @description Get the number of features in a microbData object.
+#' @description Get the number of features in a \code{microbData} object.
 #' @rdname utilities
 #' @export
 
@@ -32,7 +32,7 @@ nfeatures <- function(mD) {
 
 #' @name sample.sums
 #' @title Total Count of Features in Each Sample
-#' @description Get the total abundance of all features for each sample in a microbData object.
+#' @description Get the total abundance of all features for each sample in a \code{microbData} object.
 #' @rdname utilities
 #' @export
 
@@ -58,7 +58,7 @@ sample.sums <- function(mD, sort = NULL) {
 
 #' @name feature.sums
 #' @title Total Count of Features Across All Samples
-#' @description Get the total abundance of each features across all samples in a microbData object.
+#' @description Get the total abundance of each features across all samples in a \code{microbData} object.
 #' @rdname utilities
 #' @export
 

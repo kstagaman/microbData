@@ -18,16 +18,16 @@ ordination.coords(
 )
 }
 \arguments{
-\item{mD}{microbData; a microbData object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if `ord.list` and `metadata` are NULL. Default is NULL.}
+\item{mD}{microbData; a \code{microbData} object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.}
 
-\item{ord.list.name}{character; required if `mD` has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".}
+\item{ord.list.name}{character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".}
 
-\item{ord.list}{list; a list of ordinations, required if `mD` is NULL. This list **must** be named if `combine` is TRUE. Default is NULL.}
+\item{ord.list}{list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.}
 
 \item{metadata}{array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.}
 
 \item{feature.coords}{logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no `mD` and `feature.coords` is TRUE. Default is NULL.}
+#' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.}
 
 \item{constraint.coords}{logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.}
 

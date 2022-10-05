@@ -4,7 +4,7 @@
 \alias{keep.samples}
 \alias{drop.samples}
 \alias{filter.samples}
-\title{Keep, Drop, or Filter Samples in a microbData object}
+\title{Keep, Drop, or Filter Samples in a \code{microbData} object}
 \usage{
 keep.samples(mD, samples)
 
@@ -13,20 +13,20 @@ drop.samples(mD, samples)
 filter.samples(mD, ...)
 }
 \arguments{
-\item{mD}{required; the microbData object to be updated.}
+\item{mD}{required; the \code{microbData} object to be updated.}
 
 \item{samples}{character or logical; a vector of sample names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Sample Names slot.}
 
-\item{...}{logical expression(s) by which to filter samples based on Metadata, e.g. `Weight > 10 & Genotype != "WT"`.}
+\item{...}{logical expression(s) by which to filter samples based on Metadata, e.g. \code{Weight > 10 & Genotype != "WT"}.}
 }
 \description{
 Functions to specify specific samples to keep/drop by name or to filter samples based on variable(s) in the Metadata
 
-Create a new microbData objects with just the specified samples
+Create a new \code{microbData} objects with just the specified samples
 
-Create a new microbData objects without the specified samples
+Create a new \code{microbData} objects without the specified samples
 
-Create a new microbData objects with samples that match the filter
+Create a new \code{microbData} objects with samples that match the filter
 }
 \seealso{
 \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}

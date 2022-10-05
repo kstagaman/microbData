@@ -1,31 +1,31 @@
 #' @title Transform Feature Counts
-#' @description Functions for transforming feature counts in a microbData object.
+#' @description Functions for transforming feature counts in a \code{microbData} object.
 #' @aliases transform.counts
 #' @aliases rarefy
 #' @aliases center.log.ratio
 #' @aliases variance.stabilize
 #' @aliases relative.abundance
-#' @param mD required; the microbData object with feature counts to be transformed.
-#' @param update.mD logical; should this function return a new microbData object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.
+#' @param mD required; the \code{microbData} object with feature counts to be transformed.
+#' @param update.mD logical; should this function return a new \code{microbData} object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.
 #' @param quiet logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.
-#' @param f required for `transform.counts`; a function that can be applied to the samples (rows) of the Abundance table.
-#' @param min.abund integer; for `rarefy`, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if `min.abund = 10000` and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For `center.log.ratio`, the interger to pass to the `min.reads` argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.
-#' @param exactly.to integer; for `rarefy`, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes `min.abund`. Samples with total reads lower than this number will be dropped. Default is NULL.
-#' @param trim.features logical; for `rarefy`, should features that are no longer present in any samples after rarefaction be dropped from the microbData object? Default is TRUE.
-#' @param user.seed integer; for `rarefy`, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL
-#' @param min.prop numeric; for `center.log.ratio`, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.
-#' @param min.occur numeric; for `center.log.ratio`, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.
-#' @param smpls.by.row logical; for `center.log.ratio`, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.
-#' @param method character; for `center.log.ratio`. Choose one of: count zero multiplicative ("CZM"); geometric Bayesian multiplicative ("GBM"); square root BM ("SQ"); Bayes-Laplace BM ("BL"); user-specified hyper-parameters ("user"). (See \code{\link[zCompositions]{cmultRepl}}). Default is "CZM"
-#' @param lab numeric or character; for `center.log.ratio`, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.
-#' @param design formula or matrix; required for `variance.stabilize`, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.
+#' @param f required for \code{transform.counts}; a function that can be applied to the samples (rows) of the Abundance table.
+#' @param min.abund integer; for \code{rarefy}, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if \code{min.abund = 10000} and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For \code{center.log.ratio}, the interger to pass to the \code{min.reads} argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.
+#' @param exactly.to integer; for \code{rarefy}, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes \code{min.abund}. Samples with total reads lower than this number will be dropped. Default is NULL.
+#' @param trim.features logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.
+#' @param user.seed integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL
+#' @param min.prop numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.
+#' @param min.occur numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.
+#' @param smpls.by.row logical; for \code{center.log.ratio}, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.
+#' @param method character; for \code{center.log.ratio}. Choose one of: count zero multiplicative ("CZM"); geometric Bayesian multiplicative ("GBM"); square root BM ("SQ"); Bayes-Laplace BM ("BL"); user-specified hyper-parameters ("user"). (See \code{\link[zCompositions]{cmultRepl}}). Default is "CZM"
+#' @param lab numeric or character; for \code{center.log.ratio}, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.
+#' @param design formula or matrix; required for \code{variance.stabilize}, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.
 #' @seealso \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}
 #' @export
 
 ####################################
 #' @name transform.counts
 #' @title Transform Feature Counts
-#' @description Supply a custom function with which to transform feature counts in a microbData object.
+#' @description Supply a custom function with which to transform feature counts in a \code{microbData} object.
 #' @rdname transform.counts
 #' @export
 
@@ -44,7 +44,7 @@ transform.counts <- function(mD, f, update.mD = TRUE) {
 ####################################
 #' @name rarefy
 #' @title Rarefy Feature Counts
-#' @description Rarefy feature counts in a microbData object to the same depth.
+#' @description Rarefy feature counts in a \code{microbData} object to the same depth.
 #' @rdname transform.counts
 #' @export
 
@@ -196,7 +196,7 @@ variance.stabilize <- function(
 ####################################
 #' @name relative.abundance
 #' @title Relative Abundance of Feature Counts
-#' @description Transform feature counts to relative abundance. This function is the equivalent of `transform.counts(mD = mD, f = function(x) x / sum(x))`, but because it's a popular method of transformation, it has its own wrapper here.
+#' @description Transform feature counts to relative abundance. This function is the equivalent of \code{transform.counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
 #' @rdname transform.counts
 #' @export
 

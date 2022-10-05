@@ -4,7 +4,7 @@
 #' @param guide.seqs.file required; FASTA file containing guide sequences.
 #' @param joined.file required; FASTA file to write concatenated sequences to.
 #' @param keep.guide.ids logical; whether to return a vector containing guide sequence IDs for later removal from output. Default is TRUE
-#' @param guide.seq.ids required; a charater vector of the guide sequence IDs, usually from running `add.guide.seqs`.
+#' @param guide.seq.ids required; a charater vector of the guide sequence IDs, usually from running \code{add.guide.seqs}.
 #' @param full.tree.file required; the file containing the phylogenetic tree containing both ASV and guide sequence IDs in Newick format.
 #' @param asvs.only.tree.file required; the file to write the pruned tree of just ASV IDs to. Will be written in Newick format.
 #' @seealso \code{\link{generate.tool.command}}, \code{\link{system}}

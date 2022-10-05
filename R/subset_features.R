@@ -1,18 +1,18 @@
-#' @title Keep, Drop, or Filter Features in a microbData object
+#' @title Keep, Drop, or Filter Features in a \code{microbData} object
 #' @description Functions to specify specific features to keep/drop by name or to filter features based on variable(s) in the Metadata
 #' @aliases keep.features
 #' @aliases drop.features
 #' @aliases filter.features
 #' @aliases remove.eukarya
-#' @param mD required; the microbData object to be updated.
+#' @param mD required; the \code{microbData} object to be updated.
 #' @param features character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
-#' @param ... logical expression(s) by which to filter features based on the Features table, e.g. `Kingdom == "Bacteria" & Family != "Mitochondria"`.
+#' @param ... logical expression(s) by which to filter features based on the Features table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 
 ####################################
 #' @name keep.features
 #' @title Keep Features
-#' @description Create a new microbData objects with just the specified features
+#' @description Create a new \code{microbData} objects with just the specified features
 #' @rdname subset.features
 #' @export
 
@@ -49,7 +49,7 @@ keep.features <- function(mD, features) {
 ####################################
 #' @name drop.features
 #' @title Drop Features
-#' @description Create a new microbData objects without the specified features
+#' @description Create a new \code{microbData} objects without the specified features
 #' @rdname subset.features
 #' @export
 
@@ -87,7 +87,7 @@ drop.features <- function(mD, features) {
 ####################################
 #' @name filter.features
 #' @title Filter Features
-#' @description Create a new microbData objects with features that match the filter
+#' @description Create a new \code{microbData} objects with features that match the filter
 #' @rdname subset.features
 #' @export
 
@@ -100,7 +100,7 @@ filter.features <- function(mD, ...) {
 ####################################
 #' @name remove.eukarya
 #' @title Remove ASVs with eukaryotic taxonomic assignments
-#' @description Create a new microbData objects without ASVs assignment to eukaryotic taxonomy
+#' @description Create a new \code{microbData} objects without ASVs assignment to eukaryotic taxonomy
 #' @rdname subset.features
 #' @export
 

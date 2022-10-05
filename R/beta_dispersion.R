@@ -1,17 +1,17 @@
 #' @name beta.dispersion
 #' @title Estimate Beta-dispersion
 #' @description Utilizes \code{\link[vegan]{betadisper}} to calculate beta-dispersion (distance to centroid) for each sample by a group.
-#' @param mD required; the `microbData` object, with distance matrices (see \code{\link[microbData]{beta.diversity}}) from which to estimate beta-dispersion.
+#' @param mD required; the \code{microbData} object, with distance matrices (see \code{\link[microbData]{beta.diversity}}) from which to estimate beta-dispersion.
 #' @param group required; a character string indicating by which column in the Metadata table the samples should be grouped.
-#' @param metrics character; if NULL, beta-dispersion will be calculated for each distance matrix present in the `microbData` object. If metrics are provided, beta-dispersion will only be calculated for those metrics. Default is NULL.
+#' @param metrics character; if NULL, beta-dispersion will be calculated for each distance matrix present in the \code{microbData} object. If metrics are provided, beta-dispersion will only be calculated for those metrics. Default is NULL.
 #' @param type character; the type of analysis to perform. Use the spatial median ("median") or the group centroid ("centroid")? Default is "median". (Directly from \code{\link[vegan]{betadisper}}).
 #' @param bias.adjust logical: adjust for small sample bias in beta diversity estimates? Default is FALSE.
 #' @param sqrt.dist logical; take square root of dissimilarities. This often euclidifies dissimilarities. Default is FALSE. (Directly from \code{\link[vegan]{betadisper}}).
-#' @param add logical; add a constant to the non-diagonal dissimilarities such that all eigenvalues are non-negative in the underlying Principal Co-ordinates Analysis (see \code{\linkl[vegan]{wcmdscale}} for details). Choice "lingoes" (or TRUE) use the recommended method of Legendre & Anderson (1999: “method 1”) and "cailliez" uses their “method 2”. Default is FALSE. (Directly from \code{\link[vegan]{betadisper}}).
-#' @param update.mD logical; should this function return a new microbData object with the beta-dispersion results added to the Metadata table and add `metrics` to Other.data (TRUE) or just the results of the beta-dispersion estimation (FALSE)? Default is TRUE.
-#' @details This function utilizes \code{\link[vegan]{betadisper}} to estimate beta-dispersion (i.e., distance from spatial median or group centroid in ordination space) by categorical group. See `?vegan::betadisper` for more details about the procedure that function employs.
-#' @returns If `update.mD` is TRUE, a `microbData` object with estimated beta-dispersion scores added to the Metadata table and a list of the "betadisper" objects added to the Other.data slot.
-#' @returns If `update.mD` is FALSE, a list containing:
+#' @param add logical; add a constant to the non-diagonal dissimilarities such that all eigenvalues are non-negative in the underlying Principal Co-ordinates Analysis (see \code{\link[vegan]{wcmdscale}} for details). Choice "lingoes" (or TRUE) use the recommended method of Legendre & Anderson (1999: “method 1”) and "cailliez" uses their “method 2”. Default is FALSE. (Directly from \code{\link[vegan]{betadisper}}).
+#' @param update.mD logical; should this function return a new \code{microbData} object with the beta-dispersion results added to the Metadata table and add \code{metrics} to Other.data (TRUE) or just the results of the beta-dispersion estimation (FALSE)? Default is TRUE.
+#' @details This function utilizes \code{\link[vegan]{betadisper}} to estimate beta-dispersion (i.e., distance from spatial median or group centroid in ordination space) by categorical group. See \code{?vegan::betadisper} for more details about the procedure that function employs.
+#' @returns If \code{update.mD} is TRUE, a \code{microbData} object with estimated beta-dispersion scores added to the Metadata table and a list of the "betadisper" objects added to the Other.data slot.
+#' @returns If \code{update.mD} is FALSE, a list containing:
 #'
 #' \item{Distances}{a table of the estimated beta-dispersion scores for each sample}
 #' \item{Betadispers}{a list of the "betadisper" objects}

@@ -1,8 +1,8 @@
 #' @name phyloseq2microbData
-#' @title Phyloseq to MicrobData
-#' @description Convert a phyloseq object to a microbData object
-#' @param physeq required; the phyloseq object to be converted to a microbData object.
-#' @param feature.prefix character; If NULL, feature IDs will remain unchanged. If a character, will be the prefix followed by integers to re-ID features. E.g., if `feature.prefix = "ASV"`, features will be renamed "ASV001", "ASV002", ...with \code{\link[numbered.features]{numbered.features}}. The number of zeroes in the IDs will be determined by the total number of features. Default is NULL.
+#' @title Phyloseq to microbData
+#' @description Convert a phyloseq object to a \code{microbData} object
+#' @param physeq required; the phyloseq object to be converted to a \code{microbData} object.
+#' @param feature.prefix character; If NULL, feature IDs will remain unchanged. If a character, will be the prefix followed by integers to re-ID features. E.g., if \code{feature.prefix = "ASV"}, features will be renamed "ASV001", "ASV002", ...with \code{\link[numbered.features]{numbered.features}}. The number of zeroes in the IDs will be determined by the total number of features. Default is NULL.
 #' @param rename.NA.features logical; if FALSE, NAs in the Feature Assignments table will be ignored. If TRUE, NAs in the Feature Assignments table will be renamed with \code{\link[microbData]{rename.NA.taxa}}. Default is FALSE
 #' @param ... additional arguments to pass to \code{\link[microbData]{numbered.features}} and/or \code{\link[microbData]{rename.NA.taxa}}.
 #' @seealso \code{\link[phyloseq]{phyloseq}}, \code{\link[microbData]{numbered.features}}, \code{\link[microbData]{rename.NA.taxa}}
@@ -15,6 +15,7 @@ phyloseq2microbData <- function(
     ...
 ) {
   vargs <- rlang::list2(...)
+  if (!{"phyloseq" %in% class(physeq)}) { rlang::abort("Object supplied to argument `physeq' must be of class 'phyloseq'.")}
   smpl.dt <- as(physeq@sam_data, "data.frame") %>%
     as.data.table(keep.rownames = "Sample") %>%
     setkey(Sample)

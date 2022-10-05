@@ -2,7 +2,7 @@
 % Please edit documentation in R/mothur_NAST_align.R
 \name{mothur.NAST.align}
 \alias{mothur.NAST.align}
-\title{NAST Alignment with `mothur`}
+\title{NAST Alignment with \code{mothur}}
 \usage{
 mothur.NAST.align(
   fasta,
@@ -17,14 +17,14 @@ mothur.NAST.align(
 
 \item{template.file}{required; the path and name of the alignment file to be used. See https://mothur.org/wiki/alignment_database/ to download a database of your choice.}
 
-\item{mothur.path}{character; path to `mothur` executable if it is not in your system PATH variable. Default is NULL.}
+\item{mothur.path}{character; path to \code{mothur} executable if it is not in your system PATH variable. Default is NULL.}
 
-\item{output.dir}{character; path to output directory. Default is `getwd()`.}
+\item{output.dir}{character; path to output directory. Default is \code{getwd()}.}
 
-\item{ncores}{integer; the number of cores for `mothur`.}
+\item{ncores}{integer; the number of cores for \code{mothur}.}
 }
 \description{
-Uses the `align.seqs` function from `mothur` (requires install: https://mothur.org/wiki/installation/)
+Uses the \code{align.seqs} function from \code{mothur} (requires install: https://mothur.org/wiki/installation/)
 }
 \seealso{
 \code{\link{generate.tool.command}}, \code{\link{system}}
