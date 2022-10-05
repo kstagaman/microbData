@@ -122,7 +122,7 @@ microbData <- function(
 
   if (!{"sorted" %in% names(attributes(metadata))} & is.null(sample.names)) {
     rlang::abort(
-      "The data.table supplied to `metadata' is not sorted by sample names and `sample.names' is also NULL, please supply sample names by either using `data.table::setkey' on the data.table or providing a character vector of sample names."
+      "The data.table supplied to `metadata' is not keyed by sample names and `sample.names' is also NULL, please supply sample names by either using `data.table::setkey' on the data.table or providing a character vector of sample names."
     )
   } else {
     smpl.col <- attributes(metadata)$sorted
