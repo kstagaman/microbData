@@ -9,7 +9,7 @@
 #' @details The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a \code{microbData} object.
 #' @returns Either a \code{microbData} object with the results add to the Distance.matrices slot and the names of the metrics recorded in the Other.data slot, OR a named list of the distance matrices.
 #' @seealso \code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
-#' #' @examples
+#' @examples
 #' data("mD_rar")
 #' mD.new <- beta.diversity(mD.rar, metrics = c("Bray-Curtis", "Canberra"))
 #' print(mD.new)

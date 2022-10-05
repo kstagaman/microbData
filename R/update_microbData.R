@@ -15,6 +15,8 @@
 #' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.
 #' @param name required for \code{add.other.data}; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
 #' @param replace logical; for \code{add.other.data}. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.
+#' @details These function can replace data in or add data to an existing \code{microbData} object. The \code{@} operator, or the \code{\link{slot}} function can also accomplish this same task. However, for replacing metadata, and abundances, these functions check to make sure the replacement tables match the samples and/or features of the original tables, helping to safeguard against user error. Additionally, these functions are more user friendly and make sure data get into the correct slot than using the base functions.
+#' @returns A \code{microbData} object with the new data.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link{slot}}
 
 ####################################
@@ -41,7 +43,7 @@ replace.metadata <- function(mD, new.tbl) {
   if (!identical(sort(mD@Sample.names), sort(new.tbl[[new.smpl.col]]))) {
     rlang::abort(
       "The data.table supplied to `new.tbl' does not have the same samples as the Metadata table it is replacing."
-      )
+    )
   } else {
     mD@Metadata <- new.tbl
     if (mD@Sample.col != new.smpl.col) { mD@Sample.col <- new.smpl.col }
@@ -113,7 +115,7 @@ add.distance.matrices <- function(mD, distance.matrices) {
 ####################################
 #' @name add.features
 #' @title Add Features Table
-#' @description Add a features table to an already created \code{microbData} object
+#' @description Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.features}.
 #' @rdname update.microbData
 #' @export
 
@@ -131,22 +133,47 @@ add.features <- function(mD, features, feature.names = NULL) {
     features <- as.data.table(features, keep.rownames = "Feature")
     setkey(features, Feature)
   }
-  if (is.null(feature.names)) {
-    if (!{"sorted" %in% names(attributes(features))}) {
+  if (is.null(mD@Features)) {
+    if (is.null(feature.names)) {
+      if (!{"sorted" %in% names(attributes(features))}) {
+        rlang::abort(
+          "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
+        )
+      } else {
+        feat.col <- attributes(features)$sorted
+      }
+    } else {
+      mD@Feature.names <- feature.names
+    }
+    mD@Features <- features
+    mD@Feature.col <- feat.col
+    return(mD)
+  } else {
+    if (!{"data.table" %in% class(features)}) {
+      features <- as.data.table(metadata, keep.rownames = mD@Sample.col) %>%
+        setkeyv(mD@Sample.col)
+    } else if (!{"sorted" %in% names(attributes(features))}) {
       rlang::abort(
-        "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
+        "The data.table supplied to `features' is not keyed by sample names, please supply sample names by using `data.table::setkey'."
       )
     } else {
-      feat.col <- attributes(features)$sorted
+      new.feat.col <- attributes(features)$sorted
     }
-  } else {
-    mD@Feature.names <- feature.names
+    if (!identical(sort(mD@Feature.names), sort(features[[feat.col]]))) {
+      rlang::abort(
+        "The data.table supplied to `features' does not have the same feature names as the Features table it is replacing."
+      )
+    } else {
+      mD@Features <- features
+      if (mD@Feature.col != new.feat.col) { mD@Sample.col <- new.feat.col }
+      return(mD)
+    }
   }
-
-  mD@Features <- features
-  mD@Feature.col <- feat.col
-  return(mD)
 }
+
+#' @export
+
+replace.features <- add.features
 
 ####################################
 #' @name add.phylogeny

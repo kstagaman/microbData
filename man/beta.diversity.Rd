@@ -33,10 +33,11 @@ This function estimates beta-diversity (see \code{metrics}) from the abundances 
 \details{
 The function utilizes \code{\link[vegan]{vegdist}} and/or \code{\link[GUniFrac]{GUniFrac}} to estimate pairwise beta-diversity between each sample in a \code{microbData} object.
 }
-\seealso{
-\code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
-#' @examples
+\examples{
 data("mD_rar")
 mD.new <- beta.diversity(mD.rar, metrics = c("Bray-Curtis", "Canberra"))
 print(mD.new)
+}
+\seealso{
+\code{\link[vegan]{vegdist}}, \code{\link[GUniFrac]{GUniFrac}}
 }

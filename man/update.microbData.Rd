@@ -40,6 +40,9 @@ add.other.data(mD, name, x, replace = FALSE)
 
 \item{replace}{logical; for \code{add.other.data}. If TRUE, the new data will replace any data currently in that element of the Other.data list. If FALSE, the new data will be appended to any data currently in that element of the Other.data list. Default is FALSE.}
 }
+\value{
+A \code{microbData} object with the new data.
+}
 \description{
 Functions for adding/replacing metadata, abundances, features, phylogeny, distance matrices, and other data to an established \code{microbData} object.
 
@@ -49,11 +52,14 @@ Replace the matrix in the Abundances slot of a \code{microbData} object with a n
 
 Add one or a list of distance matrices to an already created \code{microbData} object
 
-Add a features table to an already created \code{microbData} object
+Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.features}.
 
 Add a phylogenetic to an already created \code{microbData} object
 
 Add a vector, list, etc... to an already created \code{microbData} object in the Other.data slot
+}
+\details{
+These function can replace data in or add data to an existing \code{microbData} object. The \code{@} operator, or the \code{\link{slot}} function can also accomplish this same task. However, for replacing metadata, and abundances, these functions check to make sure the replacement tables match the samples and/or features of the original tables, helping to safeguard against user error. Additionally, these functions are more user friendly and make sure data get into the correct slot than using the base functions.
 }
 \seealso{
 \code{\link[microbData]{microbData}}, \code{\link{slot}}
