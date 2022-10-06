@@ -5,6 +5,7 @@
 #' @aliases filter.samples
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param samples character or logical; a vector of sample names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Sample Names slot.
+#' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.
 #' @param ... logical expression(s) by which to filter samples based on Metadata, e.g. \code{Weight > 10 & Genotype != "WT"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}
 
@@ -15,7 +16,7 @@
 #' @rdname subset.samples
 #' @export
 
-keep.samples <- function(mD, samples) {
+keep.samples <- function(mD, samples, track = TRUE) {
   if (is.logical(samples)) {
     if (is.null(names(samples))) {
       if (length(samples) != nsamples(mD)) {
@@ -33,6 +34,13 @@ keep.samples <- function(mD, samples) {
   }
   if (!all(to.keep %in% mD@Sample.names)) {
     rlang::abort("One or more of the samples supplied to `samples' is not in the microbData Sample Names")
+  }
+  if (track) {
+    mD <- add.other.data(
+      mD = mD,
+      name = "Dropped.samples",
+      x = mD@Sample.names[!{mD@Sample.names %in% to.keep}]
+    )
   }
   mD@Metadata <- copy(mD@Metadata)[to.keep]
   mD@Abundances <- mD@Abundances[to.keep, ]
@@ -56,7 +64,7 @@ keep.samples <- function(mD, samples) {
 #' @rdname subset.samples
 #' @export
 
-drop.samples <- function(mD, samples) {
+drop.samples <- function(mD, samples, track = TRUE) {
   if (is.logical(samples)) {
     if (is.null(names(samples))) {
       if (length(samples) != nsamples(mD)) {
@@ -74,6 +82,9 @@ drop.samples <- function(mD, samples) {
   }
   if (!all(to.keep %in% mD@Sample.names)) {
     rlang::abort("One or more of the samples to be kept is not in the microbData Sample Names")
+  }
+  if (track) {
+    mD <- add.other.data(mD = mD, name = "Dropped.samples", x = samples)
   }
   mD@Metadata <- copy(mD@Metadata)[to.keep]
   mD@Abundances <- mD@Abundances[to.keep, ]
@@ -97,8 +108,11 @@ drop.samples <- function(mD, samples) {
 #' @rdname subset.samples
 #' @export
 
-filter.samples <- function(mD, ...) {
-  copy(mD@Metadata)[...][[mD@Sample.col]] %>%
-    keep.samples(mD = mD, samples = .) %>%
-    return()
+filter.samples <- function(mD, ..., track = TRUE) {
+  mD.return <- copy(mD@Metadata)[...][[mD@Sample.col]] %>%
+    keep.samples(mD = mD, samples = ., track = FALSE)
+  if (track) {
+    mD.return <- add.other.data(mD = mD.return, name = "Sample.filter", x = deparse(substitute(...)))
+  }
+  return(mD.return)
 }

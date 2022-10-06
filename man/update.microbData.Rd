@@ -5,8 +5,10 @@
 \alias{replace.abundances}
 \alias{add.distance.matrices}
 \alias{add.features}
+\alias{replace.features}
 \alias{add.other.data}
 \alias{add.phylogeny}
+\alias{replace.phylogeny}
 \title{Add or replace data in appropriate slot of a \code{microbData} object}
 \usage{
 replace.metadata(mD, new.tbl)

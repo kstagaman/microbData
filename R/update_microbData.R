@@ -4,8 +4,10 @@
 #' @aliases replace.abundances
 #' @aliases add.distance.matrices
 #' @aliases add.features
+#' @aliases replace.features
 #' @aliases add.other.data
 #' @aliases add.phylogeny
+#' @aliases replace.phylogeny
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param new.tbl required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
 #' @param distance.matrices required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
@@ -70,12 +72,28 @@ replace.abundances <- function(mD, new.tbl) {
     rlang::abort(
       "The matrix supplied to `new.tbl' does not have the same samples as the Abundances table it is replacing."
     )
-  } else if (!identical(sort(colnames(mD@Abundances)), sort(colnames(new.tbl)))) {
-    rlang::abort(
-      "The matrix supplied to `new.tbl' does not have the same features as the Abundances table it is replacing."
-    )
   } else {
-    mD@Abundances <- new.tbl[rownames(mD@Abundances), colnames(mD@Abundances)]
+    mD@Abundances <- new.tbl[
+      rownames(mD@Abundances),
+      names(sort(colSums(new.tbl), decreasing = T))
+    ]
+    if (!is.null(mD@Features)) {
+      if (!identical(sort(colnames(mD@Abundances)), sort(mD@Feature[[mD@Feature.col]]))) {
+        rlang::warn(
+          "The feature names (colnames) in the new Abundances table are not all identical to the names in the Features table."
+        )
+      }
+    }
+    if (!is.null(mD@Phylogeny)) {
+      if (!identical(sort(colnames(mD@Abundances)), sort(mD@Phylogeny$tip.label))) {
+        rlang::warn(
+          "The feature names (colnames) in the new Abundances table are not all identical to the names in the Phylogenetic tree."
+        )
+      }
+    }
+    if (!identical(sort(colnames(mD@Abundances)), sort(mD@Feature.names))) {
+      mD@Feature.names <- colnames(mD@Abundances)
+    }
     return(mD)
   }
 }
@@ -129,46 +147,31 @@ add.features <- function(mD, features, feature.names = NULL) {
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
+  feat.col <- ifelse(is.null(mD@Features), "Feature", mD@Feature.col)
   if (!{"data.table" %in% class(features)}) {
-    features <- as.data.table(features, keep.rownames = "Feature")
-    setkey(features, Feature)
-  }
-  if (is.null(mD@Features)) {
-    if (is.null(feature.names)) {
-      if (!{"sorted" %in% names(attributes(features))}) {
-        rlang::abort(
-          "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
-        )
-      } else {
-        feat.col <- attributes(features)$sorted
-      }
-    } else {
-      mD@Feature.names <- feature.names
-    }
-    mD@Features <- features
-    mD@Feature.col <- feat.col
-    return(mD)
-  } else {
-    if (!{"data.table" %in% class(features)}) {
-      features <- as.data.table(metadata, keep.rownames = mD@Sample.col) %>%
-        setkeyv(mD@Sample.col)
-    } else if (!{"sorted" %in% names(attributes(features))}) {
+    features <- as.data.table(features, keep.rownames = feat.col) %>%
+      setkeyv(feat.col)
+  } else if (is.null(feature.names)) {
+    if (!{"sorted" %in% names(attributes(features))}) {
       rlang::abort(
-        "The data.table supplied to `features' is not keyed by sample names, please supply sample names by using `data.table::setkey'."
+        "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
       )
     } else {
-      new.feat.col <- attributes(features)$sorted
+      feat.col <- attributes(features)$sorted
     }
+  } else {
+    mD@Feature.names <- feature.names
+  }
+  if (!is.null(mD@Features)) {
     if (!identical(sort(mD@Feature.names), sort(features[[feat.col]]))) {
       rlang::abort(
         "The data.table supplied to `features' does not have the same feature names as the Features table it is replacing."
       )
-    } else {
-      mD@Features <- features
-      if (mD@Feature.col != new.feat.col) { mD@Sample.col <- new.feat.col }
-      return(mD)
     }
   }
+  mD@Features <- features
+  if (is.null(mD@Feature.col) | mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
+  return(mD)
 }
 
 #' @export
@@ -200,6 +203,10 @@ add.phylogeny <- function(mD, phylo) {
     )
   }
 }
+
+#' @export
+
+replace.phylogeny <- add.phylogeny
 
 ####################################
 #' @name add.other.data

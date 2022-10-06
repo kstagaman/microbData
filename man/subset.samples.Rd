@@ -6,16 +6,18 @@
 \alias{filter.samples}
 \title{Keep, Drop, or Filter Samples in a \code{microbData} object}
 \usage{
-keep.samples(mD, samples)
+keep.samples(mD, samples, track = TRUE)
 
-drop.samples(mD, samples)
+drop.samples(mD, samples, track = TRUE)
 
-filter.samples(mD, ...)
+filter.samples(mD, ..., track = TRUE)
 }
 \arguments{
 \item{mD}{required; the \code{microbData} object to be updated.}
 
 \item{samples}{character or logical; a vector of sample names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Sample Names slot.}
+
+\item{track}{logical; should the names of the dropped samples be added to Other.data? Default is TRUE.}
 
 \item{...}{logical expression(s) by which to filter samples based on Metadata, e.g. \code{Weight > 10 & Genotype != "WT"}.}
 }
