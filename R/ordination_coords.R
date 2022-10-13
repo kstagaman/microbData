@@ -6,7 +6,7 @@
 #' @param ord.list list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.
 #' @param metadata array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.
 #' @param feature.coords logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' #' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.
+#' #' @param assignment.tbl array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.
 #' @param constraint.coords logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.
 #' @param combine logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.
 #' @seealso \code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}
@@ -18,7 +18,7 @@ ordination.coords <- function(
     ord.list = NULL,
     metadata = NULL,
     feature.coords = FALSE,
-    feature.tbl = NULL,
+    assignment.tbl = NULL,
     constraint.coords = FALSE,
     combine = TRUE,
     axes = 1:2,
@@ -41,11 +41,11 @@ ordination.coords <- function(
   }
   if (feature.coords) {
     if (!is.null(mD)) {
-      feature.tbl <- mD@Features
+      assignment.tbl <- mD@Assignments
     }
-    if (!is.null(feature.tbl)) {
-      if (!{"data.table" %in% class(feature.tbl)}) {
-        feature.tbl <- as.data.table(feature.tbl)
+    if (!is.null(assignment.tbl)) {
+      if (!{"data.table" %in% class(assignment.tbl)}) {
+        assignment.tbl <- as.data.table(assignment.tbl)
       }
     }
   }
@@ -136,36 +136,36 @@ ordination.coords <- function(
     }
 
     if (feature.coords) {
-      feat.mat <- vegan::scores(ord, display = "species")
-      colnames(feat.mat)[1:2] <- c("Axis1", "Axis2")
-      if (!is.null(feature.tbl)) {
-        if ("sorted" %in% names(attributes(feature.tbl))) {
-          feat.col.name <- attributes(feature.tbl)$sorted
+      assign.mat <- vegan::scores(ord, display = "species")
+      colnames(assign.mat)[1:2] <- c("Axis1", "Axis2")
+      if (!is.null(assignment.tbl)) {
+        if ("sorted" %in% names(attributes(assignment.tbl))) {
+          feat.col.name <- attributes(assignment.tbl)$sorted
         } else {
-          feat.col.name <- names(feature.tbl)[
-            apply(feature.tbl, MARGIN = 2, FUN = function(x) {
-              all(row.names(feat.mat) %in% x)
+          feat.col.name <- names(assignment.tbl)[
+            apply(assignment.tbl, MARGIN = 2, FUN = function(x) {
+              all(row.names(assign.mat) %in% x)
             })
           ]
           if (length(feat.col.name) == 0) {
             rlang::abort(
               paste(
-                "The supplied feature.tbl does not contain all samples in the ordination at element", i, ", please review data and re-try."
+                "The supplied assignment.tbl does not contain all samples in the ordination at element", i, ", please review data and re-try."
               )
             )
           } else {
-            setkeyv(feature.tbl, feat.col.name)
+            setkeyv(assignment.tbl, feat.col.name)
           }
         }
-        sections[["Features"]] <- as.data.table(feat.mat, keep.rownames = feat.col.name) %>%
+        sections[["Assignments"]] <- as.data.table(assign.mat, keep.rownames = feat.col.name) %>%
           setkeyv(feat.col.name) %>%
-          merge(feature.tbl)
+          merge(assignment.tbl)
       } else {
-        sections[["Features"]] <- as.data.table(feat.mat, keep.rownames = "Feature") %>%
+        sections[["Assignments"]] <- as.data.table(assign.mat, keep.rownames = "Feature") %>%
           setkey(Feature)
       }
       if (combine) {
-        sections[["Features"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
+        sections[["Assignments"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
       }
     }
     if (ord.type == "dbRDA" & constraint.coords) {

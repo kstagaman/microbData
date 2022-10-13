@@ -58,7 +58,7 @@ data("phylogeny")    # loads example phylogeny
 mD1 <- microbData(
   metadata = metadata.dt,
   abundances = asv.mat,
-  features = taxonomy.dt, 
+  assignments = taxonomy.dt, 
   phylogeny = phylogeny
 )
 print(mD1)
@@ -123,20 +123,20 @@ print(mD1)
 ## View individual tables
 # View(get.metadata(mD1))
 # View(get.abundances(mD1))
-# View(get.features(mD1))
+# View(get.assignments(mD1))
 # View(get.phylogeny(mD1))
 ```
 
 We have a lot of ASVs assigned to Eukarya, so let’s get rid of those
 first. Also notice that our ASV IDs are sequences, which can be unwieldy
 to deal with, and can cause issues with memory usage for really large
-data sets. Finally, there are NA assignments in the Features table. So
-we’re going to run a couple steps to clean things up.
+data sets. Finally, there are NA assignments in the Assignments table.
+So we’re going to run a couple steps to clean things up.
 
 ``` r
 mD2 <- remove.eukarya(mD = mD1) %>% 
   numbered.features(prefix = "ASV") %>% 
-  rename.NA.features()
+  rename.NA.assignments()
 print(mD2)
 ```
 
@@ -172,6 +172,10 @@ print(mD2)
     ## Sample Names: A01, A02, A03,..., H12
     ## 
     ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
+    ## 
+    ## Other Data:
+    ##   Dropped.features: TACGAAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCGCGTAGGTGGTTTTGTAAGTTGGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGATTAGAGCTCAACTCTAAAAAAC, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGGTTAGAGCTTAACTCTAAAAAAC,..., TACGAGAGGCCCTAGTTGATAACTACCGGCGCAAAGAGTGGTTATGGAAAAATATTTAATAAAGCCGAACACCCCCTCAGCCGTCATACGCACCTGGGAG
+    ##   Feature.filter: removed Eukarya
 
 ### Deal with uneven sampling
 
@@ -193,7 +197,7 @@ mD3 <- rarefy(mD2)
     ## Rarefying to: 13000
     ## Random seed: 10403
     ## Number of samples dropped: 18
-    ## Number of features dropped: 684
+    ## Number of features dropped: 687
 
 ``` r
 print(mD3)
@@ -212,10 +216,10 @@ print(mD3)
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3981    3241    1139     977
-    ## A02   11139     557     153     130
-    ## A03    4309    2924    1082     819
-    ## A05    1420       0       0       0
+    ## A01    3968    3116    1197     962
+    ## A02   11039     560     159     148
+    ## A03    4333    2887    1116     810
+    ## A05    1427       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -233,6 +237,9 @@ print(mD3)
     ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
     ## 
     ## Other Data:
+    ##   Dropped.features: TACGAAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCGCGTAGGTGGTTTTGTAAGTTGGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGATTAGAGCTCAACTCTAAAAAAC, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGGTTAGAGCTTAACTCTAAAAAAC,..., TACGAGAGGCCCTAGTTGATAACTACCGGCGCAAAGAGTGGTTATGGAAAAATATTTAATAAAGCCGAACACCCCCTCAGCCGTCATACGCACCTGGGAG
+    ##   Feature.filter: removed Eukarya
+    ##   Dropped.samples: A04, A09, B02,..., H11
     ##   Abundances rarefied: 13000
 
 Notice, also, the default behavior is to add a note to the Other Data
@@ -258,20 +265,20 @@ print(mD4)
     ## Sample Metadata: 28 samples with 5 covariates
     ## Preview:
     ## Key: <Sample>
-    ##    Sample Exposure  Shannon   Simpson
-    ##    <char>   <fctr>    <num>     <num>
-    ## 1:    A01       no 2.735710 0.8286525
-    ## 2:    A02       no 0.862923 0.2635847
-    ## 3:    A03       no 2.823123 0.8263305
-    ## 4:    A05       no 2.124319 0.7633306
+    ##    Sample Exposure   Shannon   Simpson
+    ##    <char>   <fctr>     <num>     <num>
+    ## 1:    A01       no 2.7789868 0.8333341
+    ## 2:    A02       no 0.9049006 0.2766212
+    ## 3:    A03       no 2.8318956 0.8261487
+    ## 4:    A05       no 2.1329583 0.7647840
     ## 
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3981    3241    1139     977
-    ## A02   11139     557     153     130
-    ## A03    4309    2924    1082     819
-    ## A05    1420       0       0       0
+    ## A01    3968    3116    1197     962
+    ## A02   11039     560     159     148
+    ## A03    4333    2887    1116     810
+    ## A05    1427       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -292,6 +299,9 @@ print(mD4)
     ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
     ## 
     ## Other Data:
+    ##   Dropped.features: TACGAAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCGCGTAGGTGGTTTTGTAAGTTGGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGATTAGAGCTCAACTCTAAAAAAC, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGGTTAGAGCTTAACTCTAAAAAAC,..., TACGAGAGGCCCTAGTTGATAACTACCGGCGCAAAGAGTGGTTATGGAAAAATATTTAATAAAGCCGAACACCCCCTCAGCCGTCATACGCACCTGGGAG
+    ##   Feature.filter: removed Eukarya
+    ##   Dropped.samples: A04, A09, B02,..., H11
     ##   Abundances rarefied: 13000
     ##   Alpha.metrics: Chao1, Shannon, Simpson, Phylogenetic
     ##   Beta.metrics: Canberra, 0.5 UniFrac
@@ -339,20 +349,20 @@ print(mD5)
     ## Sample Metadata: 28 samples with 5 covariates
     ## Preview:
     ## Key: <Sample>
-    ##    Sample Exposure  Shannon   Simpson
-    ##    <char>   <fctr>    <num>     <num>
-    ## 1:    A01       no 2.735710 0.8286525
-    ## 2:    A02       no 0.862923 0.2635847
-    ## 3:    A03       no 2.823123 0.8263305
-    ## 4:    A05       no 2.124319 0.7633306
+    ##    Sample Exposure   Shannon   Simpson
+    ##    <char>   <fctr>     <num>     <num>
+    ## 1:    A01       no 2.7789868 0.8333341
+    ## 2:    A02       no 0.9049006 0.2766212
+    ## 3:    A03       no 2.8318956 0.8261487
+    ## 4:    A05       no 2.1329583 0.7647840
     ## 
     ## Feature Abundances: 1462 features
     ## Preview:
     ##     ASV0001 ASV0002 ASV0003 ASV0004
-    ## A01    3981    3241    1139     977
-    ## A02   11139     557     153     130
-    ## A03    4309    2924    1082     819
-    ## A05    1420       0       0       0
+    ## A01    3968    3116    1197     962
+    ## A02   11039     560     159     148
+    ## A03    4333    2887    1116     810
+    ## A05    1427       0       0       0
     ## 
     ## Feature Assignments: 6 levels assigned
     ## Preview:
@@ -373,6 +383,9 @@ print(mD5)
     ## Feature Names: ASV0001, ASV0002, ASV0003,..., ASV1462
     ## 
     ## Other Data:
+    ##   Dropped.features: TACGAAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCGCGTAGGTGGTTTTGTAAGTTGGAGGTGAAATCCCCGGGCTCAACCTGGGAACTG, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGATTAGAGCTCAACTCTAAAAAAC, TACGGGGGGGGCAGGCGTTATTCAGTATAACTAGGCGTAAAGTGTTCGTAGGCGGCAAGATCAGTTGTTAGGTAAAGGTTAGAGCTTAACTCTAAAAAAC,..., TACGAGAGGCCCTAGTTGATAACTACCGGCGCAAAGAGTGGTTATGGAAAAATATTTAATAAAGCCGAACACCCCCTCAGCCGTCATACGCACCTGGGAG
+    ##   Feature.filter: removed Eukarya
+    ##   Dropped.samples: A04, A09, B02,..., H11
     ##   Abundances rarefied: 13000
     ##   Alpha.metrics: Chao1, Shannon, Simpson, Phylogenetic
     ##   Beta.metrics: Canberra, 0.5 UniFrac

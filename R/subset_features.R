@@ -1,4 +1,4 @@
-#' @title Keep, Drop, or Filter Features in a \code{microbData} object
+#' @title Keep, Drop, or Filter Assignments in a \code{microbData} object
 #' @description Functions to specify specific features to keep/drop by name or to filter features based on variable(s) in the Metadata
 #' @aliases keep.features
 #' @aliases drop.features
@@ -7,12 +7,12 @@
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param features character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
 #' #' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.
-#' @param ... logical expression(s) by which to filter features based on the Features table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.
+#' @param ... logical expression(s) by which to filter features based on the Assignments table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 
 ####################################
 #' @name keep.features
-#' @title Keep Features
+#' @title Keep Assignments
 #' @description Create a new \code{microbData} objects with just the specified features
 #' @rdname subset.features
 #' @export
@@ -45,7 +45,7 @@ keep.features <- function(mD, features, track = TRUE) {
   }
   keep.order <- order(colSums(mD@Abundances[, to.keep]), decreasing = T)
   mD@Abundances <- mD@Abundances[, to.keep[keep.order]]
-  mD@Features <- copy(mD@Features)[to.keep[keep.order]]
+  mD@Assignments <- copy(mD@Assignments)[to.keep[keep.order]]
   if (!is.null(mD@Phylogeny)) {
     to.drop <- mD@Feature.names[!{mD@Feature.names %in% to.keep}]
     mD@Phylogeny <- ape::drop.tip(mD@Phylogeny, tip = to.drop)
@@ -56,7 +56,7 @@ keep.features <- function(mD, features, track = TRUE) {
 
 ####################################
 #' @name drop.features
-#' @title Drop Features
+#' @title Drop Assignments
 #' @description Create a new \code{microbData} objects without the specified features
 #' @rdname subset.features
 #' @export
@@ -87,7 +87,7 @@ drop.features <- function(mD, features, track = TRUE) {
     mD <- add.other.data(mD = mD, name = "Dropped.features", x = features)
   }
   mD@Abundances <- mD@Abundances[, to.keep]
-  mD@Features <- copy(mD@Features)[to.keep]
+  mD@Assignments <- copy(mD@Assignments)[to.keep]
   if (!is.null(mD@Phylogeny)) {
     mD@Phylogeny <- ape::drop.tip(mD@Phylogeny, tip = to.drop)
   }
@@ -97,13 +97,13 @@ drop.features <- function(mD, features, track = TRUE) {
 
 ####################################
 #' @name filter.features
-#' @title Filter Features
+#' @title Filter Assignments
 #' @description Create a new \code{microbData} objects with features that match the filter
 #' @rdname subset.features
 #' @export
 
 filter.features <- function(mD, ..., track = TRUE) {
-  mD.return <- copy(mD@Features)[...][[mD@Feature.col]] %>%
+  mD.return <- copy(mD@Assignments)[...][[mD@Feature.col]] %>%
     keep.features(mD = mD, features = ., track = FALSE)
   if (track) {
     mD.return <- add.other.data(mD = mD.return, name = "Feature.filter", x = deparse(substitute(...)))
@@ -120,7 +120,7 @@ filter.features <- function(mD, ..., track = TRUE) {
 
 remove.eukarya <- function(mD, track = TRUE) {
   euks <- "(Kingdom == 'Bacteria' | Kingdom == 'Archaea') & Order != 'Chloroplast' & Family != 'Mitochondria'"
-  copy(mD@Features)[eval(parse(text = euks))][[mD@Feature.col]] %>%
+  copy(mD@Assignments)[eval(parse(text = euks))][[mD@Feature.col]] %>%
     keep.features(mD = mD, features = .) %>%
     add.other.data(name = "Feature.filter", x = "removed Eukarya") %>%
     return()

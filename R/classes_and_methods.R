@@ -75,7 +75,7 @@ setClass(
   slots = c(
     Metadata = "data.tableOrNULL",
     Abundances = "matrixOrNULL",
-    Features = "data.tableOrNULL",
+    Assignments = "data.tableOrNULL",
     Phylogeny = "phyloOrNULL",
     Sample.names = "characterOrNULL",
     Feature.names = "characterOrNULL",
@@ -140,17 +140,17 @@ setMethod(
     display.table(object@Abundances, 4)
     cat("", sep = "\n")
 
-    if (!is.null(object@Features)) {
+    if (!is.null(object@Assignments)) {
       cat(
         paste(
           "Feature Assignments:",
-          ncol(object@Features) - 1,
+          ncol(object@Assignments) - 1,
           "levels assigned"
         ),
         sep = "\n"
       )
       cat("Preview:", sep = "\n")
-      display.table(object@Features, 4)
+      display.table(object@Assignments, 4)
       cat("", sep = "\n")
     }
 

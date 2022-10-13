@@ -42,7 +42,7 @@ data("phylogeny")    # loads example phylogeny
 mD1 <- microbData(
   metadata = metadata.dt,
   abundances = asv.mat,
-  features = taxonomy.dt, 
+  assignments = taxonomy.dt, 
   phylogeny = phylogeny
 )
 print(mD1)
@@ -50,16 +50,16 @@ print(mD1)
 ## View individual tables
 # View(get.metadata(mD1))
 # View(get.abundances(mD1))
-# View(get.features(mD1))
+# View(get.assignments(mD1))
 # View(get.phylogeny(mD1))
 ```
 
-We have a lot of ASVs assigned to Eukarya, so let's get rid of those first. Also notice that our ASV IDs are sequences, which can be unwieldy to deal with, and can cause issues with memory usage for really large data sets. Finally, there are NA assignments in the Features table. So we're going to run a couple steps to clean things up.
+We have a lot of ASVs assigned to Eukarya, so let's get rid of those first. Also notice that our ASV IDs are sequences, which can be unwieldy to deal with, and can cause issues with memory usage for really large data sets. Finally, there are NA assignments in the Assignments table. So we're going to run a couple steps to clean things up.
 
 ```{r rename-features-and-assignments}
 mD2 <- remove.eukarya(mD = mD1) %>% 
   numbered.features(prefix = "ASV") %>% 
-  rename.NA.features()
+  rename.NA.assignments()
 print(mD2)
 ```
 

@@ -4,7 +4,7 @@
 \alias{get.microbData}
 \alias{get.abundances}
 \alias{get.distance.matrices}
-\alias{get.features}
+\alias{get.assignments}
 \alias{get.feature.col}
 \alias{get.feature.names}
 \alias{get.metadata}
@@ -21,7 +21,7 @@ get.abundances(mD, as.DT = FALSE)
 
 get.distance.matrices(mD)
 
-get.features(mD)
+get.assignments(mD)
 
 get.feature.col(mD)
 
@@ -57,7 +57,7 @@ Get the abundance table from a \code{microbData} object.
 
 Get the distance matrices from a \code{microbData} object.
 
-Get the features table from a \code{microbData} object.
+Get the feature assignments table from a \code{microbData} object.
 
 Get the name of the column containing specific feature IDs from the features table in a \code{microbData} object.
 

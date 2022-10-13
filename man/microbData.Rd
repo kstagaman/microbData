@@ -7,7 +7,7 @@
 microbData(
   metadata,
   abundances,
-  features = NULL,
+  assignments = NULL,
   phylogeny = NULL,
   distance.matrices = NULL,
   sample.names = NULL,
@@ -20,7 +20,7 @@ microbData(
 
 \item{abundances}{required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.}
 
-\item{features}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.}
+\item{assignments}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.}
 
 \item{phylogeny}{phylo; a phylogenetic tree of features (taxonomic). Default is NULL.}
 
@@ -48,7 +48,7 @@ This function creates a \code{microbData} object that is designed to make it sim
 
 \item{\code{Abundances}}{A \code{matrix} with abundance counts for each feature, e.g., ASVs, KOs, etc.}
 
-\item{\code{Features}}{A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
+\item{\code{Assignments}}{A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
 
 \item{\code{Phylogeny}}{A phylogenetic tree for features.}
 
@@ -60,7 +60,7 @@ This function creates a \code{microbData} object that is designed to make it sim
 
 \item{\code{Sample.col}}{A character string that identifies the column in the Metadata table that contains the sample names (primarily use internally, for consistency).}
 
-\item{\code{Feature.col}}{A character string that identifies the column in the Features table that contains the feature names (primarily use internally, for consistency).}
+\item{\code{Feature.col}}{A character string that identifies the column in the Assignments table that contains the feature names (primarily use internally, for consistency).}
 
 \item{\code{Other.data}}{A list of any other elements you want to associate with this data. Many of the functions in this package add information to this slot for tracking steps and results.}
 }}
@@ -79,7 +79,7 @@ data("phylogeny")    # loads example phylogeny
 mD1 <- microbData(
   metadata = metadata.dt,
   abundances = asv.mat,
-  features = taxonomy.dt,
+  assignments = taxonomy.dt,
   phylogeny = phylogeny
 )
 print(mD1)

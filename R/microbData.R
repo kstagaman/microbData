@@ -3,7 +3,7 @@
 #' @description Creates an object with associated microbiome data of class \code{microbData}
 #' @param metadata required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{sample.names} will be set from the keyed column.
 #' @param abundances required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.
-#' @param features data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.
+#' @param assignments data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.
 #' @param phylogeny phylo; a phylogenetic tree of features (taxonomic). Default is NULL.
 #' @param distance.matrices dist or list; a single distance matrix of class "dist" or a list of distance matrices. Default is NULL.
 #' @param sample.names character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.
@@ -13,13 +13,13 @@
 #' @returns A \code{microbData} object.
 #' @slot Metadata A \code{data.table} containing values for the covariates associated with each sample.
 #' @slot Abundances A \code{matrix} with abundance counts for each feature, e.g., ASVs, KOs, etc.
-#' @slot Features A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.
+#' @slot Assignments A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.
 #' @slot Phylogeny A phylogenetic tree for features.
 #' @slot Distance.matrices A distance matrix or a list of distance matrices for beta-diversity between each sample.
 #' @slot Sample.names A vector of the sample IDs (if not supplied directly, taken from the key column in the Metadata table).
 #' @slot Feature.names A vector of the feature IDs (if not supplied directly, taken from the column names in the Abundances table).
 #' @slot Sample.col A character string that identifies the column in the Metadata table that contains the sample names (primarily use internally, for consistency).
-#' @slot Feature.col A character string that identifies the column in the Features table that contains the feature names (primarily use internally, for consistency).
+#' @slot Feature.col A character string that identifies the column in the Assignments table that contains the feature names (primarily use internally, for consistency).
 #' @slot Other.data A list of any other elements you want to associate with this data. Many of the functions in this package add information to this slot for tracking steps and results.
 #' @examples
 #' ## load data
@@ -35,7 +35,7 @@
 #' mD1 <- microbData(
 #'   metadata = metadata.dt,
 #'   abundances = asv.mat,
-#'   features = taxonomy.dt,
+#'   assignments = taxonomy.dt,
 #'   phylogeny = phylogeny
 #' )
 #' print(mD1)
@@ -44,7 +44,7 @@
 microbData <- function(
     metadata,
     abundances,
-    features = NULL,
+    assignments = NULL,
     phylogeny = NULL,
     distance.matrices = NULL,
     sample.names = NULL,
@@ -63,10 +63,10 @@ microbData <- function(
       "The table supplied to `abundances' must be of class `matrix'"
     )
   }
-  if (!is.null(features)) {
-    if (!any(class(features) %in% table.classes)) {
+  if (!is.null(assignments)) {
+    if (!any(class(assignments) %in% table.classes)) {
       rlang::abort(
-        "The table supplied to `features' must be of class `data.table', `data.frame', or `matrix'"
+        "The table supplied to `assignments' must be of class `data.table', `data.frame', or `matrix'"
       )
     }
   }
@@ -113,10 +113,10 @@ microbData <- function(
     setkey(metadata, Sample)
     smpl.col <- "Sample"
   }
-  if (!is.null(features)) {
-    if (!{"data.table" %in% class(features)}) {
-      features <- as.data.table(features, keep.rownames = "Feature")
-      setkey(features, Feature)
+  if (!is.null(assignments)) {
+    if (!{"data.table" %in% class(assignments)}) {
+      assignments <- as.data.table(assignments, keep.rownames = "Feature")
+      setkey(assignments, Feature)
     }
   }
 
@@ -127,13 +127,13 @@ microbData <- function(
   } else {
     smpl.col <- attributes(metadata)$sorted
   }
-  if (!is.null(features)) {
-    if (!{"sorted" %in% names(attributes(features))} & is.null(feature.names)) {
+  if (!is.null(assignments)) {
+    if (!{"sorted" %in% names(attributes(assignments))} & is.null(feature.names)) {
       rlang::abort(
-        "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
+        "The data.table supplied to `assignments' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
       )
     } else {
-      feat.col <- attributes(features)$sorted
+      feat.col <- attributes(assignments)$sorted
     }
   }
 
@@ -157,7 +157,7 @@ microbData <- function(
       "microbData",
       Metadata = metadata,
       Abundances = abundances[, order(colSums(abundances), decreasing = T)],
-      Features = features,
+      Assignments = assignments,
       Phylogeny = phylogeny,
       Distance.matrices = distance.matrices,
       Sample.names = sample.names,

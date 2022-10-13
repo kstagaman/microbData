@@ -27,12 +27,12 @@ merge.microbData <- function(mD1, mD2) {
     metadata = rbindlist(list(mD1@Metadata, mD2@Metadata), fill = TRUE),
     abundances = merged.abunds.mat
   )
-  if (!is.null(mD1@Features) & !is.null(mD2@Features)) {
-    merged.features <- merge(mD1@Features, mD2@Features, by = mD1@Feature.col, all = TRUE)
+  if (!is.null(mD1@Assignments) & !is.null(mD2@Assignments)) {
+    merged.features <- merge(mD1@Assignments, mD2@Assignments, by = mD1@Feature.col, all = TRUE)
     new.mD <- add.features(features = merged.features, mD = new.mD)
-  } else if (!is.null(mD1@Features) | !is.null(mD2@Features)) {
+  } else if (!is.null(mD1@Assignments) | !is.null(mD2@Assignments)) {
     rlang::inform(
-      "One of the supplied microbData objects had a Features table, but the other did not, so none has been included in the merged microbData object."
+      "One of the supplied microbData objects had a Assignments table, but the other did not, so none has been included in the merged microbData object."
     )
   }
   if (!is.null(mD1@Phylogeny) & !is.null(mD2@Phylogeny)) {

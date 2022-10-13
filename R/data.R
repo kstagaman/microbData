@@ -10,7 +10,7 @@
 
 #' Example Taxonomic Assignments
 #'
-#' @format A data.table with example taxonomicy assignments for the ASVs
+#' @format A data.table with example taxonomic assignments for the ASVs
 "taxonomy.dt"
 
 #' Example Phylogeny

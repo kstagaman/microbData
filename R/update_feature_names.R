@@ -19,9 +19,9 @@ update.feature.names <- function(mD, new.names) {
     ) %>% setkey(Old)
     colnames(mD@Abundances) <- names.dt[colnames(mD@Abundances)]$New
     mD@Abundances <- mD@Abundances[, sort(colnames(mD@Abundances))]
-    mD@Features[[mD@Feature.col]] <- names.dt[mD@Features[[mD@Feature.col]]]$New
-    setkeyv(mD@Features, mD@Feature.col)
-    mD@Features[new.names]
+    mD@Assignments[[mD@Feature.col]] <- names.dt[mD@Assignments[[mD@Feature.col]]]$New
+    setkeyv(mD@Assignments, mD@Feature.col)
+    mD@Assignments[new.names]
     mD@Phylogeny$tip.label <- names.dt[mD@Phylogeny$tip.label]$New
     mD@Feature.names <- names.dt[mD@Feature.names]$New
   } else {

@@ -3,15 +3,15 @@
 #' @aliases replace.metadata
 #' @aliases replace.abundances
 #' @aliases add.distance.matrices
-#' @aliases add.features
-#' @aliases replace.features
+#' @aliases add.assignments
+#' @aliases replace.assignments
 #' @aliases add.other.data
 #' @aliases add.phylogeny
 #' @aliases replace.phylogeny
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param new.tbl required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
 #' @param distance.matrices required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
-#' @param features required for \code{add.features}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
+#' @param features required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
 #' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{features}. Default is NULL.
 #' @param phylo required for \code{add.phylogeny}; phylo, a phylogenetic tree object.
 #' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.
@@ -77,10 +77,10 @@ replace.abundances <- function(mD, new.tbl) {
       rownames(mD@Abundances),
       names(sort(colSums(new.tbl), decreasing = T))
     ]
-    if (!is.null(mD@Features)) {
+    if (!is.null(mD@Assignments)) {
       if (!identical(sort(colnames(mD@Abundances)), sort(mD@Feature[[mD@Feature.col]]))) {
         rlang::warn(
-          "The feature names (colnames) in the new Abundances table are not all identical to the names in the Features table."
+          "The feature names (colnames) in the new Abundances table are not all identical to the names in the Assignments table."
         )
       }
     }
@@ -131,13 +131,13 @@ add.distance.matrices <- function(mD, distance.matrices) {
 }
 
 ####################################
-#' @name add.features
-#' @title Add Features Table
-#' @description Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.features}.
+#' @name add.assignments
+#' @title Add Assignments Table
+#' @description Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.assignments}.
 #' @rdname update.microbData
 #' @export
 
-add.features <- function(mD, features, feature.names = NULL) {
+add.assignments <- function(mD, features, feature.names = NULL) {
   table.classes <- c("matrix", "data.frame", "data.table")
   if (!any(class(features) %in% table.classes)) {
     rlang::abort(
@@ -147,7 +147,7 @@ add.features <- function(mD, features, feature.names = NULL) {
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
-  feat.col <- ifelse(is.null(mD@Features), "Feature", mD@Feature.col)
+  feat.col <- ifelse(is.null(mD@Assignments), "Feature", mD@Feature.col)
   if (!{"data.table" %in% class(features)}) {
     features <- as.data.table(features, keep.rownames = feat.col) %>%
       setkeyv(feat.col)
@@ -162,21 +162,21 @@ add.features <- function(mD, features, feature.names = NULL) {
   } else {
     mD@Feature.names <- feature.names
   }
-  if (!is.null(mD@Features)) {
+  if (!is.null(mD@Assignments)) {
     if (!identical(sort(mD@Feature.names), sort(features[[feat.col]]))) {
       rlang::abort(
-        "The data.table supplied to `features' does not have the same feature names as the Features table it is replacing."
+        "The data.table supplied to `features' does not have the same feature names as the Assignments table it is replacing."
       )
     }
   }
-  mD@Features <- features
+  mD@Assignments <- features
   if (is.null(mD@Feature.col) | mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
   return(mD)
 }
 
 #' @export
 
-replace.features <- add.features
+replace.assignments <- add.assignments
 
 ####################################
 #' @name add.phylogeny

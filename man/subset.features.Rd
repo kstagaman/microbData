@@ -5,7 +5,7 @@
 \alias{drop.features}
 \alias{filter.features}
 \alias{remove.eukarya}
-\title{Keep, Drop, or Filter Features in a \code{microbData} object}
+\title{Keep, Drop, or Filter Assignments in a \code{microbData} object}
 \usage{
 keep.features(mD, features, track = TRUE)
 
@@ -21,7 +21,7 @@ remove.eukarya(mD, track = TRUE)
 \item{features}{character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
 #' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.}
 
-\item{...}{logical expression(s) by which to filter features based on the Features table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.}
+\item{...}{logical expression(s) by which to filter features based on the Assignments table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.}
 }
 \description{
 Functions to specify specific features to keep/drop by name or to filter features based on variable(s) in the Metadata

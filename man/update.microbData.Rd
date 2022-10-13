@@ -4,8 +4,8 @@
 \alias{replace.metadata}
 \alias{replace.abundances}
 \alias{add.distance.matrices}
-\alias{add.features}
-\alias{replace.features}
+\alias{add.assignments}
+\alias{replace.assignments}
 \alias{add.other.data}
 \alias{add.phylogeny}
 \alias{replace.phylogeny}
@@ -17,7 +17,7 @@ replace.abundances(mD, new.tbl)
 
 add.distance.matrices(mD, distance.matrices)
 
-add.features(mD, features, feature.names = NULL)
+add.assignments(mD, features, feature.names = NULL)
 
 add.phylogeny(mD, phylo)
 
@@ -30,7 +30,7 @@ add.other.data(mD, name, x, replace = FALSE)
 
 \item{distance.matrices}{required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".}
 
-\item{features}{required for \code{add.features}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.}
+\item{features}{required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.}
 
 \item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{features}. Default is NULL.}
 
@@ -54,7 +54,7 @@ Replace the matrix in the Abundances slot of a \code{microbData} object with a n
 
 Add one or a list of distance matrices to an already created \code{microbData} object
 
-Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.features}.
+Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.assignments}.
 
 Add a phylogenetic to an already created \code{microbData} object
 

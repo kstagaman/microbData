@@ -3,7 +3,7 @@
 #' @description Functions grabbing features, phylogeny, distance matrices, or other data from a \code{microbData} object. The function \code{get.microbData} allows the user to programmatically get data from various slots as it takes the slot name as a character and returns the data in that slot. The other functions are very simple wrappers for the \code{@} extraction operator to make code more human-readable, or just because they may be easier to understand.
 #' @aliases get.abundances
 #' @aliases get.distance.matrices
-#' @aliases get.features
+#' @aliases get.assignments
 #' @aliases get.feature.col
 #' @aliases get.feature.names
 #' @aliases get.metadata
@@ -63,14 +63,14 @@ get.distance.matrices <- function(mD) {
 }
 
 ####################################
-#' @name get.features
-#' @title Get Features
-#' @description Get the features table from a \code{microbData} object.
+#' @name get.assignments
+#' @title Get Assignments
+#' @description Get the feature assignments table from a \code{microbData} object.
 #' @rdname get.microbData
 #' @export
 
-get.features <- function(mD) {
-  return(mD@Features)
+get.assignments <- function(mD) {
+  return(mD@Assignments)
 }
 
 ####################################

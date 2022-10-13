@@ -10,7 +10,7 @@ ordination.coords(
   ord.list = NULL,
   metadata = NULL,
   feature.coords = FALSE,
-  feature.tbl = NULL,
+  assignment.tbl = NULL,
   constraint.coords = FALSE,
   combine = TRUE,
   axes = 1:2,
@@ -27,7 +27,7 @@ ordination.coords(
 \item{metadata}{array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.}
 
 \item{feature.coords}{logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' @param feature.tbl array; a data.frame/data.table/matrix with data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.}
+#' @param assignment.tbl array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.}
 
 \item{constraint.coords}{logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.}
 

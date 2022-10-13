@@ -5,7 +5,7 @@
 \alias{taxonomy.dt}
 \title{Example Taxonomic Assignments}
 \format{
-A data.table with example taxonomicy assignments for the ASVs
+A data.table with example taxonomic assignments for the ASVs
 }
 \usage{
 taxonomy.dt

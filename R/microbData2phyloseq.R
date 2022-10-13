@@ -19,10 +19,10 @@ microbData2phyloseq <- function(mD) {
   if (!is.null(mD@Phylogeny)) {
     phy_tree(ps) <- mD@Phylogeny
   }
-  if (!is.null(mD@Features)) {
-    features <- as.data.frame(mD@Features)
-    row.names(features) <- mD@Features[[mD@Feature.col]]
-    tax_table(ps) <- features
+  if (!is.null(mD@Assignments)) {
+    assignments <- as.data.frame(mD@Assignments)
+    row.names(assignments) <- mD@Assignments[[mD@Feature.col]]
+    tax_table(ps) <- assignments
   }
   return(ps)
 }
