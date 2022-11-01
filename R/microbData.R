@@ -13,7 +13,7 @@
 #' @returns A \code{microbData} object.
 #' @slot Metadata A \code{data.table} containing values for the covariates associated with each sample.
 #' @slot Abundances A \code{matrix} with abundance counts for each feature, e.g., ASVs, KOs, etc.
-#' @slot Assignments A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.
+#' @slot Assignments A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOs.
 #' @slot Phylogeny A phylogenetic tree for features.
 #' @slot Distance.matrices A distance matrix or a list of distance matrices for beta-diversity between each sample.
 #' @slot Sample.names A vector of the sample IDs (if not supplied directly, taken from the key column in the Metadata table).

@@ -48,7 +48,7 @@ This function creates a \code{microbData} object that is designed to make it sim
 
 \item{\code{Abundances}}{A \code{matrix} with abundance counts for each feature, e.g., ASVs, KOs, etc.}
 
-\item{\code{Assignments}}{A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOS.}
+\item{\code{Assignments}}{A \code{data.table} containing higher order assignments for each feature, e.g., taxonomy for ASVs or modules and pathways for KOs.}
 
 \item{\code{Phylogeny}}{A phylogenetic tree for features.}
 
