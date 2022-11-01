@@ -11,8 +11,7 @@
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param new.tbl required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
 #' @param distance.matrices required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
-#' @param features required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
-#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{features}. Default is NULL.
+#' @param assignments required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature". If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
 #' @param phylo required for \code{add.phylogeny}; phylo, a phylogenetic tree object.
 #' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.
 #' @param name required for \code{add.other.data}; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
@@ -133,43 +132,41 @@ add.distance.matrices <- function(mD, distance.matrices) {
 ####################################
 #' @name add.assignments
 #' @title Add Assignments Table
-#' @description Add a features table, or replace existing features table in an already created \code{microbData} object. An alias for this function is \code{replace.assignments}.
+#' @description Add a assignments table, or replace existing assignments table in an already created \code{microbData} object. An alias for this function is \code{replace.assignments}.
 #' @rdname update.microbData
 #' @export
 
-add.assignments <- function(mD, features, feature.names = NULL) {
+add.assignments <- function(mD, assignments, feature.names = NULL) {
   table.classes <- c("matrix", "data.frame", "data.table")
-  if (!any(class(features) %in% table.classes)) {
+  if (!any(class(assignments) %in% table.classes)) {
     rlang::abort(
-      "The table supplied to `features' must be of class `data.table', `data.frame', or `matrix'"
+      "The table supplied to `assignments' must be of class `data.table', `data.frame', or `matrix'"
     )
   }
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
   feat.col <- ifelse(is.null(mD@Assignments), "Feature", mD@Feature.col)
-  if (!{"data.table" %in% class(features)}) {
-    features <- as.data.table(features, keep.rownames = feat.col) %>%
+  if (!{"data.table" %in% class(assignments)}) {
+    assignments <- as.data.table(assignments, keep.rownames = feat.col) %>%
       setkeyv(feat.col)
   } else if (is.null(feature.names)) {
-    if (!{"sorted" %in% names(attributes(features))}) {
+    if (!{"sorted" %in% names(attributes(assignments))}) {
       rlang::abort(
-        "The data.table supplied to `features' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
+        "The data.table supplied to `assignments' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
       )
     } else {
-      feat.col <- attributes(features)$sorted
+      feat.col <- attributes(assignments)$sorted
     }
-  } else {
-    mD@Feature.names <- feature.names
   }
   if (!is.null(mD@Assignments)) {
-    if (!identical(sort(mD@Feature.names), sort(features[[feat.col]]))) {
+    if (!identical(sort(mD@Feature.names), sort(assignments[[feat.col]]))) {
       rlang::abort(
-        "The data.table supplied to `features' does not have the same feature names as the Assignments table it is replacing."
+        "The data.table supplied to `assignments' does not have the same feature names as the Assignments table it is replacing."
       )
     }
   }
-  mD@Assignments <- features
+  mD@Assignments <- assignments
   if (is.null(mD@Feature.col) | mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
   return(mD)
 }

@@ -83,8 +83,8 @@ microbData <- function(
         if (class(distance.matrices[[i]]) != "dist") {
           rlang::abort(
             paste(
-            "The elements in the list supplied to `distance.matrices' must all be of class `dist'.",
-            "Element at index", i, "is of class", class(distance.matrices[[i]])
+              "The elements in the list supplied to `distance.matrices' must all be of class `dist'.",
+              "Element at index", i, "is of class", class(distance.matrices[[i]])
             )
           )
         }

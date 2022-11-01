@@ -29,7 +29,7 @@ merge.microbData <- function(mD1, mD2) {
   )
   if (!is.null(mD1@Assignments) & !is.null(mD2@Assignments)) {
     merged.features <- merge(mD1@Assignments, mD2@Assignments, by = mD1@Feature.col, all = TRUE)
-    new.mD <- add.assignments(features = merged.features, mD = new.mD)
+    new.mD <- add.assignments(assignments = merged.features, mD = new.mD)
   } else if (!is.null(mD1@Assignments) | !is.null(mD2@Assignments)) {
     rlang::inform(
       "One of the supplied microbData objects had a Assignments table, but the other did not, so none has been included in the merged microbData object."
