@@ -4,6 +4,7 @@
 #' @param mD required; \code{microbData} object from which data will be read.
 #' @param method character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[vegan]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".
 #' @param formula formula; in the form of e.g., \code{~ Var1 + Var2 * Var3}. This is only required for and used by the dbRDA method. Default is NULL.
+#' @param optimize logical; should \code{\link[vegan]{ordistep}} be run on the dbRDA model and the results returned in place of the full model? Default is FALSE.
 #' @param only.for character or integer; a vector of the names or the indices of the matrices contained in the Distance.matrices slot of the microbData. If NULL, will make an ordination for all matrices. Default is NULL.
 #' @param include.feature.scores logical; some ordination methods, like "NMDS" and "dbRDA" allow feature (often referred to a 'species') scores as well as site scores. If true, these will be calculated. Default is FALSE.
 #' @param update.mD logical; should this function return a new \code{microbData} object with the ordinations list (called "Ordinations") added to Other.data (TRUE) or just a list of the results (FALSE)? Default is TRUE.
@@ -15,6 +16,7 @@ ordinate <- function(
     mD,
     method = "dbRDA",
     formula = NULL,
+    optimize = FALSE,
     only.for = NULL,
     include.feature.scores = FALSE,
     update.mD = TRUE,
@@ -23,11 +25,7 @@ ordinate <- function(
   if (!{"microbData" %in% class(mD)}) {
     rlang::abort("Object supplied to `mD' must be of class 'microbData'")
   }
-  if (!{method %in% c("PCoA", "NMDS", "dbRDA")}) {
-    rlang::abort(
-      "The only currently supported methods are 'PCoA', 'NMDS', and 'dbRDA' and there is no partial matching. Please select one of these methods."
-    )
-  }
+  method <- rlang::arg_match(method, values = c("PCoA", "NMDS", "dbRDA"))
   if (method == "dbRDA" & is.null(formula)) {
     rlang::abort("The argument supplied to `method' is 'dbRDA', but `formula' is NULL. Please supply a formula")
   }
@@ -35,6 +33,14 @@ ordinate <- function(
     if (!purrr::is_formula(formula)) {
       rlang::abort("The argument supplied to `formula' must be of class 'formula'")
     }
+  }
+  if (!is.logical(optimize)) {
+    rlang::abort("The argument supplied to `optimize' must be of class 'logical'")
+  }
+  if (method != "dbRDA" & optimize) {
+    rlang::warn(
+      "The argument `optimize' is set to TRUE, but `method' is not 'dbRDA', this option will be ignored"
+      )
   }
 
   if (is.null(only.for)) {
@@ -44,9 +50,9 @@ ordinate <- function(
   }
   ord.list <- lapply(dist.mat.list, function(dist.mat) {
     if (method == "PCoA") {
-      ord <- ape::pcoa(D = dist.mat)
+      ord <- ape::pcoa(D = dist.mat, ...)
     } else if (method == "NMDS") {
-      ord <- vegan::metaMDS(comm = dist.mat)
+      ord <- vegan::metaMDS(comm = dist.mat, ...)
       if (include.feature.scores) {
         vegan::sppscores(ord) <- mD@Abundances
       }
@@ -57,10 +63,14 @@ ordinate <- function(
         ord <- vegan::capscale(
           formula = mod.frm,
           data = mD@Metadata,
-          comm = mD@Abundances
+          comm = mD@Abundances,
+          ...
         )
       } else {
-        ord <- vegan::capscale(formula = mod.frm, data = mD@Metadata)
+        ord <- vegan::capscale(formula = mod.frm, data = mD@Metadata, ...)
+      }
+      if (optimize) {
+        ord <- vegan::ordistep(object = ord, direction = "both")
       }
     }
     return(ord)
