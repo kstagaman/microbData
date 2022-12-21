@@ -84,7 +84,10 @@ ordinate <- function(
   })
   names(ord.list) <- paste0(names(ord.list), "_", method)
   if (update.mD) {
-    add.other.data(x = ord.list, name = "Ordinations", mD = mD) %>% return()
+    add.other.data(
+      x = ord.list, name = ifelse(optimize, "Optimized.ordinations", "Ordinations"), mD = mD
+      ) %>%
+      return()
   } else {
     return(ord.list)
   }
