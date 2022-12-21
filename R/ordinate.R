@@ -59,15 +59,22 @@ ordinate <- function(
     } else {
       mod.frm <- update.formula(formula, dist.mat ~ .)
       environment(mod.frm) <- environment()
+      if (optimize) {
+        mod.data <- copy(mD@Metadata)[, .SD, .SDcols = c(all.vars(formula), mD@Sample.col)] %>%
+          .[complete.cases(.)]
+        dist.mat <- usedist::dist_subset(d = dist.mat, idx = mod.data[[mD@Sample.col]])
+      } else {
+        mod.data <- copy(mD@Metadata)
+      }
       if (include.feature.scores) {
         ord <- vegan::capscale(
           formula = mod.frm,
-          data = mD@Metadata,
+          data = mod.data,
           comm = mD@Abundances,
           ...
         )
       } else {
-        ord <- vegan::capscale(formula = mod.frm, data = mD@Metadata, ...)
+        ord <- vegan::capscale(formula = mod.frm, data = mod.data, ...)
       }
       if (optimize) {
         ord <- vegan::ordistep(object = ord, direction = "both")
