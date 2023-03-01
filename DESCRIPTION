@@ -25,6 +25,7 @@ Suggests:
   DESeq2,
   foreach,
   doParallel,
+  phyloseq,
   seqinr,
   zCompositions
 RoxygenNote: 7.2.3
