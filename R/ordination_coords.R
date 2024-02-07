@@ -12,22 +12,24 @@
 #' @seealso \code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}
 #' @export
 
+
 ordination.coords <- function(
-    mD = NULL,
-    ord.list.name = "Ordinations",
-    ord.list = NULL,
-    metadata = NULL,
-    feature.coords = FALSE,
-    assignment.tbl = NULL,
-    constraint.coords = FALSE,
-    combine = TRUE,
-    axes = 1:2,
-    axis.digits = 2
-) {
+  mD = NULL,
+  ord.list  = NULL,
+  ord.list.name = "Ordinations",
+  metadata = NULL,
+  feature.coords = FALSE,
+  assignment.tbl = NULL,
+  constraint.coords = FALSE,
+  combine = TRUE,
+  axes = 1:2,
+  axis.digits = 2
+)
+{
   if (is.null(mD) & is.null(ord.list)) {
     rlang::abort(
       "Either `mD' or `ord.list' must be supplied to get ordination coordinates."
-    )
+      )
   }
   if (!is.null(mD)) {
     ord.list <- mD@Other.data[[ord.list.name]]
@@ -35,7 +37,9 @@ ordination.coords <- function(
     smpl.col.name <- mD@Sample.col
   }
   if (!is.null(metadata)) {
-    if (!{"data.table" %in% class(metadata)}) {
+    if (!{
+      "data.table" %in% class(metadata)
+    }) {
       metadata <- as.data.table(metadata)
     }
   }
@@ -44,29 +48,36 @@ ordination.coords <- function(
       assignment.tbl <- mD@Assignments
     }
     if (!is.null(assignment.tbl)) {
-      if (!{"data.table" %in% class(assignment.tbl)}) {
+      if (!{
+        "data.table" %in% class(assignment.tbl)
+      }) {
         assignment.tbl <- as.data.table(assignment.tbl)
       }
     }
   }
-
   ord.dts <- lapply(seq_along(ord.list), function(i) {
     sections <- NULL
     if (combine) {
       if (str_detect(names(ord.list)[i], "NMDS$|PCoA$|dbRDA$")) {
-        dist.name <- str_split(names(ord.list)[i], "\\_") %>% unlist() %>% head(1)
-        ord.type <- str_split(names(ord.list)[i], "\\_") %>% unlist() %>% tail(1)
+        dist.name <- str_split(names(ord.list)[i], "\\_") %>% 
+          unlist() %>% head(1)
+        ord.type <- str_split(names(ord.list)[i], "\\_") %>% 
+          unlist() %>% tail(1)
       } else {
         ord.class <- class(ord.list[[i]])
         ord.type <- ifelse(
-          "metaMDS" %in% ord.class, "NMDS",
+          "metaMDS" %in% ord.class, 
+          "NMDS", 
           ifelse(
-            "capscale" %in% ord.class, "dbRDA",
+            "capscale" %in% ord.class, 
+            "dbRDA", 
             ifelse("pcoa" == ord.class, "pcoa", NA)
           )
         )
         if (is.na(ord.type)) {
-          rlang::abort(paste("The ordination supplied at element", i, "is not supported."))
+          rlang::abort(
+            paste("The ordination supplied at element", i, "is not supported.")
+          )
         }
       }
     }
@@ -83,15 +94,23 @@ ordination.coords <- function(
       if (ord.type == "PCoA") {
         pct.explained <- setNames(ord$values$Relative_eig[axes], orig.axis.names)
       } else {
-        pct.explained <- { vegan::eigenvals(ord) / sum(vegan::eigenvals(ord)) }[1:2]
+        pct.explained <- { vegan::eigenvals(ord)/sum(vegan::eigenvals(ord)) }[1:2]
       }
-      sections[["Axis.labs"]] <- sapply(orig.axis.names, function(n) {
-        paste0(n, " (", round(pct.explained[n], axis.digits), "%)")
-      })
+      sections[["Axis.labs"]] <- sapply(
+        orig.axis.names, function(n) {
+          paste0(n, " (", round(pct.explained[n], axis.digits), "%)")
+        })
     }
     if (combine) {
-      sections[["Axis.labs"]] <- as.data.table(list(Label = sections[["Axis.labs"]])) %>%
-        .[, `:=`(Axis = c("Axis1", "Axis2"), Ord.method = ord.type, Beta.metric = dist.name)]
+      sections[["Axis.labs"]] <- list(Label = sections[["Axis.labs"]]) %>% 
+        as.data.table() %>% 
+        .[
+          , `:=`(
+            Axis = c("Axis1", "Axis2"), 
+            Ord.method = ord.type, 
+            Beta.metric = dist.name
+          )
+        ]
     }
     colnames(smpl.mat)[1:2] <- c("Axis1", "Axis2")
     if (!is.null(metadata)) {
@@ -99,7 +118,11 @@ ordination.coords <- function(
         smpl.col.name <- attributes(metadata)$sorted
       } else {
         smpl.col.name <- names(metadata)[
-          apply(metadata, MARGIN = 2, FUN = function(x) {all(row.names(smpl.mat) %in% x)})
+          apply(
+            metadata, 
+            MARGIN = 2, 
+            FUN = function(x) { all(row.names(smpl.mat) %in% x) }
+          )
         ]
         if (length(smpl.col.name) == 0) {
           rlang::abort(
@@ -112,29 +135,36 @@ ordination.coords <- function(
         }
       }
       sections[["Samples"]] <- as.data.table(
-        smpl.mat,
+        smpl.mat, 
         keep.rownames = smpl.col.name
-      ) %>%
-        setkeyv(smpl.col.name) %>%
+      ) %>% 
+        setkeyv(smpl.col.name) %>% 
         merge(metadata)
     } else {
-      sections[["Samples"]] <- as.data.table(smpl.mat, keep.rownames = "Sample") %>%
+      sections[["Samples"]] <- as.data.table(
+        smpl.mat, 
+        keep.rownames = "Sample"
+      ) %>% 
         setkey(Sample)
     }
-
     if (combine) {
       sections[["Samples"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
       label.pad <- 1.1
       sections[["Axis.labs"]][
         , `:=`(
-          Axis1 = c(max(sections[["Samples"]]$Axis1) * label.pad, min(sections[["Samples"]]$Axis1) * label.pad),
-          Axis2 = c(min(sections[["Samples"]]$Axis2) * label.pad, max(sections[["Samples"]]$Axis2) * label.pad),
-          Angle = ifelse(Axis == "Axis1", 0, 90),
+          Axis1 = c(
+            max(sections[["Samples"]]$Axis1) * label.pad, 
+            min(sections[["Samples"]]$Axis1) * label.pad
+          ), 
+          Axis2 = c(
+            min(sections[["Samples"]]$Axis2) * label.pad, 
+            max(sections[["Samples"]]$Axis2) * label.pad
+          ), 
+          Angle = ifelse(Axis == "Axis1", 0, 90), 
           Vjust = ifelse(Axis == "Axis1", 1, 0)
         )
       ]
     }
-
     if (feature.coords) {
       assign.mat <- vegan::scores(ord, display = "species")
       colnames(assign.mat)[1:2] <- c("Axis1", "Axis2")
@@ -143,63 +173,95 @@ ordination.coords <- function(
           feat.col.name <- attributes(assignment.tbl)$sorted
         } else {
           feat.col.name <- names(assignment.tbl)[
-            apply(assignment.tbl, MARGIN = 2, FUN = function(x) {
-              all(row.names(assign.mat) %in% x)
-            })
+            apply(
+              assignment.tbl, 
+              MARGIN = 2, 
+              FUN = function(x) { all(row.names(assign.mat) %in% x) }
+            )
           ]
           if (length(feat.col.name) == 0) {
             rlang::abort(
               paste(
-                "The supplied assignment.tbl does not contain all samples in the ordination at element", i, ", please review data and re-try."
+                "The supplied assignment.tbl does not contain all samples in the ordination at element", 
+                i, ", please review data and re-try."
               )
             )
           } else {
             setkeyv(assignment.tbl, feat.col.name)
           }
         }
-        sections[["Assignments"]] <- as.data.table(assign.mat, keep.rownames = feat.col.name) %>%
-          setkeyv(feat.col.name) %>%
+        sections[["Assignments"]] <- as.data.table(
+          assign.mat, 
+          keep.rownames = feat.col.name
+        ) %>% 
+          setkeyv(feat.col.name) %>% 
           merge(assignment.tbl)
       } else {
-        sections[["Assignments"]] <- as.data.table(assign.mat, keep.rownames = "Feature") %>%
+        sections[["Assignments"]] <- as.data.table(
+          assign.mat, 
+          keep.rownames = "Feature"
+        ) %>% 
           setkey(Feature)
       }
       if (combine) {
-        sections[["Assignments"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
+        sections[["Assignments"]][
+          , `:=`(Ord.method = ord.type, Beta.metric = dist.name)
+        ]
       }
     }
     if (ord.type == "dbRDA" & constraint.coords) {
-      sections[["Vectors"]] <- scores(ord, display = "bp") %>%
+      sections[["Vectors"]] <- scores(ord, display = "bp") %>% 
         as.data.table(keep.rownames = "Old")
       sections[["Vectors"]][
-        , Variable := str_extract(Old, paste(names(metadata), collapse = "|"))
+        , `:=`(Variable, str_extract(Old, paste(names(metadata), collapse = "|")))
       ]
       setcolorder(sections[["Vectors"]], ncol(sections[["Vectors"]]))
-      replace.cols <- str_which(names(sections[["Vectors"]]), paste(orig.axis.names, collapse = "|"))
+      replace.cols <- str_which(
+        names(sections[["Vectors"]]), 
+        paste(orig.axis.names, collapse = "|")
+      )
       names(sections[["Vectors"]])[replace.cols] <- c("Axis1", "Axis2")
       if (combine) {
-        sections[["Vectors"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
+        sections[["Vectors"]][
+          , `:=`(Ord.method = ord.type, Beta.metric = dist.name)
+        ]
       }
-
-      sections[["Centroids"]] <- scores(ord, display = "cn") %>%
-        as.data.table(keep.rownames = "Class")
-      sections[["Centroids"]][
-        , Variable := str_extract(Class, paste(names(metadata), collapse = "|"))
-      ]
-      sections[["Centroids"]][, Class := str_remove(Class, paste0("^", Variable))]
-      setcolorder(sections[["Centroids"]], ncol(sections[["Centroids"]]))
-      replace.cols <- str_which(names(sections[["Centroids"]]), paste(orig.axis.names, collapse = "|"))
-      names(sections[["Centroids"]])[replace.cols] <- c("Axis1", "Axis2")
-      if (combine) {
-        sections[["Centroids"]][, `:=`(Ord.method = ord.type, Beta.metric = dist.name)]
+      if (!is.null(scores(ord, display = "cn"))) {
+        sections[["Centroids"]] <- scores(ord, display = "cn") %>% 
+          as.data.table(keep.rownames = "Class")
+        sections[["Centroids"]][
+          , `:=`(
+            Variable, 
+            str_extract(Class, paste(names(metadata), collapse = "|"))
+          )
+        ]
+        sections[["Centroids"]][
+          , `:=`(Class, str_remove(Class, paste0("^", Variable)))
+        ]
+        setcolorder(sections[["Centroids"]], ncol(sections[["Centroids"]]))
+        replace.cols <- str_which(
+          names(sections[["Centroids"]]),  
+          paste(orig.axis.names, collapse = "|")
+        )
+        names(sections[["Centroids"]])[replace.cols] <- c("Axis1", "Axis2")
+        if (combine) {
+          sections[["Centroids"]][
+            , `:=`(Ord.method = ord.type, Beta.metric = dist.name)
+          ]
+        }
       }
     }
     return(sections)
   })
   if (combine) {
-    section.names <- lapply(ord.dts, names) %>% unlist() %>% unique() %>% set_names()
+    section.names <- lapply(ord.dts, names) %>% 
+      unlist() %>% 
+      unique() %>% 
+      set_names()
     lapply(section.names, function(sn) {
-      lapply(ord.dts, function(x) { x[[sn]] }) %>% rbindlist()
+      lapply(ord.dts, function(x) {
+        x[[sn]]
+      }) %>% rbindlist()
     }) %>% return()
   } else {
     names(ord.dts) <- names(ord.list)
