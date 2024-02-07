@@ -167,7 +167,7 @@ add.assignments <- function(mD, assignments, feature.names = NULL) {
     }
   }
   mD@Assignments <- assignments
-  if (is.null(mD@Feature.col) | mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
+  if (is.null(mD@Feature.col) || mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
   return(mD)
 }
 
@@ -221,7 +221,7 @@ add.other.data <- function(mD, name, x, replace = FALSE) {
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
-  if (is.null(mD@Other.data[[name]]) | replace) {
+  if (is.null(mD@Other.data[[name]]) || replace) {
     mD@Other.data[[name]] <- x
   } else {
     mD@Other.data[[name]] <- c(mD@Other.data[[name]], x)
