@@ -16,28 +16,27 @@
 #' @export
 
 beta.diversity <- function(
-    mD,
-    metrics = c("Sorensen", "Canberra", "Bray-Curtis", "W UniFrac", "0.5 UniFrac", "U UniFrac"),
-    presence.absence = FALSE,
-    ncores = 1,
-    update.mD = TRUE
+  mD, 
+  metrics = c("Sorensen", "Canberra", "Bray-Curtis", "W UniFrac", "0.5 UniFrac", "U UniFrac"), 
+  presence.absence = FALSE, 
+  ncores = 1, 
+  update.mD = TRUE
 ) {
   vegdist.metric.names <- data.table(
     My.name = c(
       "Manhattan", "Euclidean", "Canberra", "Clark", "Bray-Curtis", "Kulczynski", "Jaccard", "Gower", "Alt Gower", "Morisita", "Horn", "Mountford", "Raup", "Binomial", "Chao", "Cao", "Mahalanobis", "Chisq", "Chord", "Aitchison", "Robust Aitchison", "Sorensen"
-    ),
+    ), 
     Vegdist.name = c(
       "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao", "mahalanobis", "chisq", "chord", "aitchison", "robust.aitchison", "bray"
     )
-  ) %>% setkey(My.name)
+  ) %>% 
+    setkey(My.name)
   if (any(!str_detect(metrics, "UniFrac"))) {
     if (!all(str_subset(metrics, "UniFrac", negate = T) %in% vegdist.metric.names$My.name)) {
       rlang::abort(
-        paste(
-          "Arguments supplied to `metrics' must be of the following:",
-          paste(vegdist.metric.names$My.name, collapse = ", "),
-          "\nOR must include 'UniFrac' preceeded by U, W or a number between 0 and 1, inclusive"
-        )
+        paste("Arguments supplied to `metrics' must be of the following:", 
+              paste(vegdist.metric.names$My.name, collapse = ", "), 
+              "\nOR must include 'UniFrac' preceeded by U, W or a number between 0 and 1, inclusive")
       )
     }
   }
@@ -49,30 +48,35 @@ beta.diversity <- function(
     dist.list <- NULL
     for (metric in metrics) {
       if (metric %in% vegdist.metric.names$My.name) {
-        orig.pa <- presence.absence
-        if (metric == "Sorensen") {
-          presence.absence <- TRUE
-        }
-        dist.list[[metric]] <- vegan::vegdist(
-          mD@Abundances,
-          method = vegdist.metric.names[metric]$Vegdist.name,
-          binary = presence.absence
-        )
-        if (metric == "Sorensen") {
-          presence.absence <- orig.pa
+        if (metric == "Aitchison") {
+          dist.list[[metric]] <- vegan::vegdist(
+            mD@Abundances, 
+            method = vegdist.metric.names[metric]$Vegdist.name, 
+            binary = presence.absence,
+            pseudocount = 1
+          )
+        } else {
+          orig.pa <- presence.absence
+          if (metric == "Sorensen") {
+            presence.absence <- TRUE
+          }
+          dist.list[[metric]] <- vegan::vegdist(
+            mD@Abundances, 
+            method = vegdist.metric.names[metric]$Vegdist.name, 
+            binary = presence.absence
+          )
+          if (metric == "Sorensen") {
+            presence.absence <- orig.pa
+          }
         }
       } else if (str_detect(metric, "UniFrac")) {
-        alpha <- str_split(metric, " ") %>%
-          sapply(head, 1) %>%
-          sapply(function(a) {
-            ifelse(a == "W", 1, ifelse(a == "U", 0, as.numeric(a)))
-          })
+        alpha <- str_split(metric, " ") %>% 
+          sapply(head, 1) %>% 
+          sapply(function(a) { ifelse(a == "W", 1, ifelse(a == "U", 0, as.numeric(a))) })
         dist.list[[metric]] <- GUniFrac::GUniFrac(
-          otu.tab = mD@Abundances,
-          tree = mD@Phylogeny,
-          alpha = alpha
-        )$unifracs[, , 1] %>%
-          as.dist()
+          otu.tab = mD@Abundances, 
+          tree = mD@Phylogeny, alpha = alpha
+        )$unifracs[, , 1] %>% as.dist()
       }
     }
   } else {
@@ -81,39 +85,28 @@ beta.diversity <- function(
     usable.cores <- min(c(ncores, length(metrics)))
     cl <- makeCluster(usable.cores, type = "FORK")
     registerDoParallel(cl, usable.cores)
-    dist.list <- foreach::foreach(
-      metric = metrics,
-      .final = function(x) setNames(x, metrics)
-    ) %dopar% {
+    dist.list <- foreach::foreach(metric = metrics, .final = function(x) setNames(x, metrics)) %dopar% {
       if (metric %in% vegdist.metric.names$My.name) {
         orig.pa <- presence.absence
         if (metric == "Sorensen") {
           presence.absence <- TRUE
         }
-        dist.mat <- vegan::vegdist(
-          mD@Abundances,
-          method = vegdist.metric.names[metric]$Vegdist.name,
-          binary = presence.absence
-        )
+        dist.mat <- vegan::vegdist(mD@Abundances, method = vegdist.metric.names[metric]$Vegdist.name, 
+                                   binary = presence.absence)
         if (metric == "Sorensen") {
           presence.absence <- orig.pa
         }
       } else if (str_detect(metric, "UniFrac")) {
-        alpha <- str_split(metric, " ") %>%
-          sapply(head, 1) %>%
-          sapply(function(a) {
-            ifelse(a == "W", 1, ifelse(a == "U", 0, as.numeric(a)))
-          })
+        alpha <- str_split(metric, " ") %>% 
+          sapply(head, 1) %>% 
+          sapply(function(a) { ifelse(a == "W", 1, ifelse(a == "U", 0, as.numeric(a))) })
         dist.mat <- GUniFrac::GUniFrac(
-          otu.tab = mD@Abundances,
-          tree = mD@Phylogeny,
-          alpha = alpha
-        )$unifracs[, , 1] %>%
-          as.dist()
+          otu.tab = mD@Abundances, 
+          tree = mD@Phylogeny, alpha = alpha
+        )$unifracs[, , 1] %>% as.dist()
       }
       return(dist.mat)
-    } %>%
-      try(silent = TRUE)
+    } %>% try(silent = TRUE)
     stopCluster(cl)
     if ("try-error" %in% class(dist.list)) {
       cat(dist.list, sep = "\n")
@@ -129,3 +122,4 @@ beta.diversity <- function(
     return(dist.list)
   }
 }
+
