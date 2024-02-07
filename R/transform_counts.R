@@ -118,45 +118,44 @@ rarefy <- function(
 #' @export
 
 center.log.ratio <- function(
-    mD,
-    min.abund = 1e4,
-    min.prop = 0.001,
-    min.occur = 0,
-    smpls.by.row = TRUE,
-    method = "CZM",
-    lab = 0,
-    update.mD = TRUE,
-    quiet = FALSE
+  mD,
+  min.abund = 10000,
+  min.prop = 0.001,
+  min.occur = 0,
+  smpls.by.row = TRUE,
+  method = "CZM",
+  lab = 0,
+  update.mD = TRUE,
+  quiet = FALSE
 ) {
+  
   require(CoDaSeq)
   require(zCompositions)
-
-  clr.mat <- codaSeq.filter(
-    mD@Abundances,
-    min.reads = min.abund,
-    min.prop = min.prop,
-    min.occurrence = min.occur,
+  filt.mat <- codaSeq.filter(
+    mD@Abundances, 
+    min.reads = min.abund, 
+    
+    min.prop = min.prop, 
+    min.occurrence = min.occur, 
     samples.by.row = smpls.by.row
-  ) %>%
-    t() %>%
-    cmultRepl(
-      method = method,
-      label = lab,
-      z.warning = 1
-    ) %>% # replace 0 values with an estimate
-    codaSeq.clr()
+  ) %>% 
+    t()
+  rep.mat <- try(cmultRepl(filt.mat, method = method, label = lab, z.warning = 1), silent = T)
+  if ("try-class" %in% class(rep.mat)) {
+    clr.mat <- codaSeq.clr(filt.mat)
+  } else {
+    clr.mat <- codaSeq.clr(rep.mat)
+  }
+  
   if (!quiet) {
-    rlang::inform(
-      paste("Number of samples dropped:", nsamples(mD) - nrow(clr.mat))
-    )
-    rlang::inform(
-      paste("Number of features dropped:", nfeatures(mD) - ncol(clr.mat))
-    )
+    rlang::inform(paste("Number of samples dropped:", nsamples(mD) - nrow(clr.mat)))
+    rlang::inform(paste("Number of features dropped:", nfeatures(mD) - ncol(clr.mat)))
   }
   if (update.mD) {
-    mD.res <- keep.features(mD, features = colnames(clr.mat)) %>%
+    mD.res <- keep.features(mD, features = colnames(clr.mat)) %>% 
       keep.samples(samples = rownames(clr.mat))
-    mD.res <- add.other.data(x = "CLR", name = "Abundances transformed", mD = mD)
+    mD.res <- replace.abundances(mD = mD.res, new.tbl = clr.mat)
+    mD.res <- add.other.data(x = "CLR", name = "Abundances transformed", mD = mD.res)
     return(mD.res)
   } else {
     return(clr.mat)
