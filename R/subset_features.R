@@ -17,13 +17,13 @@
 #' @rdname subset.features
 #' @export
 
-keep.features <- function(mD, features, track = TRUE) {
+keep.features <- function (mD, features, track = TRUE) {
   if (is.logical(features)) {
     if (is.null(names(features))) {
       if (length(features) != nfeatures(mD)) {
         rlang::abort(
           "The length of the supplied logical vector does not match the number of features in the supplied microbData object"
-        )
+          )
       } else {
         to.keep <- mD@Feature.names[features]
       }
@@ -34,11 +34,13 @@ keep.features <- function(mD, features, track = TRUE) {
     to.keep <- features
   }
   if (!all(to.keep %in% mD@Feature.names)) {
-    rlang::abort("One or more of the features supplied to `features' is not in the microbData Feature Names")
+    rlang::abort(
+      "One or more of the features supplied to `features' is not in the microbData Feature Names"
+      )
   }
   if (track) {
     mD <- add.other.data(
-      mD = mD,
+      mD = mD, 
       name = "Dropped.features",
       x = mD@Feature.names[!{mD@Feature.names %in% to.keep}]
     )
@@ -46,8 +48,13 @@ keep.features <- function(mD, features, track = TRUE) {
   keep.order <- order(colSums(mD@Abundances[, to.keep]), decreasing = T)
   mD@Abundances <- mD@Abundances[, to.keep[keep.order]]
   mD@Assignments <- copy(mD@Assignments)[to.keep[keep.order]]
+  if (is.null(attributes(mD@Assignments)$sorted)) {
+    setkeyv(mD@Assignments, mD@Feature.col)
+  }
   if (!is.null(mD@Phylogeny)) {
-    to.drop <- mD@Feature.names[!{mD@Feature.names %in% to.keep}]
+    to.drop <- mD@Feature.names[!{
+      mD@Feature.names %in% to.keep
+    }]
     mD@Phylogeny <- ape::drop.tip(mD@Phylogeny, tip = to.drop)
   }
   mD@Feature.names <- to.keep[keep.order]
