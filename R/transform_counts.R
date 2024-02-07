@@ -49,25 +49,26 @@ transform.counts <- function(mD, f, update.mD = TRUE) {
 #' @export
 
 rarefy <- function(
-    mD,
-    min.abund = 1e4,
-    exactly.to = NULL,
-    trim.features = TRUE,
-    user.seed = NULL,
-    update.mD = TRUE,
-    quiet = FALSE
+  mD, 
+  min.abund = 10000, 
+  exactly.to = NULL, 
+  trim.features = TRUE, 
+  user.seed = NULL, 
+  update.mD = TRUE, 
+  quiet = FALSE
 ) {
   if (is.null(exactly.to)) {
     rarefy.to <- min(sample.sums(mD)[sample.sums(mD) >= min.abund])
-    if (!quiet) { rlang::inform(paste("Rarefying to:", rarefy.to)) }
+    if (!quiet) {
+      rlang::inform(paste("Rarefying to:", rarefy.to))
+    }
   } else {
     rarefy.to <- exactly.to
   }
   mD.rar <- drop.samples(
-    mD,
+    mD, 
     samples = names(sample.sums(mD)[sample.sums(mD) < rarefy.to])
   )
-
   if (is.null(user.seed)) {
     if (!quiet) {
       rlang::inform(paste("Random seed:", .Random.seed[1]))
@@ -75,14 +76,11 @@ rarefy <- function(
   } else {
     set.seed(user.seed)
   }
-  res <- apply(
-    X = mD.rar@Abundances,
-    MARGIN = 1,
-    FUN = function(x) {
-      sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-        table()
-    }
-  )
+  res <- apply(X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+    sample(names(x), size = rarefy.to, replace = T, prob = x) %>% 
+      table() %>% 
+      return()
+  })
   mD.rar@Abundances[mD.rar@Abundances >= 0] <- 0
   for (smpl in names(res)) {
     mD.rar@Abundances[smpl, names(res[[smpl]])] <- res[[smpl]]
@@ -103,7 +101,11 @@ rarefy <- function(
     mD.res <- mD.rar
   }
   if (update.mD) {
-    mD.res <- add.other.data(x = rarefy.to, name = "Abundances rarefied", mD = mD.rar)
+    mD.res <- add.other.data(
+      x = rarefy.to, 
+      name = "Abundances rarefied", 
+      mD = mD.rar
+    )
     return(mD.res)
   } else {
     return(mD.res@Abundances)
