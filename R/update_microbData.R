@@ -27,30 +27,35 @@
 #' @rdname update.microbData
 #' @export
 
-replace.metadata <- function(mD, new.tbl) {
+replace.metadata <- function (mD, new.tbl){
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
   if (!{"data.table" %in% class(new.tbl)}) {
-    new.tbl <- as.data.table(metadata, keep.rownames = mD@Sample.col) %>%
+    new.tbl <- as.data.table(metadata, keep.rownames = mD@Sample.col) %>% 
       setkeyv(mD@Sample.col)
-  } else if (!{"sorted" %in% names(attributes(new.tbl))}) {
+  } else if (!{
+    "sorted" %in% names(attributes(new.tbl))
+  }) {
     rlang::abort(
       "The data.table supplied to `new.tbl' is not keyed by sample names, please supply sample names by using `data.table::setkey'."
-    )
+      )
   } else {
     new.smpl.col <- attributes(new.tbl)$sorted
   }
-  if (!identical(sort(mD@Sample.names), sort(new.tbl[[new.smpl.col]]))) {
+  if (!identical(sort(mD@Sample.names), sort(as.character(new.tbl[[new.smpl.col]])))) {
     rlang::abort(
       "The data.table supplied to `new.tbl' does not have the same samples as the Metadata table it is replacing."
-    )
+      )
   } else {
     mD@Metadata <- new.tbl
-    if (mD@Sample.col != new.smpl.col) { mD@Sample.col <- new.smpl.col }
+    if (mD@Sample.col != new.smpl.col) {
+      mD@Sample.col <- new.smpl.col
+    }
     return(mD)
   }
 }
+
 
 ####################################
 #' @name replace.abundances
@@ -59,35 +64,34 @@ replace.metadata <- function(mD, new.tbl) {
 #' @rdname update.microbData
 #' @export
 
-replace.abundances <- function(mD, new.tbl) {
+replace.abundances <- function (mD, new.tbl) {
   if (class(mD) != "microbData") {
     rlang::abort("Argument `mD' must be an object of class `microbData'")
   }
-  if (!{"matrix" %in% class(new.tbl)}) {
-    rlang::abort(
-      "The table supplied to `new.tbl' must be a matrix."
-    )
-  } else if (!identical(sort(rownames(mD@Abundances)), sort(rownames(new.tbl)))) {
+  if (!{
+    "matrix" %in% class(new.tbl)
+  }) {
+    rlang::abort("The table supplied to `new.tbl' must be a matrix.")
+  }
+  else if (!identical(sort(rownames(mD@Abundances)), sort(rownames(new.tbl)))) {
     rlang::abort(
       "The matrix supplied to `new.tbl' does not have the same samples as the Abundances table it is replacing."
-    )
-  } else {
-    mD@Abundances <- new.tbl[
-      rownames(mD@Abundances),
-      names(sort(colSums(new.tbl), decreasing = T))
-    ]
+      )
+  }
+  else {
+    mD@Abundances <- new.tbl[rownames(mD@Abundances), names(sort(colSums(new.tbl), decreasing = T))]
     if (!is.null(mD@Assignments)) {
-      if (!identical(sort(colnames(mD@Abundances)), sort(mD@Feature[[mD@Feature.col]]))) {
+      if (!identical(sort(colnames(mD@Abundances)), sort(mD@Assignments[[mD@Feature.col]]))) {
         rlang::warn(
           "The feature names (colnames) in the new Abundances table are not all identical to the names in the Assignments table."
-        )
+          )
       }
     }
     if (!is.null(mD@Phylogeny)) {
       if (!identical(sort(colnames(mD@Abundances)), sort(mD@Phylogeny$tip.label))) {
         rlang::warn(
           "The feature names (colnames) in the new Abundances table are not all identical to the names in the Phylogenetic tree."
-        )
+          )
       }
     }
     if (!identical(sort(colnames(mD@Abundances)), sort(mD@Feature.names))) {
