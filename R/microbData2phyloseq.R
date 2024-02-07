@@ -5,24 +5,25 @@
 #' @seealso \code{\link[phyloseq]{phyloseq}}
 #' @export
 
-microbData2phyloseq <- function(mD) {
+microbData2phyloseq <- function (mD) {
   require(phyloseq)
   abundances <- mD@Abundances
   metadata <- as.data.frame(mD@Metadata)
   row.names(metadata) <- mD@Metadata[[mD@Sample.col]]
   metadata <- metadata[rownames(abundances), ]
-
   ps <- phyloseq(
-    sample_data(metadata),
-    otu_table(abundances)
+    sample_data(metadata), 
+    otu_table(abundances, taxa_are_rows = FALSE)
   )
   if (!is.null(mD@Phylogeny)) {
     phy_tree(ps) <- mD@Phylogeny
   }
   if (!is.null(mD@Assignments)) {
-    assignments <- as.data.frame(mD@Assignments)
-    row.names(assignments) <- mD@Assignments[[mD@Feature.col]]
-    tax_table(ps) <- assignments
+    assignments <- as.matrix(mD@Assignments)
+    rownames(assignments) <- mD@Assignments[[mD@Feature.col]]
+    identical(sort(rownames(assignments)), sort(taxa_names(ps)))
+    tax_table(ps) <- assignments[taxa_names(ps), ]
   }
   return(ps)
 }
+
