@@ -59,18 +59,18 @@ ordination.coords <- function(
     sections <- NULL
     if (combine) {
       if (str_detect(names(ord.list)[i], "NMDS$|PCoA$|dbRDA$")) {
-        dist.name <- str_split(names(ord.list)[i], "\\_") %>% 
+        dist.name <- str_split(names(ord.list)[i], "\\_") %>%
           unlist() %>% head(1)
-        ord.type <- str_split(names(ord.list)[i], "\\_") %>% 
+        ord.type <- str_split(names(ord.list)[i], "\\_") %>%
           unlist() %>% tail(1)
       } else {
         ord.class <- class(ord.list[[i]])
         ord.type <- ifelse(
-          "metaMDS" %in% ord.class, 
-          "NMDS", 
+          "metaMDS" %in% ord.class,
+          "NMDS",
           ifelse(
-            "capscale" %in% ord.class, 
-            "dbRDA", 
+            "capscale" %in% ord.class,
+            "dbRDA",
             ifelse("pcoa" == ord.class, "pcoa", NA)
           )
         )
@@ -102,12 +102,12 @@ ordination.coords <- function(
         })
     }
     if (combine) {
-      sections[["Axis.labs"]] <- list(Label = sections[["Axis.labs"]]) %>% 
-        as.data.table() %>% 
+      sections[["Axis.labs"]] <- list(Label = sections[["Axis.labs"]]) %>%
+        as.data.table() %>%
         .[
           , `:=`(
-            Axis = c("Axis1", "Axis2"), 
-            Ord.method = ord.type, 
+            Axis = c("Axis1", "Axis2"),
+            Ord.method = ord.type,
             Beta.metric = dist.name
           )
         ]
@@ -119,15 +119,16 @@ ordination.coords <- function(
       } else {
         smpl.col.name <- names(metadata)[
           apply(
-            metadata, 
-            MARGIN = 2, 
+            metadata,
+            MARGIN = 2,
             FUN = function(x) { all(row.names(smpl.mat) %in% x) }
           )
         ]
         if (length(smpl.col.name) == 0) {
           rlang::abort(
             paste(
-              "The supplied metadata does not contain all samples in the ordination at element", i, ", please review data and re-try."
+              "The supplied metadata does not contain all samples in the ordination at element",
+              i, ", please review data and re-try."
             )
           )
         } else {
@@ -135,16 +136,16 @@ ordination.coords <- function(
         }
       }
       sections[["Samples"]] <- as.data.table(
-        smpl.mat, 
+        smpl.mat,
         keep.rownames = smpl.col.name
-      ) %>% 
-        setkeyv(smpl.col.name) %>% 
+      ) %>%
+        setkeyv(smpl.col.name) %>%
         merge(metadata)
     } else {
       sections[["Samples"]] <- as.data.table(
-        smpl.mat, 
+        smpl.mat,
         keep.rownames = "Sample"
-      ) %>% 
+      ) %>%
         setkey(Sample)
     }
     if (combine) {
@@ -152,16 +153,11 @@ ordination.coords <- function(
       label.pad <- 1.1
       sections[["Axis.labs"]][
         , `:=`(
-          Axis1 = c(
-            max(sections[["Samples"]]$Axis1) * label.pad, 
-            min(sections[["Samples"]]$Axis1) * label.pad
-          ), 
-          Axis2 = c(
-            min(sections[["Samples"]]$Axis2) * label.pad, 
-            max(sections[["Samples"]]$Axis2) * label.pad
-          ), 
-          Angle = ifelse(Axis == "Axis1", 0, 90), 
-          Vjust = ifelse(Axis == "Axis1", 1, 0)
+          Axis1 = c(Inf, -Inf),
+          Axis2 = c(-Inf, Inf),
+          Angle = ifelse(Axis == "Axis1", 0, 90),
+          Vjust = ifelse(Axis == "Axis1", -1, 1.5),
+          HJust = ifelse(Axis == "AXis1", 1, 1.1)
         )
       ]
     }
@@ -174,15 +170,15 @@ ordination.coords <- function(
         } else {
           feat.col.name <- names(assignment.tbl)[
             apply(
-              assignment.tbl, 
-              MARGIN = 2, 
+              assignment.tbl,
+              MARGIN = 2,
               FUN = function(x) { all(row.names(assign.mat) %in% x) }
             )
           ]
           if (length(feat.col.name) == 0) {
             rlang::abort(
               paste(
-                "The supplied assignment.tbl does not contain all samples in the ordination at element", 
+                "The supplied assignment.tbl does not contain all samples in the ordination at element",
                 i, ", please review data and re-try."
               )
             )
@@ -191,16 +187,16 @@ ordination.coords <- function(
           }
         }
         sections[["Assignments"]] <- as.data.table(
-          assign.mat, 
+          assign.mat,
           keep.rownames = feat.col.name
-        ) %>% 
-          setkeyv(feat.col.name) %>% 
+        ) %>%
+          setkeyv(feat.col.name) %>%
           merge(assignment.tbl)
       } else {
         sections[["Assignments"]] <- as.data.table(
-          assign.mat, 
+          assign.mat,
           keep.rownames = "Feature"
-        ) %>% 
+        ) %>%
           setkey(Feature)
       }
       if (combine) {
@@ -210,14 +206,14 @@ ordination.coords <- function(
       }
     }
     if (ord.type == "dbRDA" & constraint.coords) {
-      sections[["Vectors"]] <- scores(ord, display = "bp") %>% 
+      sections[["Vectors"]] <- scores(ord, display = "bp") %>%
         as.data.table(keep.rownames = "Old")
       sections[["Vectors"]][
         , `:=`(Variable, str_extract(Old, paste(names(metadata), collapse = "|")))
       ]
       setcolorder(sections[["Vectors"]], ncol(sections[["Vectors"]]))
       replace.cols <- str_which(
-        names(sections[["Vectors"]]), 
+        names(sections[["Vectors"]]),
         paste(orig.axis.names, collapse = "|")
       )
       names(sections[["Vectors"]])[replace.cols] <- c("Axis1", "Axis2")
@@ -227,11 +223,11 @@ ordination.coords <- function(
         ]
       }
       if (!is.null(scores(ord, display = "cn"))) {
-        sections[["Centroids"]] <- scores(ord, display = "cn") %>% 
+        sections[["Centroids"]] <- scores(ord, display = "cn") %>%
           as.data.table(keep.rownames = "Class")
         sections[["Centroids"]][
           , `:=`(
-            Variable, 
+            Variable,
             str_extract(Class, paste(names(metadata), collapse = "|"))
           )
         ]
@@ -240,7 +236,7 @@ ordination.coords <- function(
         ]
         setcolorder(sections[["Centroids"]], ncol(sections[["Centroids"]]))
         replace.cols <- str_which(
-          names(sections[["Centroids"]]),  
+          names(sections[["Centroids"]]),
           paste(orig.axis.names, collapse = "|")
         )
         names(sections[["Centroids"]])[replace.cols] <- c("Axis1", "Axis2")
@@ -254,9 +250,9 @@ ordination.coords <- function(
     return(sections)
   })
   if (combine) {
-    section.names <- lapply(ord.dts, names) %>% 
-      unlist() %>% 
-      unique() %>% 
+    section.names <- lapply(ord.dts, names) %>%
+      unlist() %>%
+      unique() %>%
       set_names()
     lapply(section.names, function(sn) {
       lapply(ord.dts, function(x) {
