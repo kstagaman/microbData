@@ -6,8 +6,8 @@
 \usage{
 ordination.coords(
   mD = NULL,
-  ord.list.name = "Ordinations",
   ord.list = NULL,
+  ord.list.name = "Ordinations",
   metadata = NULL,
   feature.coords = FALSE,
   assignment.tbl = NULL,
@@ -20,9 +20,9 @@ ordination.coords(
 \arguments{
 \item{mD}{microbData; a \code{microbData} object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.}
 
-\item{ord.list.name}{character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".}
-
 \item{ord.list}{list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.}
+
+\item{ord.list.name}{character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".}
 
 \item{metadata}{array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.}
 

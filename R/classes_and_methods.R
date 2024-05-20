@@ -59,20 +59,31 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 #' @keywords internal
 setClassUnion("listOrNULL", c("list", "NULL"))
-library
 #' @keywords internal
 setClassUnion("listOrDistOrNULL", c("list", "dist", "NULL"))
 #' @keywords internal
 setClassUnion("characterOrNULL", c("character", "NULL"))
 ################################################################################
 #' @title The class for microbData
+#'
+#' @slot Metadata a \code{\link{data.table}} of sample metadata, must be keyed by sample name
+#' @slot Abundances a \code{\link{matrix}} of abundance counts by sample
+#' @slot Assignments a \code{\link{data.table}} of assignments/annotations for the features
+#' @slot Phylogeny a \code{\link{phylo}} class phylogeny of features
+#' @slot Sample.names a \code{character} vector of sample names/IDs
+#' @slot Feature.names a \code{character} vector of feature names/IDs
+#' @slot Distance.matrices = a \code{\link{dist}} object (or \code{list} of them) of distance metrics pairwise by sample
+#' @slot Sample.col = the name of the sample column in the \code{Metadata} slot (\code{character})
+#' @slot Feature.col = the name of the sample column in the \code{Assignments} slot (\code{character})
+#' @slot Other.data = a \code{list} of any other information to be associated with the microbData object
+#'
 #' @name microbData-class
 #' @rdname microbData-class
 #' @exportClass microbData
 
 setClass(
   Class = "microbData",
-  slots = c(
+  representation(
     Metadata = "data.tableOrNULL",
     Abundances = "matrixOrNULL",
     Assignments = "data.tableOrNULL",
@@ -83,6 +94,18 @@ setClass(
     Sample.col = "characterOrNULL",
     Feature.col = "characterOrNULL",
     Other.data = "listOrNULL"
+  ),
+  prototype(
+    Metadata = NULL,
+    Abundances = NULL,
+    Assignments = NULL,
+    Phylogeny = NULL,
+    Sample.names = NULL,
+    Feature.names = NULL,
+    Distance.matrices = NULL,
+    Sample.col = NULL,
+    Feature.col = NULL,
+    Other.data = NULL
   )
 )
 ################################################################################

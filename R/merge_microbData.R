@@ -1,4 +1,4 @@
-#' @name merge.microbData
+#' @name merge_mDs
 #' @title Merge Two MicrobDatas
 #' @description Merge two \code{microbData} objects.
 #' @param mD1 required; a \code{microbData} object you want to merge.
@@ -6,7 +6,7 @@
 #' @seealso \code{\link[microbData]{microbData}}
 #' @export
 
-merge.microbData <- function(mD1, mD2) {
+merge_mDs <- function(mD1, mD2) {
   if (mD1@Sample.col != mD2@Sample.col) {
     rlang::abort(
       "The Sample Column names for these two microbData object do not match, and therefore cannot be merged"

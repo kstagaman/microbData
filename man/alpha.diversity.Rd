@@ -2,13 +2,10 @@
 % Please edit documentation in R/alpha_diversity.R
 \name{alpha.diversity}
 \alias{alpha.diversity}
+\alias{phylogenetic.diversity}
 \title{Estimate Alpha-diversity}
 \usage{
-alpha.diversity(
-  mD,
-  metrics = c("Chao1", "Shannon", "Simpson", "Phylogenetic"),
-  update.mD = TRUE
-)
+phylogenetic.diversity(samp, tree, include.root = TRUE)
 }
 \arguments{
 \item{mD}{required; \code{microbData} object from which data will be read.}

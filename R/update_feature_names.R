@@ -1,11 +1,11 @@
-#' @name update.feature.names
+#' @name update_feature_names
 #' @title Update Feature Names
 #' @description A simple way to replace the feature names in a \code{microbData} object.
 #' @param mD required; \code{microbData} object to read from and write to.
 #' @param new.names required; a character vector of new feature names. This vector must be the same length as the original Feature Names and in the same order.
 #' @export
 
-update.feature.names <- function(mD, new.names) {
+update_feature_names <- function(mD, new.names) {
   if (!is.null(mD@Feature.names)) {
     if (length(mD@Feature.names) != length(new.names)) {
       rlang::abort(

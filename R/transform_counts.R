@@ -23,13 +23,13 @@
 #' @export
 
 ####################################
-#' @name transform.counts
+#' @name transform_counts
 #' @title Transform Feature Counts
 #' @description Supply a custom function with which to transform feature counts in a \code{microbData} object.
-#' @rdname transform.counts
+#' @rdname transform_counts
 #' @export
 
-transform.counts <- function(mD, f, update.mD = TRUE) {
+transform_counts <- function(mD, f, update.mD = TRUE) {
   mD@Abundances <- apply(X = mD@Abundances, MARGIN = 1, FUN = f) %>%
     t() %>%
     .[, mD@Feature.names]
@@ -49,12 +49,12 @@ transform.counts <- function(mD, f, update.mD = TRUE) {
 #' @export
 
 rarefy <- function(
-  mD, 
-  min.abund = 10000, 
-  exactly.to = NULL, 
-  trim.features = TRUE, 
-  user.seed = NULL, 
-  update.mD = TRUE, 
+  mD,
+  min.abund = 10000,
+  exactly.to = NULL,
+  trim.features = TRUE,
+  user.seed = NULL,
+  update.mD = TRUE,
   quiet = FALSE
 ) {
   if (is.null(exactly.to)) {
@@ -66,7 +66,7 @@ rarefy <- function(
     rarefy.to <- exactly.to
   }
   mD.rar <- drop.samples(
-    mD, 
+    mD,
     samples = names(sample.sums(mD)[sample.sums(mD) < rarefy.to])
   )
   if (is.null(user.seed)) {
@@ -77,8 +77,8 @@ rarefy <- function(
     set.seed(user.seed)
   }
   res <- apply(X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-    sample(names(x), size = rarefy.to, replace = T, prob = x) %>% 
-      table() %>% 
+    sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+      table() %>%
       return()
   })
   mD.rar@Abundances[mD.rar@Abundances >= 0] <- 0
@@ -102,8 +102,8 @@ rarefy <- function(
   }
   if (update.mD) {
     mD.res <- add.other.data(
-      x = rarefy.to, 
-      name = "Abundances rarefied", 
+      x = rarefy.to,
+      name = "Abundances rarefied",
       mD = mD.rar
     )
     return(mD.res)
@@ -130,17 +130,17 @@ center.log.ratio <- function(
   update.mD = TRUE,
   quiet = FALSE
 ) {
-  
+
   require(CoDaSeq)
   require(zCompositions)
   filt.mat <- codaSeq.filter(
-    mD@Abundances, 
-    min.reads = min.abund, 
-    
-    min.prop = min.prop, 
-    min.occurrence = min.occur, 
+    mD@Abundances,
+    min.reads = min.abund,
+
+    min.prop = min.prop,
+    min.occurrence = min.occur,
     samples.by.row = smpls.by.row
-  ) %>% 
+  ) %>%
     t()
   rep.mat <- try(cmultRepl(filt.mat, method = method, label = lab, z.warning = 1), silent = T)
   if ("try-class" %in% class(rep.mat)) {
@@ -148,13 +148,13 @@ center.log.ratio <- function(
   } else {
     clr.mat <- codaSeq.clr(rep.mat)
   }
-  
+
   if (!quiet) {
     rlang::inform(paste("Number of samples dropped:", nsamples(mD) - nrow(clr.mat)))
     rlang::inform(paste("Number of features dropped:", nfeatures(mD) - ncol(clr.mat)))
   }
   if (update.mD) {
-    mD.res <- keep.features(mD, features = colnames(clr.mat)) %>% 
+    mD.res <- keep.features(mD, features = colnames(clr.mat)) %>%
       keep.samples(samples = rownames(clr.mat))
     mD.res <- replace.abundances(mD = mD.res, new.tbl = clr.mat)
     mD.res <- add.other.data(x = "CLR", name = "Abundances transformed", mD = mD.res)
