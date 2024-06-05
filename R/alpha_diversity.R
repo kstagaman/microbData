@@ -16,6 +16,8 @@
 # this function is a fix of picante::pd(), which would sometimes get unrooted subtrees, and throw an error
 phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
   require(phytools)
+  require(ape)
+  require(picante)
   if (is.null(tree$edge.length)) {
     stop("Tree has no branch lengths, cannot compute pd")
   }
@@ -23,7 +25,7 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
     if (!is.rooted(tree)) {
       stop("Rooted tree required to calculate PD with include.root=TRUE argument")
     }
-    tree <- node.age(tree)
+    tree <- picante::node.age(tree)
   }
   species <- colnames(samp)
   SR <- rowSums(ifelse(samp > 0, 1, 0))
@@ -50,7 +52,7 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
       PDs[i] <- sum(tree$edge.length)
     } else {
       sub.tree <- drop.tip(tree, treeabsent)
-      if (!is.rooted(subtree)) { sub.tree <- phytools::midpoint.root(sub.tree) }
+      if (!is.rooted(sub.tree)) { sub.tree <- phytools::midpoint.root(sub.tree) }
       if (include.root) {
         if (!is.rooted(tree)) {
           stop("Rooted tree required to calculate PD with include.root=TRUE argument")
