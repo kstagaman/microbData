@@ -25,6 +25,7 @@ Suggests:
   DESeq2,
   foreach,
   doParallel,
+  picante,
   phyloseq,
   seqinr,
   zCompositions
