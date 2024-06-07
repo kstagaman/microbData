@@ -55,6 +55,7 @@ rarefy <- function(
   trim.features = TRUE,
   user.seed = NULL,
   update.mD = TRUE,
+  threads = 1,
   quiet = FALSE
 ) {
   if (is.null(exactly.to)) {
@@ -76,11 +77,21 @@ rarefy <- function(
   } else {
     set.seed(user.seed)
   }
-  res <- apply(X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-    sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-      table() %>%
-      return()
-  })
+  if (threads == 1) {
+    res <- apply(X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+      sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+        table() %>%
+        return()
+    })
+  } else {
+    cl <- parallel::makeCluster(threads)
+    res <- parallel::parApply(cl = cl, X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+      sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+        table() %>%
+        return()
+    })
+    stopCluster(cl)
+  }
   mD.rar@Abundances[mD.rar@Abundances >= 0] <- 0
   for (smpl in names(res)) {
     mD.rar@Abundances[smpl, names(res[[smpl]])] <- res[[smpl]]
