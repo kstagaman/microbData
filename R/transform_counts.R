@@ -84,7 +84,7 @@ rarefy <- function(
         return()
     })
   } else {
-    cl <- parallel::makeCluster(threads)
+    cl <- parallel::makeCluster(threads, type = "FORK")
     res <- parallel::parApply(cl = cl, X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
       sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
         table() %>%
