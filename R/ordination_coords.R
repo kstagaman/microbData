@@ -157,7 +157,7 @@ ordination.coords <- function(
           Axis2 = c(-Inf, Inf),
           Angle = ifelse(Axis == "Axis1", 0, 90),
           Vjust = ifelse(Axis == "Axis1", -1, 1.5),
-          HJust = ifelse(Axis == "AXis1", 1, 1.1)
+          Hjust = ifelse(Axis == "AXis1", 1, 1.1)
         )
       ]
     }
