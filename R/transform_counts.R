@@ -133,7 +133,7 @@ rarefy <- function(
   } else {
     require(parallel)
     cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
-    clusterExport(cl, c("mD1", "rarefy.to", "zero.mat"))
+    clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"))
     clusterEvalQ(cl, library(magrittr))
     mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(x) {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
