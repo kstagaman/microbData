@@ -17,5 +17,5 @@ numbered.features(mD, prefix, old.IDs.file = NULL)
 This function replaces the feature names in a \code{microbData} object with IDs including a prefix and then numerals, e.g. "ASV0001", "ASV0002", ..., "ASV1234".
 }
 \seealso{
-\code{\link[microbData]{update.feature.names}}
+\code{\link[microbData]{update_feature_names}}
 }

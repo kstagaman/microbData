@@ -1,6 +1,6 @@
 #' @title Transform Feature Counts
 #' @description Functions for transforming feature counts in a \code{microbData} object.
-#' @aliases transform.counts
+#' @aliases transform_counts
 #' @aliases rarefy
 #' @aliases center.log.ratio
 #' @aliases variance.stabilize
@@ -8,7 +8,7 @@
 #' @param mD required; the \code{microbData} object with feature counts to be transformed.
 #' @param update.mD logical; should this function return a new \code{microbData} object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.
 #' @param quiet logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.
-#' @param f required for \code{transform.counts}; a function that can be applied to the samples (rows) of the Abundance table.
+#' @param f required for \code{transform_counts}; a function that can be applied to the samples (rows) of the Abundance table.
 #' @param iters integer; for \code{rarefy}, the number of times to subsample the abundance table. Default is 999.
 #' @param replace.with character; for \code{rarefy}, whether to return the first subsampling as the new abundances table in the microbData object, or to return a table of average abundances (may cause issues with other functions). Default is "first"
 #' @param keep.tables logical; for \code{rarefy}, keep all the subsampled abundances tables?
@@ -51,7 +51,7 @@ transform_counts <- function(mD, f, update.mD = TRUE) {
 #' @name rarefy
 #' @title Rarefy Feature Counts
 #' @description Rarefy feature counts in a \code{microbData} object to the same depth over multiple iterations and, if wanted calculate average alpha- and beta-diversity statistics.
-#' @rdname transform.counts
+#' @rdname transform_counts
 #' @export
 
 rarefy <- function(
@@ -206,7 +206,7 @@ rarefy <- function(
 #' @name subsample.features
 #' @title Subsample Feature Counts
 #' @description Subsample feature counts in a \code{microbData} object to the same depth.
-#' @rdname transform.counts
+#' @rdname transform_counts
 #' @export
 
 subsample.features <- function(
@@ -288,7 +288,7 @@ subsample.features <- function(
 #' @name center.log.ratio
 #' @title Center-log Ratio Transform Feature Counts
 #' @description Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \code{\link{zCompositions}}.
-#' @rdname transform.counts
+#' @rdname transform_counts
 #' @export
 
 center.log.ratio <- function(
@@ -340,7 +340,7 @@ center.log.ratio <- function(
 #' @name variance.stabilize
 #' @title Variance Stabilize Feature Counts
 #' @description Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
-#' @rdname transform.counts
+#' @rdname transform_counts
 #' @export
 
 variance.stabilize <- function(
@@ -369,8 +369,8 @@ variance.stabilize <- function(
 ####################################
 #' @name relative.abundance
 #' @title Relative Abundance of Feature Counts
-#' @description Transform feature counts to relative abundance. This function is the equivalent of \code{transform.counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
-#' @rdname transform.counts
+#' @description Transform feature counts to relative abundance. This function is the equivalent of \code{transform_counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
+#' @rdname transform_counts
 #' @export
 
 relative.abundance <- function(mD, update.mD = TRUE) {

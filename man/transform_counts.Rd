@@ -2,31 +2,85 @@
 % Please edit documentation in R/transform_counts.R
 \name{transform_counts}
 \alias{transform_counts}
-\alias{transform.counts}
 \alias{rarefy}
 \alias{center.log.ratio}
 \alias{variance.stabilize}
 \alias{relative.abundance}
+\alias{subsample.features}
 \title{Transform Feature Counts}
 \usage{
 transform_counts(mD, f, update.mD = TRUE)
+
+rarefy(
+  mD,
+  iters = 999,
+  replace.with = c("first", "average"),
+  keep.tables = FALSE,
+  min.abund = 10000,
+  exactly.to = NULL,
+  alpha.metrics = NULL,
+  beta.metrics = NULL,
+  trim.features = TRUE,
+  user.seed = NULL,
+  threads = 1,
+  quiet = FALSE
+)
+
+subsample.features(
+  mD,
+  min.abund = 10000,
+  exactly.to = NULL,
+  trim.features = TRUE,
+  user.seed = NULL,
+  update.mD = TRUE,
+  threads = 1,
+  quiet = FALSE
+)
+
+center.log.ratio(
+  mD,
+  min.abund = 10000,
+  min.prop = 0.001,
+  min.occur = 0,
+  smpls.by.row = TRUE,
+  method = "CZM",
+  lab = 0,
+  update.mD = TRUE,
+  quiet = FALSE
+)
+
+variance.stabilize(mD, design, update.mD = TRUE)
+
+relative.abundance(mD, update.mD = TRUE)
 }
 \arguments{
 \item{mD}{required; the \code{microbData} object with feature counts to be transformed.}
 
-\item{f}{required for \code{transform.counts}; a function that can be applied to the samples (rows) of the Abundance table.}
+\item{f}{required for \code{transform_counts}; a function that can be applied to the samples (rows) of the Abundance table.}
 
 \item{update.mD}{logical; should this function return a new \code{microbData} object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.}
 
-\item{quiet}{logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.}
+\item{iters}{integer; for \code{rarefy}, the number of times to subsample the abundance table. Default is 999.}
+
+\item{replace.with}{character; for \code{rarefy}, whether to return the first subsampling as the new abundances table in the microbData object, or to return a table of average abundances (may cause issues with other functions). Default is "first"}
+
+\item{keep.tables}{logical; for \code{rarefy}, keep all the subsampled abundances tables?}
 
 \item{min.abund}{integer; for \code{rarefy}, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if \code{min.abund = 10000} and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For \code{center.log.ratio}, the interger to pass to the \code{min.reads} argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.}
 
 \item{exactly.to}{integer; for \code{rarefy}, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes \code{min.abund}. Samples with total reads lower than this number will be dropped. Default is NULL.}
 
+\item{alpha.metrics}{character; for \code{rarefy}, which alpha-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.}
+
+\item{beta.metrics}{character; for \code{rarefy}, which beta-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.}
+
 \item{trim.features}{logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.}
 
-\item{user.seed}{integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL}
+\item{user.seed}{integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL.}
+
+\item{threads}{integer; for \code{rarefy}, the number of threads to run the rarefaction subsampling. Default is 1 (no parallelization).}
+
+\item{quiet}{logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.}
 
 \item{min.prop}{numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.}
 
@@ -44,6 +98,16 @@ transform_counts(mD, f, update.mD = TRUE)
 Functions for transforming feature counts in a \code{microbData} object.
 
 Supply a custom function with which to transform feature counts in a \code{microbData} object.
+
+Rarefy feature counts in a \code{microbData} object to the same depth over multiple iterations and, if wanted calculate average alpha- and beta-diversity statistics.
+
+Subsample feature counts in a \code{microbData} object to the same depth.
+
+Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \code{\link{zCompositions}}.
+
+Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
+
+Transform feature counts to relative abundance. This function is the equivalent of \code{transform_counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
 }
 \seealso{
 \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}
