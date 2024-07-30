@@ -133,7 +133,7 @@ rarefy <- function(
   } else {
     require(parallel)
     cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
-    clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"))
+    clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"), envir = environment())
     clusterEvalQ(cl, library(magrittr))
     mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(x) {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
@@ -149,7 +149,7 @@ rarefy <- function(
     })
 
     if (!is.null(alpha.metrics)) {
-      clusterExport(cl, c("mat.list", "alpha.metrics"))
+      clusterExport(cl, c("mat.list", "alpha.metrics"), envir = environment())
       clusterEvalQ(cl, library(microbData))
       alpha.res <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
         mD.i <- replace.abundances(mD1, mat.list[[i]])
@@ -162,7 +162,7 @@ rarefy <- function(
     }
     if (!is.null(beta.metrics)) {
       dist.mats <- lapply(beta.metrics, function(beta) {
-        clusterExport(cl, c("beta"))
+        clusterExport(cl, c("beta"), envir = environment())
         iter.mats <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
           mD.i <- replace.abundances(mD1, mat.list[[i]])
           microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
