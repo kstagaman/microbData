@@ -9,10 +9,16 @@
 #' @param update.mD logical; should this function return a new \code{microbData} object with the transformed abundances replacing the original abundances (TRUE) or just the resulting transformed abundance table (FALSE)? Default is TRUE.
 #' @param quiet logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.
 #' @param f required for \code{transform.counts}; a function that can be applied to the samples (rows) of the Abundance table.
+#' @param iters integer; for \code{rarefy}, the number of times to subsample the abundance table. Default is 999.
+#' @param replace.with character; for \code{rarefy}, whether to return the first subsampling as the new abundances table in the microbData object, or to return a table of average abundances (may cause issues with other functions). Default is "first"
+#' @param keep.tables logical; for \code{rarefy}, keep all the subsampled abundances tables?
 #' @param min.abund integer; for \code{rarefy}, if not NULL, samples will be rarefied to the same depth as the lowest sample abundance equal to or greater than this integer. E.g., if \code{min.abund = 10000} and there four samples with 8000, 11000, 12000, and 13000 total reads, respectively, the first sample will be dropped, and last three samples will be rarefied to 11000 reads. For \code{center.log.ratio}, the interger to pass to the \code{min.reads} argument in \code{\link[CoDaSeq]{codaSeq.filter}}. Default is 1e4.
 #' @param exactly.to integer; for \code{rarefy}, if not NULL, samples will be rarefied to exactly this integer. This argument supersedes \code{min.abund}. Samples with total reads lower than this number will be dropped. Default is NULL.
+#' @param alpha.metrics character; for \code{rarefy}, which alpha-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.
+#' @param beta.metrics character; for \code{rarefy}, which beta-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.
 #' @param trim.features logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.
-#' @param user.seed integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL
+#' @param user.seed integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL.
+#' @param threads integer; for \code{rarefy}, the number of threads to run the rarefaction subsampling. Default is 1 (no parallelization).
 #' @param min.prop numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.
 #' @param min.occur numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.
 #' @param smpls.by.row logical; for \code{center.log.ratio}, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.
@@ -44,31 +50,186 @@ transform_counts <- function(mD, f, update.mD = TRUE) {
 ####################################
 #' @name rarefy
 #' @title Rarefy Feature Counts
-#' @description Rarefy feature counts in a \code{microbData} object to the same depth.
+#' @description Rarefy feature counts in a \code{microbData} object to the same depth over multiple iterations and, if wanted calculate average alpha- and beta-diversity statistics.
 #' @rdname transform.counts
 #' @export
 
 rarefy <- function(
-  mD,
-  min.abund = 10000,
-  exactly.to = NULL,
-  trim.features = TRUE,
-  user.seed = NULL,
-  update.mD = TRUE,
-  threads = 1,
-  quiet = FALSE
+    mD,
+    iters = 999,
+    replace.with = c("first", "average"),
+    keep.tables = FALSE,
+    min.abund = 10000,
+    exactly.to = NULL,
+    alpha.metrics = NULL,
+    beta.metrics = NULL,
+    trim.features = TRUE,
+    user.seed = NULL,
+    threads = 1,
+    quiet = FALSE
 ) {
-  if (is.null(exactly.to)) {
-    rarefy.to <- min(sample.sums(mD)[sample.sums(mD) >= min.abund])
-    if (!quiet) {
-      rlang::inform(paste("Rarefying to:", rarefy.to))
-    }
-  } else {
-    rarefy.to <- exactly.to
-  }
-  mD.rar <- drop.samples(
+  rarefy.to <- ifelse(
+    is.null(exactly.to),
+    min(sample.sums(mD)[sample.sums(mD) >= min.abund]),
+    exactly.to
+  )
+  replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
+  if (!quiet) { rlang::inform(paste("Rarefying to:", rarefy.to)) }
+
+  alpha.metrics %<>% purrr::set_names()
+  beta.metrics %<>% purrr::set_names()
+
+  mD1 <- drop.samples(
     mD,
     samples = names(sample.sums(mD)[sample.sums(mD) < rarefy.to])
+  )
+  zero.mat <- copy(mD1@Abundances)
+  zero.mat[,] <- 0
+  if (is.null(user.seed)) {
+    if (!quiet) { rlang::inform(paste("Random seed:", .Random.seed[1])) }
+  } else {
+    set.seed(user.seed)
+    if (!quiet) { rlang::inform(paste("Random seed:", user.seed)) }
+  }
+  if (!quiet) { rlang::inform(paste("Using", threads, "threads")) }
+  if (threads == 1) {
+    mat.list <- lapply(1:iters, function(i) {
+      sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      })
+      mat.i <- zero.mat
+      for (smpl in names(sub.list)) {
+        mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
+      }
+      return(mat.i)
+    })
+    if (!is.null(alpha.metrics)) {
+      alpha.res <- lapply(1:iters, function(i) {
+        mD.i <- replace.abundances(mD1, mat.list[[i]])
+        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F) %>%
+          .[, Iter := i]
+      }) %>% rbindlist()
+      new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
+        merge(mD1@Metadata, by = mD1@Sample.col)
+      mD1 %<>% replace.metadata(new.tbl = new.meta)
+    }
+    if (!is.null(beta.metrics)) {
+      dist.mats <- lapply(beta.metrics, function(beta) {
+        iter.mats <- lapply(1:iters, function(i) {
+          mD.i <- replace.abundances(mD1, mat.list[[i]])
+          microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
+            as.matrix() %>%
+            return()
+        })
+        {Reduce("+", iter.mats)/length(iter.mats)} %>%
+          as.dist() %>%
+          return()
+      })
+      mD1@Other.data[["Beta.metrics"]] <- beta.metrics
+      mD1@Distance.matrices <- dist.mats
+    }
+  } else {
+    require(parallel)
+    cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
+    clusterExport(cl, c("mD1", "rarefy.to", "zero.mat"))
+    clusterEvalQ(cl, library(magrittr))
+    mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(x) {
+      sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      })
+      mat.i <- zero.mat
+      for (smpl in names(sub.list)) {
+        mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
+      }
+      return(mat.i)
+    })
+
+    if (!is.null(alpha.metrics)) {
+      clusterExport(cl, c("mat.list", "alpha.metrics"))
+      clusterEvalQ(cl, library(microbData))
+      alpha.res <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
+        mD.i <- replace.abundances(mD1, mat.list[[i]])
+        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F) %>%
+          .[, Iter := i]
+      }) %>% rbindlist()
+      new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
+        merge(mD1@Metadata, by = mD1@Sample.col)
+      mD1 %<>% replace.metadata(new.tbl = new.meta)
+    }
+    if (!is.null(beta.metrics)) {
+      dist.mats <- lapply(beta.metrics, function(beta) {
+        clusterExport(cl, c("beta"))
+        iter.mats <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
+          mD.i <- replace.abundances(mD1, mat.list[[i]])
+          microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
+            as.matrix() %>%
+            return()
+        })
+        {Reduce("+", iter.mats)/length(iter.mats)} %>%
+          as.dist() %>%
+          return()
+      })
+      mD1@Other.data[["Beta.metrics"]] <- beta.metrics
+      mD1@Distance.matrices <- dist.mats
+    }
+    stopCluster(cl)
+  }
+  if (replace.with == "first") {
+    mD1 %<>% replace.abundances(new.tbl = mat.list[[1]])
+  } else {
+    mD1 %<>% replace.abundances(new.tbl = {Reduce("+", mat.list)/length(mat.list)})
+  }
+  if (!quiet) { rlang::inform(paste("Number of samples dropped:", sum(sample.sums(mD) < rarefy.to))) }
+  if (trim.features) {
+    if (!quiet) { rlang::inform(paste("Number of features dropped:", sum(feature.sums(mD1) == 0))) }
+    mD1 %<>% drop.features(features = feature.sums(mD1) == 0)
+  }
+
+  mD1 %<>% add.other.data(
+    x = rarefy.to,
+    name = "Abundances rarefied"
+  )
+  if (keep.tables) {
+    mD1 %<>% add.other.data(
+      x = mat.list,
+      name = "Rarefied.tables"
+    )
+  }
+  return(mD1)
+}
+
+####################################
+#' @name subsample.features
+#' @title Subsample Feature Counts
+#' @description Subsample feature counts in a \code{microbData} object to the same depth.
+#' @rdname transform.counts
+#' @export
+
+subsample.features <- function(
+    mD,
+    min.abund = 10000,
+    exactly.to = NULL,
+    trim.features = TRUE,
+    user.seed = NULL,
+    update.mD = TRUE,
+    threads = 1,
+    quiet = FALSE
+) {
+  if (is.null(exactly.to)) {
+    subsmpl.to <- min(sample.sums(mD)[sample.sums(mD) >= min.abund])
+    if (!quiet) {
+      rlang::inform(paste("Rarefying to:", subsmpl.to))
+    }
+  } else {
+    subsmpl.to <- exactly.to
+  }
+  mD1 <- drop.samples(
+    mD,
+    samples = names(sample.sums(mD)[sample.sums(mD) < subsmpl.to])
   )
   if (is.null(user.seed)) {
     if (!quiet) {
@@ -78,44 +239,44 @@ rarefy <- function(
     set.seed(user.seed)
   }
   if (threads == 1) {
-    res <- apply(X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-      sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+    res <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+      sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
         table() %>%
         return()
     })
   } else {
     cl <- parallel::makeCluster(threads, type = "FORK")
-    res <- parallel::parApply(cl = cl, X = mD.rar@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-      sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+    res <- parallel::parApply(cl = cl, X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+      sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
         table() %>%
         return()
     })
     stopCluster(cl)
   }
-  mD.rar@Abundances[mD.rar@Abundances >= 0] <- 0
+  mD1@Abundances[mD1@Abundances >= 0] <- 0
   for (smpl in names(res)) {
-    mD.rar@Abundances[smpl, names(res[[smpl]])] <- res[[smpl]]
+    mD1@Abundances[smpl, names(res[[smpl]])] <- res[[smpl]]
   }
   if (!quiet) {
     rlang::inform(
-      paste("Number of samples dropped:", sum(sample.sums(mD) < rarefy.to))
+      paste("Number of samples dropped:", sum(sample.sums(mD) < subsmpl.to))
     )
   }
   if (trim.features) {
     if (!quiet) {
       rlang::inform(
-        paste("Number of features dropped:", sum(feature.sums(mD.rar) == 0))
+        paste("Number of features dropped:", sum(feature.sums(mD1) == 0))
       )
     }
-    mD.res <- drop.features(mD.rar, features = feature.sums(mD.rar) == 0)
+    mD.res <- drop.features(mD1, features = feature.sums(mD1) == 0)
   } else {
-    mD.res <- mD.rar
+    mD.res <- mD1
   }
   if (update.mD) {
     mD.res <- add.other.data(
-      x = rarefy.to,
+      x = subsmpl.to,
       name = "Abundances rarefied",
-      mD = mD.rar
+      mD = mD1
     )
     return(mD.res)
   } else {
@@ -131,15 +292,15 @@ rarefy <- function(
 #' @export
 
 center.log.ratio <- function(
-  mD,
-  min.abund = 10000,
-  min.prop = 0.001,
-  min.occur = 0,
-  smpls.by.row = TRUE,
-  method = "CZM",
-  lab = 0,
-  update.mD = TRUE,
-  quiet = FALSE
+    mD,
+    min.abund = 10000,
+    min.prop = 0.001,
+    min.occur = 0,
+    smpls.by.row = TRUE,
+    method = "CZM",
+    lab = 0,
+    update.mD = TRUE,
+    quiet = FALSE
 ) {
 
   require(CoDaSeq)

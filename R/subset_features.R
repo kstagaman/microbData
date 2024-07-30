@@ -40,7 +40,7 @@ keep.features <- function (mD, features, track = TRUE) {
   }
   if (track) {
     mD <- add.other.data(
-      mD = mD, 
+      mD = mD,
       name = "Dropped.features",
       x = mD@Feature.names[!{mD@Feature.names %in% to.keep}]
     )
@@ -94,7 +94,7 @@ drop.features <- function(mD, features, track = TRUE) {
     mD <- add.other.data(mD = mD, name = "Dropped.features", x = features)
   }
   mD@Abundances <- mD@Abundances[, to.keep]
-  mD@Assignments <- copy(mD@Assignments)[to.keep]
+  mD@Assignments <- mD@Assignments[to.keep]
   if (!is.null(mD@Phylogeny)) {
     mD@Phylogeny <- ape::drop.tip(mD@Phylogeny, tip = to.drop)
   }

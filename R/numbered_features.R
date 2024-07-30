@@ -4,7 +4,7 @@
 #' @param mD required; \code{microbData} object from which data will be read.
 #' @param prefix required; character string to append to numeric IDs, e.g., "ASV", "KO".
 #' @param old.IDs.file character; name of file to write old IDs (in FASTA, CSV, or RDS format inferred from extention: must be ".fa", ".fasta", ".csv", or ".rds") to. NULL will not save IDs to a file. Default is NULL.
-#' @seealso \code{\link[microbData]{update.feature.names}}
+#' @seealso \code{\link[microbData]{update_feature_names}}
 #' @export
 
 numbered.features <- function(mD, prefix, old.IDs.file = NULL) {
@@ -37,6 +37,6 @@ numbered.features <- function(mD, prefix, old.IDs.file = NULL) {
       )
     }
   }
-  update.feature.names(mD = mD, new.names = new.ids) %>%
+  update_feature_names(mD = mD, new.names = new.ids) %>%
     return()
 }
