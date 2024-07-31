@@ -23,6 +23,7 @@ Suggests:
   biomformat,
   CoDaSeq,
   DESeq2,
+  dqrng,
   foreach,
   doParallel,
   picante,

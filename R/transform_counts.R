@@ -68,13 +68,19 @@ rarefy <- function(
     threads = 1,
     quiet = FALSE
 ) {
+  dqrng.installed <- require(dqrng, quietly = TRUE)
   rarefy.to <- ifelse(
     is.null(exactly.to),
     min(sample.sums(mD)[sample.sums(mD) >= min.abund]),
     exactly.to
   )
-  replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
   if (!quiet) { rlang::inform(paste("Rarefying to:", rarefy.to)) }
+  if (rarefy.to >= 1e5 && !dqrng.installed) {
+    rlang::inform(
+      "Your target rarefaction depth is quite high (>=100,000 reads/sample). Consider installing the `dqrng' package to speed up subsampling"
+    )
+  }
+  replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
 
   alpha.metrics %<>% purrr::set_names()
   beta.metrics %<>% purrr::set_names()
@@ -95,9 +101,15 @@ rarefy <- function(
   if (threads == 1) {
     mat.list <- lapply(1:iters, function(i) {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-          table() %>%
-          return()
+        if (dqrng.installed) {
+          dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+            table() %>%
+            return()
+        } else {
+          sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+            table() %>%
+            return()
+        }
       })
       mat.i <- zero.mat
       for (smpl in names(sub.list)) {
@@ -137,9 +149,15 @@ rarefy <- function(
     clusterEvalQ(cl, library(magrittr))
     mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(x) {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-          table() %>%
-          return()
+        if (dqrng.installed) {
+          dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+            table() %>%
+            return()
+        } else {
+          sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+            table() %>%
+            return()
+        }
       })
       mat.i <- zero.mat
       for (smpl in names(sub.list)) {
@@ -219,13 +237,17 @@ subsample.features <- function(
     threads = 1,
     quiet = FALSE
 ) {
-  if (is.null(exactly.to)) {
-    subsmpl.to <- min(sample.sums(mD)[sample.sums(mD) >= min.abund])
-    if (!quiet) {
-      rlang::inform(paste("Rarefying to:", subsmpl.to))
-    }
-  } else {
-    subsmpl.to <- exactly.to
+  dqrng.installed <- require(dqrng, quietly = TRUE)
+  subsmpl.to <- ifelse(
+    is.null(exactly.to),
+    min(sample.sums(mD)[sample.sums(mD) >= min.abund]),
+    exactly.to
+  )
+  if (!quiet) { rlang::inform(paste("Rarefying to:", subsmpl.to)) }
+  if (subsmpl.to >= 1e5 && !dqrng.installed) {
+    rlang::inform(
+      "Your target subsampling depth is quite high (>=100,000 reads/sample). Consider installing the `dqrng' package to speed up subsampling"
+    )
   }
   mD1 <- drop.samples(
     mD,
@@ -240,16 +262,28 @@ subsample.features <- function(
   }
   if (threads == 1) {
     res <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-      sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
-        table() %>%
-        return()
+      if (dqrng.installed) {
+        dqrng::dqsample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      } else {
+        sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      }
     })
   } else {
     cl <- parallel::makeCluster(threads, type = "FORK")
     res <- parallel::parApply(cl = cl, X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-      sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
-        table() %>%
-        return()
+      if (dqrng.installed) {
+        dqrng::dqsample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      } else {
+        sample(names(x), size = subsmpl.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      }
     })
     stopCluster(cl)
   }
