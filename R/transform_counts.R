@@ -82,8 +82,8 @@ rarefy <- function(
   }
   replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
 
-  alpha.metrics %<>% purrr::set_names()
-  beta.metrics %<>% purrr::set_names()
+  if (!is.null(alpha.metrics)) { alpha.metrics %<>% purrr::set_names() }
+  if (!is.null(beta.metrics)) { beta.metrics %<>% purrr::set_names() }
 
   mD1 <- drop.samples(
     mD,
