@@ -147,7 +147,7 @@ rarefy <- function(
     cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
     clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"), envir = environment())
     clusterEvalQ(cl, library(magrittr))
-    mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(x) {
+    mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
         if (dqrng.installed) {
           dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
