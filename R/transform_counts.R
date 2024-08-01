@@ -147,24 +147,45 @@ rarefy <- function(
     cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
     clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"), envir = environment())
     clusterEvalQ(cl, library(magrittr))
-    mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
-      sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-        if (dqrng.installed) {
-          dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-            table() %>%
-            return()
-        } else {
-          sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-            table() %>%
-            return()
+    if (iters > nsamples(mD1)) {
+      mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
+        sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
+          if (dqrng.installed) {
+            dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+              table() %>%
+              return()
+          } else {
+            sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+              table() %>%
+              return()
+          }
+        })
+        mat.i <- zero.mat
+        for (smpl in names(sub.list)) {
+          mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
         }
+        return(mat.i)
       })
-      mat.i <- zero.mat
-      for (smpl in names(sub.list)) {
-        mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
-      }
-      return(mat.i)
-    })
+    } else {
+      mat.list <- lapply(1:iters, function(i) {
+        sub.list <- parApply(cl = cl, X = mD1@Abundances, MARGIN = 1, FUN = function(x) {
+          if (dqrng.installed) {
+            dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+              table() %>%
+              return()
+          } else {
+            sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+              table() %>%
+              return()
+          }
+        })
+        mat.i <- zero.mat
+        for (smpl in names(sub.list)) {
+          mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
+        }
+        return(mat.i)
+      })
+    }
 
     if (!is.null(alpha.metrics)) {
       clusterExport(cl, c("mat.list", "alpha.metrics"), envir = environment())
@@ -203,8 +224,14 @@ rarefy <- function(
   }
   if (!quiet) { rlang::inform(paste("Number of samples dropped:", sum(sample.sums(mD) < rarefy.to))) }
   if (trim.features) {
-    if (!quiet) { rlang::inform(paste("Number of features dropped:", sum(feature.sums(mD1) == 0))) }
-    mD1 %<>% drop.features(features = feature.sums(mD1) == 0)
+    if (is.null(beta.metrics)) {
+      rlang::inform(
+        "Argument `beta.metrics' is NULL, so feature trimming is skipped as it could interfere with later beta-diversity estimation"
+      )
+    } else {
+      if (!quiet) { rlang::inform(paste("Number of features dropped:", sum(feature.sums(mD1) == 0))) }
+      mD1 %<>% drop.features(features = feature.sums(mD1) == 0)
+    }
   }
 
   mD1 %<>% add.other.data(
