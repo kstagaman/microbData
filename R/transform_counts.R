@@ -78,21 +78,21 @@ rarefy <- function(
     user.seed = NULL,
     quiet = FALSE
 ) {
+  if (is.null(user.seed)) {
+    if (!quiet) { rlang::inform(paste("Random seed:", .Random.seed[1])) }
+  } else {
+    set.seed(user.seed)
+    if (!quiet) { rlang::inform(paste("Random seed:", user.seed)) }
+  }
+  replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
+  if (!is.null(alpha.metrics)) { alpha.metrics %<>% purrr::set_names() }
+  if (!is.null(beta.metrics)) { beta.metrics %<>% purrr::set_names() }
   rarefy.to <- ifelse(
     is.null(exactly.to),
     min(sample.sums(mD)[sample.sums(mD) >= min.abund]),
     exactly.to
   )
   if (!quiet) { rlang::inform(paste("Rarefying to:", rarefy.to)) }
-  if (rarefy.to >= 1e5 && !dqrng.installed) {
-    rlang::inform(
-      "Your target rarefaction depth is quite high (>=100,000 reads/sample). Consider installing the `dqrng' package to speed up subsampling"
-    )
-  }
-  replace.with <- rlang::arg_match(replace.with, values = c("first", "average"))
-
-  if (!is.null(alpha.metrics)) { alpha.metrics %<>% purrr::set_names() }
-  if (!is.null(beta.metrics)) { beta.metrics %<>% purrr::set_names() }
 
   mD1 <- drop.samples(
     mD,
@@ -100,12 +100,6 @@ rarefy <- function(
   )
   zero.mat <- copy(mD1@Abundances)
   zero.mat[,] <- 0
-  if (is.null(user.seed)) {
-    if (!quiet) { rlang::inform(paste("Random seed:", .Random.seed[1])) }
-  } else {
-    set.seed(user.seed)
-    if (!quiet) { rlang::inform(paste("Random seed:", user.seed)) }
-  }
 
   if (iters > nsamples(mD1)) {
     mat.list <- foreach::foreach(i = 1:iters, .verbose = !quiet) %dopar% {
