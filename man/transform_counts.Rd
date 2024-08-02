@@ -22,7 +22,6 @@ rarefy(
   beta.metrics = NULL,
   trim.features = TRUE,
   user.seed = NULL,
-  threads = 1,
   quiet = FALSE
 )
 
@@ -78,8 +77,6 @@ relative.abundance(mD, update.mD = TRUE)
 
 \item{user.seed}{integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL.}
 
-\item{threads}{integer; for \code{rarefy}, the number of threads to run the rarefaction subsampling. Default is 1 (no parallelization).}
-
 \item{quiet}{logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.}
 
 \item{min.prop}{numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.}
@@ -108,6 +105,19 @@ Transform feature counts using the center log-ratio method. This function requir
 Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
 
 Transform feature counts to relative abundance. This function is the equivalent of \code{transform_counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
+}
+\examples{
+data("mD_raw")
+# serial execution
+mD.rar <- rarefy(mD.raw, keep.tables = T, alpha.metrics = "InvSimpson", beta.metrics = "Canberra")
+
+# parallel execution
+cl <- parallel::makeCluster(4L)
+doParallel::registerDoParallel(cl)
+mD.rar <- rarefy(mD.raw, keep.tables = T, alpha.metrics = "InvSimpson", beta.metrics = "Canberra")
+parallel::stopCluster()
+doParallel::registerDoSEQ()
+
 }
 \seealso{
 \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}

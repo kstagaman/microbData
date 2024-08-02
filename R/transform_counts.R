@@ -18,7 +18,6 @@
 #' @param beta.metrics character; for \code{rarefy}, which beta-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.
 #' @param trim.features logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.
 #' @param user.seed integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL.
-#' @param threads integer; for \code{rarefy}, the number of threads to run the rarefaction subsampling. Default is 1 (no parallelization).
 #' @param min.prop numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.
 #' @param min.occur numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.
 #' @param smpls.by.row logical; for \code{center.log.ratio}, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.
@@ -26,6 +25,18 @@
 #' @param lab numeric or character; for \code{center.log.ratio}, a unique label used to denote count zeros in X. (See \code{\link[zCompositions]{cmultRepl}}). Default is 0.
 #' @param design formula or matrix; required for \code{variance.stabilize}, from \code{\link[DESeq2]{DESeqDataSetFromMatrix}}: the formula expresses how the counts for each gene depend on the variables in colData. Many R formula are valid, including designs with multiple variables, e.g., ~ group + condition, and designs with interactions, e.g., ~ genotype + treatment + genotype:treatment. See results for a variety of designs and how to extract results tables. By default, the functions in this package will use the last variable in the formula for building results tables and plotting. ~ 1 can be used for no design, although users need to remember to switch to another design for differential testing.
 #' @seealso \code{\link[CoDaSeq]{codaSeq.filter}}, \code{\link[zCompositions]{cmultRepl}}, \code{\link[DESeq2]{getVarianceStabilizedData}}
+#' @examples
+#' data("mD_raw")
+#' # serial execution
+#' mD.rar <- rarefy(mD.raw, keep.tables = T, alpha.metrics = "InvSimpson", beta.metrics = "Canberra")
+#'
+#' # parallel execution
+#' cl <- parallel::makeCluster(4L)
+#' doParallel::registerDoParallel(cl)
+#' mD.rar <- rarefy(mD.raw, keep.tables = T, alpha.metrics = "InvSimpson", beta.metrics = "Canberra")
+#' parallel::stopCluster()
+#' doParallel::registerDoSEQ()
+#'
 #' @export
 
 ####################################
@@ -65,7 +76,6 @@ rarefy <- function(
     beta.metrics = NULL,
     trim.features = TRUE,
     user.seed = NULL,
-    threads = 1,
     quiet = FALSE
 ) {
   dqrng.installed <- require(dqrng, quietly = TRUE)
@@ -98,129 +108,63 @@ rarefy <- function(
     if (!quiet) { rlang::inform(paste("Random seed:", user.seed)) }
   }
   if (!quiet) { rlang::inform(paste("Using", threads, "threads")) }
-  if (threads == 1) {
-    mat.list <- lapply(1:iters, function(i) {
+
+  if (iters > nsamples(mD1)) {
+    mat.list <- foreach::foreach(i = 1:iters) %dopar% {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-        if (dqrng.installed) {
-          dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-            table() %>%
-            return()
-        } else {
-          sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-            table() %>%
-            return()
-        }
+        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
       })
       mat.i <- zero.mat
       for (smpl in names(sub.list)) {
         mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
       }
       return(mat.i)
-    })
-    if (!is.null(alpha.metrics)) {
-      alpha.res <- lapply(1:iters, function(i) {
-        mD.i <- replace.abundances(mD1, mat.list[[i]])
-        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F) %>%
-          .[, Iter := i]
-      }) %>% rbindlist()
-      new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
-        merge(mD1@Metadata, by = mD1@Sample.col)
-      mD1 %<>% replace.metadata(new.tbl = new.meta)
-    }
-    if (!is.null(beta.metrics)) {
-      dist.mats <- lapply(beta.metrics, function(beta) {
-        iter.mats <- lapply(1:iters, function(i) {
-          mD.i <- replace.abundances(mD1, mat.list[[i]])
-          microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
-            as.matrix() %>%
-            return()
-        })
-        {Reduce("+", iter.mats)/length(iter.mats)} %>%
-          as.dist() %>%
-          return()
-      })
-      mD1@Other.data[["Beta.metrics"]] <- beta.metrics
-      mD1@Distance.matrices <- dist.mats
     }
   } else {
-    require(parallel)
-    cl <- makeCluster(threads, type = ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"))
-    clusterExport(cl, c("iters", "mD1", "rarefy.to", "zero.mat"), envir = environment())
-    clusterEvalQ(cl, library(magrittr))
-    if (iters > nsamples(mD1)) {
-      mat.list <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
-        sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
-          if (dqrng.installed) {
-            dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-              table() %>%
-              return()
-          } else {
-            sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-              table() %>%
-              return()
-          }
-        })
-        mat.i <- zero.mat
-        for (smpl in names(sub.list)) {
-          mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
-        }
-        return(mat.i)
-      })
-    } else {
-      mat.list <- lapply(1:iters, function(i) {
-        sub.list <- parApply(cl = cl, X = mD1@Abundances, MARGIN = 1, FUN = function(x) {
-          if (dqrng.installed) {
-            dqrng::dqsample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-              table() %>%
-              return()
-          } else {
-            sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
-              table() %>%
-              return()
-          }
-        })
-        mat.i <- zero.mat
-        for (smpl in names(sub.list)) {
-          mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
-        }
-        return(mat.i)
-      })
-    }
+    mat.list <- lapply(1:iters, function(i) {
+      sub.list <- foreach::foreach(x = split(mD1@Abundances, seq_len(nrow(mD1@Abundances)))) %dopar% {
+        sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
+          table() %>%
+          return()
+      }
+      mat.i <- zero.mat
+      for (smpl in names(sub.list)) {
+        mat.i[smpl, names(sub.list[[smpl]])] <- sub.list[[smpl]]
+      }
+      return(mat.i)
+    })
 
     if (!is.null(alpha.metrics)) {
-      clusterExport(cl, c("mat.list", "alpha.metrics"), envir = environment())
-      clusterEvalQ(cl, library(microbData))
-      alpha.res <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
-        mD.i <- replace.abundances(mD1, mat.list[[i]])
-        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F) %>%
-          .[, Iter := i]
-      }) %>% rbindlist()
+      alpha.res <- foreach::foreach(mat.i = mat.list, .combine = rbindlist, .inorder = TRUE) %dopar% {
+        mD.i <- replace.abundances(mD1, mat.i)
+        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F)
+      }
       new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
         merge(mD1@Metadata, by = mD1@Sample.col)
       mD1 %<>% replace.metadata(new.tbl = new.meta)
     }
     if (!is.null(beta.metrics)) {
       dist.mats <- lapply(beta.metrics, function(beta) {
-        clusterExport(cl, c("beta"), envir = environment())
-        iter.mats <- parLapply(cl = cl, X = 1:iters, fun = function(i) {
-          mD.i <- replace.abundances(mD1, mat.list[[i]])
+        iter.mats <- foreach::foreach(mat.i = mat.list) %dopar% {
+          mD.i <- replace.abundances(mD1, mat.i)
           microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
             as.matrix() %>%
             return()
-        })
-        {Reduce("+", iter.mats)/length(iter.mats)} %>%
+        }
+        { Reduce("+", iter.mats)/length(iter.mats) } %>%
           as.dist() %>%
           return()
       })
       mD1@Other.data[["Beta.metrics"]] <- beta.metrics
       mD1@Distance.matrices <- dist.mats
     }
-    stopCluster(cl)
   }
   if (replace.with == "first") {
     mD1 %<>% replace.abundances(new.tbl = mat.list[[1]])
   } else {
-    mD1 %<>% replace.abundances(new.tbl = {Reduce("+", mat.list)/length(mat.list)})
+    mD1 %<>% replace.abundances(new.tbl = { Reduce("+", mat.list)/length(mat.list) })
   }
   if (!quiet) { rlang::inform(paste("Number of samples dropped:", sum(sample.sums(mD) < rarefy.to))) }
   if (trim.features) {
@@ -452,3 +396,4 @@ relative.abundance <- function(mD, update.mD = TRUE) {
     return(mD@Abundances)
   }
 }
+
