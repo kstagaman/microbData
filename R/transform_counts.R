@@ -117,6 +117,7 @@ rarefy <- function(
     }
   } else {
     splits <- split(mD1@Abundances, row(mD1@Abundances)) %>%
+      setNames(rownames(mD1@Abundances)) %>%
       lapply(setNames, colnames(mD1@Abundances))
     mat.list <- lapply(1:iters, function(i) {
       sub.list <- foreach::foreach(
