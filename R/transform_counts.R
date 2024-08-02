@@ -78,7 +78,6 @@ rarefy <- function(
     user.seed = NULL,
     quiet = FALSE
 ) {
-  dqrng.installed <- require(dqrng, quietly = TRUE)
   rarefy.to <- ifelse(
     is.null(exactly.to),
     min(sample.sums(mD)[sample.sums(mD) >= min.abund]),
@@ -107,7 +106,6 @@ rarefy <- function(
     set.seed(user.seed)
     if (!quiet) { rlang::inform(paste("Random seed:", user.seed)) }
   }
-  if (!quiet) { rlang::inform(paste("Using", threads, "threads")) }
 
   if (iters > nsamples(mD1)) {
     mat.list <- foreach::foreach(i = 1:iters) %dopar% {
@@ -135,31 +133,31 @@ rarefy <- function(
       }
       return(mat.i)
     })
+  }
 
-    if (!is.null(alpha.metrics)) {
-      alpha.res <- foreach::foreach(mat.i = mat.list, .combine = rbindlist, .inorder = TRUE) %dopar% {
+  if (!is.null(alpha.metrics)) {
+    alpha.res <- foreach::foreach(mat.i = mat.list, .combine = rbindlist, .inorder = TRUE) %dopar% {
+      mD.i <- replace.abundances(mD1, mat.i)
+      metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F)
+    }
+    new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
+      merge(mD1@Metadata, by = mD1@Sample.col)
+    mD1 %<>% replace.metadata(new.tbl = new.meta)
+  }
+  if (!is.null(beta.metrics)) {
+    dist.mats <- lapply(beta.metrics, function(beta) {
+      iter.mats <- foreach::foreach(mat.i = mat.list) %dopar% {
         mD.i <- replace.abundances(mD1, mat.i)
-        metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F)
-      }
-      new.meta <- alpha.res[, lapply(.SD, mean), by = c(mD1@Sample.col), .SDcols = alpha.metrics] %>%
-        merge(mD1@Metadata, by = mD1@Sample.col)
-      mD1 %<>% replace.metadata(new.tbl = new.meta)
-    }
-    if (!is.null(beta.metrics)) {
-      dist.mats <- lapply(beta.metrics, function(beta) {
-        iter.mats <- foreach::foreach(mat.i = mat.list) %dopar% {
-          mD.i <- replace.abundances(mD1, mat.i)
-          microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
-            as.matrix() %>%
-            return()
-        }
-        { Reduce("+", iter.mats)/length(iter.mats) } %>%
-          as.dist() %>%
+        microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
+          as.matrix() %>%
           return()
-      })
-      mD1@Other.data[["Beta.metrics"]] <- beta.metrics
-      mD1@Distance.matrices <- dist.mats
-    }
+      }
+      { Reduce("+", iter.mats)/length(iter.mats) } %>%
+        as.dist() %>%
+        return()
+    })
+    mD1@Other.data[["Beta.metrics"]] <- beta.metrics
+    mD1@Distance.matrices <- dist.mats
   }
   if (replace.with == "first") {
     mD1 %<>% replace.abundances(new.tbl = mat.list[[1]])
