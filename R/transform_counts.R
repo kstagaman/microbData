@@ -115,11 +115,10 @@ rarefy <- function(
       return(mat.i)
     }
   } else {
+    splits <- split(mD1@Abundances, row(mD1@Abundances)) %>%
+      lapply(setNames, colnames(mD1@Abundances))
     mat.list <- lapply(1:iters, function(i) {
-      sub.list <- foreach::foreach(
-        x = split(mD1@Abundances, seq_len(nrow(mD1@Abundances))),
-        .verbose = !quiet
-      ) %dopar% {
+      sub.list <- foreach::foreach(x = splits, .verbose = !quiet) %dopar% {
         sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
           table() %>%
           return()
