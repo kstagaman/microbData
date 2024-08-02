@@ -108,7 +108,7 @@ rarefy <- function(
   }
 
   if (iters > nsamples(mD1)) {
-    mat.list <- foreach::foreach(i = 1:iters) %dopar% {
+    mat.list <- foreach::foreach(i = 1:iters, .verbose = !quiet) %dopar% {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
         sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
           table() %>%
@@ -122,7 +122,10 @@ rarefy <- function(
     }
   } else {
     mat.list <- lapply(1:iters, function(i) {
-      sub.list <- foreach::foreach(x = split(mD1@Abundances, seq_len(nrow(mD1@Abundances)))) %dopar% {
+      sub.list <- foreach::foreach(
+        x = split(mD1@Abundances, seq_len(nrow(mD1@Abundances))),
+        .verbose = !quiet
+      ) %dopar% {
         sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
           table() %>%
           return()
@@ -136,7 +139,12 @@ rarefy <- function(
   }
 
   if (!is.null(alpha.metrics)) {
-    alpha.res <- foreach::foreach(mat.i = mat.list, .combine = rbindlist, .inorder = TRUE) %dopar% {
+    alpha.res <- foreach::foreach(
+      mat.i = mat.list,
+      .final = rbindlist,
+      .inorder = FALSE,
+      .verbose = !quiet
+    ) %dopar% {
       mD.i <- replace.abundances(mD1, mat.i)
       metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F)
     }
@@ -146,7 +154,7 @@ rarefy <- function(
   }
   if (!is.null(beta.metrics)) {
     dist.mats <- lapply(beta.metrics, function(beta) {
-      iter.mats <- foreach::foreach(mat.i = mat.list) %dopar% {
+      iter.mats <- foreach::foreach(mat.i = mat.list, .verbose = !quiet) %dopar% {
         mD.i <- replace.abundances(mD1, mat.i)
         microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
           as.matrix() %>%
