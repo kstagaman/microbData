@@ -1,7 +1,7 @@
 Package: microbData
 Type: Package
 Title: Data Wrangling for Microbiome Analyses
-Version: 0.3
+Version: 1.1
 Date: `Sys.Date()`
 Author: Keaton Stagaman
 Maintainer: Keaton Stagaman <kstagaman@gmail.com>

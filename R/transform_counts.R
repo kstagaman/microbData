@@ -103,7 +103,11 @@ rarefy <- function(
   zero.mat[,] <- 0
 
   if (iters > nsamples(mD1)) {
-    mat.list <- foreach::foreach(i = 1:iters, .verbose = debug) %dopar% {
+    mat.list <- foreach::foreach(
+      i = 1:iters,
+      .verbose = debug,
+      .export = c("mD1", "rarefy.to")
+    ) %dopar% {
       sub.list <- apply(X = mD1@Abundances, MARGIN = 1, simplify = F, FUN = function(x) {
         sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
           table() %>%
@@ -123,7 +127,8 @@ rarefy <- function(
       sub.list <- foreach::foreach(
         x = splits,
         .final = function(x) setNames(x, names(splits)),
-        .verbose = debug
+        .verbose = debug,
+        .export = c("rarefy.to")
       ) %dopar% {
         sample(names(x), size = rarefy.to, replace = T, prob = x) %>%
           table() %>%
@@ -145,7 +150,8 @@ rarefy <- function(
       mat.i = mat.list,
       .final = rbindlist,
       .inorder = FALSE,
-      .verbose = debug
+      .verbose = debug,
+      .export = c("mD1", "alpha.metrics")
     ) %dopar% {
       mD.i <- replace.abundances(mD1, mat.i)
       metrics.i <- microbData::alpha.diversity(mD.i, metrics = alpha.metrics, update.mD = F)
@@ -159,7 +165,11 @@ rarefy <- function(
       rlang::inform(paste("Calculating beta-diversities:", paste(beta.metrics, collapse = ", ")))
     }
     dist.mats <- lapply(beta.metrics, function(beta) {
-      iter.mats <- foreach::foreach(mat.i = mat.list, .verbose = debug) %dopar% {
+      iter.mats <- foreach::foreach(
+        mat.i = mat.list,
+        .verbose = debug,
+        .export = c("mD1", "beta")
+      ) %dopar% {
         mD.i <- replace.abundances(mD1, mat.i)
         microbData::beta.diversity(mD.i, metrics = beta, update.mD = F)[[1]] %>%
           as.matrix() %>%

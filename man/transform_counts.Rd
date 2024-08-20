@@ -22,7 +22,8 @@ rarefy(
   beta.metrics = NULL,
   trim.features = TRUE,
   user.seed = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  debug = FALSE
 )
 
 subsample.features(
