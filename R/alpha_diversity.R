@@ -80,10 +80,17 @@ alpha.diversity <- function(
     update.mD = TRUE
 ) {
   diversity.metrics <- c("Shannon", "Simpson", "InvSimpson")
-  estimateR.metrics <- c("ACE", "Chao1", "Richness")
+  estimateR.metrics <- c("ACE", "Chao1")
+  richness.metric <- c("Richness")
   pd.metric <- c("Phylogenetic")
   fisherfit.metric <- c("Fisher")
-  all.metrics <- c(diversity.metrics, estimateR.metrics, pd.metric, fisherfit.metric)
+  all.metrics <- c(
+    diversity.metrics,
+    estimateR.metrics,
+    richness.metric,
+    pd.metric,
+    fisherfit.metric
+  )
   if (!all(metrics %in% all.metrics)) {
     rlang::abort(
       paste(
@@ -121,6 +128,18 @@ alpha.diversity <- function(
     names(res.dt)[2:4] <- c("Richness", "Chao1", "ACE")
     keep.cols <- c(mD@Sample.col, esr.mets)
     res.dt <- res.dt[, ..keep.cols]
+    if (is.null(results)) {
+      results <- res.dt
+    } else {
+      results <- merge(results, res.dt, by = mD@Sample.col)
+    }
+  }
+  if (richness.metric %in% metrics) {
+    abund.mat <- mD@Abundances
+    abund.mat[abund.mat > 0] <- 1
+    row.sums <- rowSums(abund.mat)
+    res.dt <- data.table(X = names(row.sums), Y = row.sums)
+    names(res.dt) <- c(mD@Sample.col, richness.metric)
     if (is.null(results)) {
       results <- res.dt
     } else {
