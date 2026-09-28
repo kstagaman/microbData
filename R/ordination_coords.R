@@ -98,7 +98,7 @@ ordination.coords <- function(
       }
       sections[["Axis.labs"]] <- sapply(
         orig.axis.names, function(n) {
-          paste0(n, " (", round(pct.explained[n], axis.digits), "%)")
+          paste0(n, " (", round(pct.explained[n] * 100, axis.digits), "%)")
         })
     }
     if (combine) {
