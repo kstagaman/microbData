@@ -53,7 +53,7 @@ setOldClass("phylo")
 ################################################################################
 setOldClass("dist")
 #' @keywords internal
-setClassUnion("data.frameORnull", c("data.table", "NULL"))
+setClassUnion("data.frameORnull", c("data.frame", "NULL"))
 #' @keywords internal
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @keywords internal

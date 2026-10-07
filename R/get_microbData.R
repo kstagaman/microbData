@@ -28,9 +28,9 @@
 
 make_converter <- function(to, fn) {
   force(to); force(fn)
-  function(x) {
+  function(x, ...) {
     tryCatch(
-      fn(x),
+      fn(x, ...),
       error = function(e) {
         rlang::abort(
           sprintf("Object of class <%s> cannot be converted to a %s", class(x)[1], to),
