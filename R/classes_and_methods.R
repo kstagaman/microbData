@@ -43,6 +43,7 @@ phylo <- structure(list(), class = "phylo")
 #' @rdname phylo-class
 #' @exportClass phylo
 setOldClass("phylo")
+
 ################################################################################
 # Taken from phyloseq:
 # Use setClassUnion to define the unholy NULL-data union as a virtual class.
@@ -52,7 +53,7 @@ setOldClass("phylo")
 ################################################################################
 setOldClass("dist")
 #' @keywords internal
-setClassUnion("data.tableORtibbleOrNULL", c("data.table", "tbl_df", "NULL"))
+setClassUnion("data.frameORnull", c("data.table", "NULL"))
 #' @keywords internal
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @keywords internal
@@ -84,9 +85,9 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 setClass(
   Class = "microbData",
   representation(
-    Metadata = "data.tableORtibbleOrNULL",
+    Metadata = "data.frameORnull",
     Abundances = "matrixOrNULL",
-    Assignments = "data.tableORtibbleOrNULL",
+    Assignments = "data.frameORnull",
     Phylogeny = "phyloOrNULL",
     Sample.names = "characterOrNULL",
     Feature.names = "characterOrNULL",

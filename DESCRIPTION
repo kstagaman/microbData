@@ -1,7 +1,7 @@
 Package: microbData
 Type: Package
 Title: Data Wrangling for Microbiome Analyses
-Version: 1.1
+Version: 2.0
 Date: `Sys.Date()`
 Author: Keaton Stagaman
 Maintainer: Keaton Stagaman <kstagaman@gmail.com>
@@ -18,7 +18,6 @@ Depends:
   phytools,
   rlang,
   stringr,
-  tibble,
   usedist,
   vegan
 Suggests:
@@ -29,6 +28,7 @@ Suggests:
     picante,
     phyloseq,
     seqinr,
+    tibble,
     zCompositions,
     testthat (>= 3.0.0)
 Config/roxygen2/version: 8.1.0

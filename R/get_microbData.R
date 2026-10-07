@@ -44,10 +44,10 @@ make_converter <- function(to, fn) {
 return.as.choices <- c("self", "data.table", "tibble", "data.frame", "matrix", "list")
 
 converters <- list(
-  data.table = make_converter("data.table", function(x) as.data.table(x, keep.rownames = mD@Sample.col)),
-  tibble = make_converter("tibble", function(x) as_tibble(x, rownames = mD@Sample.col)),
-  data.frame = make_converter("data.frame", function(x) as.data.frame(x, row.names = mD@Sample.col)),
-  matrix = make_converter("matrix", function(x) as.matrix(x, rownames = mD@Sample.col)),
+  data.table = make_converter("data.table", function(x, rn) as.data.table(x, keep.rownames = rn)),
+  tibble = make_converter("tibble", function(x, rn) tibble::as_tibble(x, rownames = rn)),
+  data.frame = make_converter("data.frame", function(x, rn) as.data.frame(x, row.names = rn)),
+  matrix = make_converter("matrix", function(x, rn) as.matrix(x, rownames = rn)),
   list = make_converter("list", function(x) as.list(x))
 )
 
@@ -65,7 +65,7 @@ get.microbData <- function(mD, slot.name, return.as = return.as.choices) {
   if (return.as == "self" | { return.as %in% class(tbl) }) {
     return(tbl)
   } else {
-    return(converters[[return.as]](tbl))
+    return(converters[[return.as]](tbl, rn = mD@Sample.col))
   }
 }
 
