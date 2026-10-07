@@ -52,7 +52,7 @@ setOldClass("phylo")
 ################################################################################
 setOldClass("dist")
 #' @keywords internal
-setClassUnion("data.tableOrNULL", c("data.table", "NULL"))
+setClassUnion("data.tableORtibbleOrNULL", c("data.table", "tbl_df", "NULL"))
 #' @keywords internal
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @keywords internal
@@ -84,9 +84,9 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 setClass(
   Class = "microbData",
   representation(
-    Metadata = "data.tableOrNULL",
+    Metadata = "data.tableORtibbleOrNULL",
     Abundances = "matrixOrNULL",
-    Assignments = "data.tableOrNULL",
+    Assignments = "data.tableORtibbleOrNULL",
     Phylogeny = "phyloOrNULL",
     Sample.names = "characterOrNULL",
     Feature.names = "characterOrNULL",

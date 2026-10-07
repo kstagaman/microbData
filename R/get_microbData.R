@@ -22,17 +22,50 @@
 #' @seealso \code{\link{slot}}, \code{\link{\@}}
 
 ####################################
+#' @title Type converters
+#' @description A dictionary of functions to convert to specific data types in the mD context
+#' @noRd
+
+make_converter <- function(to, fn) {
+  force(to); force(fn)
+  function(x) {
+    tryCatch(
+      fn(x),
+      error = function(e) {
+        rlang::abort(
+          sprintf("Object of class <%s> cannot be converted to a %s", class(x)[1], to),
+          parent = e
+          )
+      }
+    )
+  }
+}
+
+return.as.choices <- c("self", "data.table", "tibble", "data.frame", "matrix", "list")
+
+converters <- list(
+  data.table = make_converter("data.table", function(x) as.data.table(x, keep.rownames = mD@Sample.col)),
+  tibble = make_converter("tibble", function(x) as_tibble(x, rownames = mD@Sample.col)),
+  data.frame = make_converter("data.frame", function(x) as.data.frame(x, row.names = mD@Sample.col)),
+  matrix = make_converter("matrix", function(x) as.matrix(x, rownames = mD@Sample.col)),
+  list = make_converter("list", function(x) as.list(x))
+)
+
+
+
+####################################
 #' @title Get Abundances
 #' @description Get the abundance table from a \code{microbData} object.
 #' @rdname get.microbData
 #' @export
 
-get.microbData <- function(mD, slot.name, as.DT = FALSE) {
+get.microbData <- function(mD, slot.name, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
   tbl <- slot(mD, slot.name)
-  if (as.DT & !{c("data.table", "phylo") %in% class(tbl)} ) {
-    return(as.data.table(tbl, keep.rownames = mD@Sample.col))
-  } else {
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
     return(tbl)
+  } else {
+    return(converters[[return.as]](tbl))
   }
 }
 
@@ -43,11 +76,13 @@ get.microbData <- function(mD, slot.name, as.DT = FALSE) {
 #' @rdname get.microbData
 #' @export
 
-get.abundances <- function(mD, as.DT = FALSE) {
-  if (as.DT) {
-    return(as.data.table(mD@Abundances, keep.rownames = mD@Sample.col))
+get.abundances <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Abundances
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl))
   } else {
-    return(mD@Abundances)
+    return(converters[[return.as]](tbl))
   }
 }
 
@@ -69,8 +104,14 @@ get.distance.matrices <- function(mD) {
 #' @rdname get.microbData
 #' @export
 
-get.assignments <- function(mD) {
-  return(mD@Assignments)
+get.assignments <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Assignments
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl)
+  } else {
+    return(converters[[return.as]](tbl))
+  }
 }
 
 ####################################
@@ -102,8 +143,14 @@ get.feature.names <- function(mD) {
 #' @rdname get.microbData
 #' @export
 
-get.metadata <- function(mD) {
-  return(mD@Metadata)
+get.metadata <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Metadata
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl)
+  } else {
+    return(converters[[return.as]](tbl))
+  }
 }
 
 ####################################

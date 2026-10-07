@@ -44,36 +44,38 @@
 microbData <- function(
     metadata,
     abundances,
+    sample.names.col = NULL,
+    sample.names = NULL,
     assignments = NULL,
+    feature.names.col = NULL,
+    feature.names = NULL,
     phylogeny = NULL,
     distance.matrices = NULL,
-    sample.names = NULL,
-    feature.names = NULL,
     other.data = NULL
 ) {
-  table.classes <- c("matrix", "data.frame", "data.table")
+  table.classes <- c("matrix", "data.frame", "data.table", "tbl_df")
   feat.col <- NULL
   if (!any(class(metadata) %in% table.classes)) {
     rlang::abort(
-      "The table supplied to `metadata' must be of class `data.table', `data.frame', or `matrix'"
+      "The table supplied to `metadata' must be of class `data.table`, `data.frame`, `tbl_df`, or `matrix`"
     )
   }
   if (!{"matrix" %in% class(abundances)}) {
     rlang::abort(
-      "The table supplied to `abundances' must be of class `matrix'"
+      "The table supplied to `abundances` must be of class `matrix`"
     )
   }
   if (!is.null(assignments)) {
     if (!any(class(assignments) %in% table.classes)) {
       rlang::abort(
-        "The table supplied to `assignments' must be of class `data.table', `data.frame', or `matrix'"
+        "The table supplied to `assignments' must be of class `data.table`, `data.frame`, `tbl_df`, or `matrix`"
       )
     }
   }
   if (!is.null(phylogeny)) {
     if (!{"phylo" %in% class(phylogeny)}) {
       rlang::abort(
-        "The tree supplied to `phylogeny' must be of class `phylo'"
+        "The tree supplied to `phylogeny` must be of class `phylo`"
       )
     }
   }
@@ -83,7 +85,7 @@ microbData <- function(
         if (class(distance.matrices[[i]]) != "dist") {
           rlang::abort(
             paste(
-              "The elements in the list supplied to `distance.matrices' must all be of class `dist'.",
+              "The elements in the list supplied to `distance.matrices` must all be of class `dist`.",
               "Element at index", i, "is of class", class(distance.matrices[[i]])
             )
           )
@@ -91,80 +93,167 @@ microbData <- function(
       }
     } else if (class(distance.matrices) != "dist") {
       rlang::abort(
-        "The object supplied to `distance.matrices' must be of class `dist' or `list'"
+        "The object supplied to `distance.matrices` must be of class `dist` or `list`"
       )
     }
   }
   if (!is.null(other.data)) {
     if (class(other.data) != "list") {
       rlang::abort(
-        "The data supplied to `other.data' must be of class `list'"
+        "The data supplied to `other.data` must be of class `list`"
       )
     }
     if (is.null(names(other.data))) {
       rlang::abort(
-        "The list supplied to `other.data' must have names"
+        "The list supplied to `other.data` must have names"
       )
     }
   }
+  metadata.checker <- table.checkers[[class(metadata)[1]]]
+  metadata.check <- metadata.checker(metadata, sample.names.col, sample.names, slot = "metadata")
 
-  if (!{"data.table" %in% class(metadata)}) {
-    metadata <- as.data.table(metadata, keep.rownames = "Sample")
-    setkey(metadata, Sample)
-    smpl.col <- "Sample"
-  }
   if (!is.null(assignments)) {
-    if (!{"data.table" %in% class(assignments)}) {
-      assignments <- as.data.table(assignments, keep.rownames = "Feature")
-      setkey(assignments, Feature)
-    }
-  }
-
-  if (!{"sorted" %in% names(attributes(metadata))} & is.null(sample.names)) {
-    rlang::abort(
-      "The data.table supplied to `metadata' is not keyed by sample names and `sample.names' is also NULL, please supply sample names by either using `data.table::setkey' on the data.table or providing a character vector of sample names."
-    )
+    assignments.checker <- table.checkers[[class(assignments)[1]]]
+    assignments.check <- assignments.checker(metadata, sample.names.col, sample.names, slot = "assignments")
   } else {
-    smpl.col <- attributes(metadata)$sorted
-  }
-  if (!is.null(assignments)) {
-    if (!{"sorted" %in% names(attributes(assignments))} & is.null(feature.names)) {
-      rlang::abort(
-        "The data.table supplied to `assignments' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
-      )
-    } else {
-      feat.col <- attributes(assignments)$sorted
-    }
+    assignments.check <- list(TBL = NULL, NC = NULL, NS = NULL)
   }
 
-  if (is.null(sample.names)) {
-    sample.names <- as.character(metadata[[attributes(metadata)$sorted]])
-  }
-  if (!identical(sort(sample.names), sort(rownames(abundances)))) {
-    if (identical(sort(sample.names), sort(colnames(abundances)))) {
+  if (!identical(sort(metadata.check$ns), sort(rownames(abundances)))) {
+    if (identical(sort(metadata.check$ns), sort(colnames(abundances)))) {
       abundances <- t(abundances)
     } else {
       rlang::abort(
-        "The sample names supplied in either `sample.names' or the key column of `metadata' do no match the sample names in the `abundances' matrix"
+        "The sample names supplied in either `sample.names` or the key column of `metadata` do no match the sample names in the `abundances' matrix"
       )
     }
   }
-  if (is.null(feature.names)) {
-    feature.names <- colnames(abundances)[order(colSums(abundances), decreasing = T)]
-  }
+
   return(
     new(
       "microbData",
-      Metadata = metadata,
+      Metadata = metadata.check$TBL,
       Abundances = abundances[, order(colSums(abundances), decreasing = T)],
-      Assignments = assignments,
+      Assignments = assignments.check$TBL,
       Phylogeny = phylogeny,
       Distance.matrices = distance.matrices,
-      Sample.names = sample.names,
-      Feature.names = feature.names,
-      Sample.col = smpl.col,
-      Feature.col = feat.col,
+      Sample.names = metadata.check$SN,
+      Feature.names = assignments.check$SN,
+      Sample.col = metadata.check$NC,
+      Feature.col = assignments.check$NC,
       Other.data = other.data
     )
   )
 }
+
+
+####################################
+#' @title Table checkers
+#' @description A dictionary of functions to check that certain table are in the correct mD format
+#' @noRd
+
+table.checkers <- list(
+  data.table = function(tbl, nc = NULL, ns = NULL, slot = c("metadata", "assignments")) {
+    if ("sorted" %in% names(attributes(tbl))) {
+      smpl.col <- attributes(tbl)$sorted
+    } else if (!is.null(nc)) {
+      smpl.col <- nc
+      setkeyv(tbl, nc)
+    } else if (!is.null(ns)) {
+      smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+      setkeyv(tbl, smpl.col)
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "The data.table supplied to `%1$s` is not keyed by %2$s names and both `%2$s.names.col` & `%2$s.names` are NULL, please use `data.table::setkey` on the data.table or provide the name of the appropriate column or a character vector of names.",
+          slot,
+          type
+        )
+      )
+    }
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  tbl_df = function(tbl, nc = NULL, ns = NULL, slot = c("metadata", "assignments")) {
+    if (!is.null(nc)) {
+      smpl.col <- nc
+    } else if (!is.null(ns)) {
+      smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  data.frame = function(tbl, nc = NULL, ns = NULL) {
+    if (!is.null(nc)) {
+      if (nc == 0 | nc == "rn") {
+        tbl %<>% as.data.table(keep.rownames = "Sample")
+        setkey(tbl, Sample)
+        smpl.col <- "Sample"
+      } else {
+        tbl %<>% as.data.table()
+        setkeyv(tbl, nc)
+        smpl.col <- nc
+      }
+    } else if (!is.null(ns)) {
+      if (setequal(row.names(tbl), ns)) {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+      } else {
+        smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+        tbl %<>% as.data.table()
+      }
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    setkeyv(tbl, smpl.col)
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  matrix = function(tbl, nc = NULL, ns = NULL) {
+    if (!is.null(nc)) {
+      if (nc == 0 | nc == "rn") {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+        setkeyv(tbl, smpl.col)
+      } else {
+        tbl %<>% as.data.table()
+        setkeyv(tbl, nc)
+        smpl.col <- nc
+      }
+    } else if (!is.null(ns)) {
+      if (setequal(rownames(tbl), ns)) {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+      } else {
+        smpl.col <- colnames(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+        tbl %<>% as.data.table()
+      }
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    setkeyv(tbl, smpl.col)
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  }
+)
