@@ -18,6 +18,7 @@ Depends:
   phytools,
   rlang,
   stringr,
+  tibble,
   usedist,
   vegan
 Suggests:
@@ -28,7 +29,6 @@ Suggests:
     picante,
     phyloseq,
     seqinr,
-    tibble,
     zCompositions,
     testthat (>= 3.0.0)
 Config/roxygen2/version: 8.1.0
