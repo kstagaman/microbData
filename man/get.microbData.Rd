@@ -13,21 +13,21 @@
 \alias{get.sample.col}
 \alias{get.sample.names}
 \alias{get.covariate.names}
-\title{Get data from appropriate slot of a \code{microbData} object}
+\title{Get Abundances}
 \usage{
-get.microbData(mD, slot.name, as.DT = FALSE)
+get.microbData(mD, slot.name, return.as = return.as.choices)
 
-get.abundances(mD, as.DT = FALSE)
+get.abundances(mD, return.as = return.as.choices)
 
 get.distance.matrices(mD)
 
-get.assignments(mD)
+get.assignments(mD, return.as = return.as.choices)
 
 get.feature.col(mD)
 
 get.feature.names(mD)
 
-get.metadata(mD)
+get.metadata(mD, return.as = return.as.choices)
 
 get.other.data(mD, location)
 
@@ -39,18 +39,7 @@ get.sample.names(mD)
 
 get.covariate.names(mD)
 }
-\arguments{
-\item{mD}{required; the \code{microbData} object to get data from.}
-
-\item{slot.name}{required for \code{get.microbData}; the name of the slot (e.g., Metadata, Abundances, ...) you wish to extract from the \code{mD}. To see what slot names are valid, use the function \code{\link{slotNames}} on the mD.}
-
-\item{as.DT}{logical; for \code{get.microbData} and \code{get.abundances}. The Abundances table is the only one stored as a matrix in the microbData. However, if you would like to retrieve it and convert it to a data.table, you can set this to TRUE. Default is FALSE.}
-
-\item{location}{required for \code{get.other.data}; the index or name of the list element to get from the Other.data slot.}
-}
 \description{
-Functions grabbing features, phylogeny, distance matrices, or other data from a \code{microbData} object. The function \code{get.microbData} allows the user to programmatically get data from various slots as it takes the slot name as a character and returns the data in that slot. The other functions are very simple wrappers for the \code{@} extraction operator to make code more human-readable, or just because they may be easier to understand.
-
 Get the abundance table from a \code{microbData} object.
 
 Get the abundance table from a \code{microbData} object.
@@ -74,14 +63,4 @@ Get the name of the column containing specific sample IDs from the samples table
 Get the specific IDs of samples in a \code{microbData} object.
 
 Get the column names from the Metadata (minus sample column name) in a \code{microbData} object.
-}
-\details{
-There are two ways to access slots in an object that has them. One can use the \code{slot} function or the \code{@} operator. These functions provide wrappers for these two basic functions that make code a bit more human readable. The \code{get.microbData} function is included in case users want to programmatically grab data from a slot (i.e., store the slot name in a variable and use that to retrieve the data). These functions also have an option to coerce the results in to a \code{data.table} if it is not already stored as that class.
-
-The rest of the functions are equivalent to using the \code{@} operator. For example \code{get.metadata(mD)} is the same as \code{mD@Metadata}. Neither should cause the user any problem, it is just a matter of preference.
-
-The \code{get.covariate.names} function is a little bit different in that it doesn't grab an object from a slot, but rather returns the column names from the Metadata table (excluding the sample IDs column).
-}
-\seealso{
-\code{\link{slot}}, \code{\link{\@}}
 }

@@ -80,7 +80,7 @@ get.abundances <- function(mD, return.as = return.as.choices) {
   return.as <- rlang::arg_match(return.as)
   tbl <- mD@Abundances
   if (return.as == "self" | { return.as %in% class(tbl) }) {
-    return(tbl))
+    return(tbl)
   } else {
     return(converters[[return.as]](tbl))
   }

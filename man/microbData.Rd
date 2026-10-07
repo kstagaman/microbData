@@ -7,11 +7,13 @@
 microbData(
   metadata,
   abundances,
+  sample.names.col = NULL,
+  sample.names = NULL,
   assignments = NULL,
+  feature.names.col = NULL,
+  feature.names = NULL,
   phylogeny = NULL,
   distance.matrices = NULL,
-  sample.names = NULL,
-  feature.names = NULL,
   other.data = NULL
 )
 }
@@ -20,15 +22,15 @@ microbData(
 
 \item{abundances}{required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.}
 
+\item{sample.names}{character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.}
+
 \item{assignments}{data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.}
+
+\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.}
 
 \item{phylogeny}{phylo; a phylogenetic tree of features (taxonomic). Default is NULL.}
 
 \item{distance.matrices}{dist or list; a single distance matrix of class "dist" or a list of distance matrices. Default is NULL.}
-
-\item{sample.names}{character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.}
-
-\item{feature.names}{character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.}
 
 \item{other.data}{list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the \code{microbData} package.}
 }
