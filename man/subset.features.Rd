@@ -18,8 +18,9 @@ remove.eukarya(mD, track = TRUE)
 \arguments{
 \item{mD}{required; the \code{microbData} object to be updated.}
 
-\item{features}{character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
-#' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.}
+\item{features}{character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.}
+
+\item{track}{logical; should the names of the dropped samples be added to Other.data? Default is TRUE.}
 
 \item{...}{logical expression(s) by which to filter features based on the Assignments table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.}
 }

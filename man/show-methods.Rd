@@ -2,6 +2,7 @@
 % Please edit documentation in R/classes_and_methods.R
 \name{show-microbData}
 \alias{show-microbData}
+\alias{show,microbData-method}
 \title{Method extensions to `show` for microbData object}
 \usage{
 \S4method{show}{microbData}(object)

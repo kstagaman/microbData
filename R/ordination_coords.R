@@ -1,14 +1,16 @@
 #' @name ordination.coords
 #' @title Get Plotting Coordinates from (an) Ordination(s)
 #' @description Get the appropriate coordinates to plot the results of one or more ordinations. This also returns axis labels with percentage variance explained for relevant ordination methods (i.e., for all supported methods but NMDS).
-#' @param mD microbData; a \code{microbData} object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.
-#' @param ord.list.name character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".
-#' @param ord.list list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.
+#' @param mD microbData; a \code{microbData} object that includes ordination results in its \code{Ordinations} slot. Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.
+#' @param log.name character; the name of the tracking table in \code{Other.data} that records the method and distance metric (if any) for each ordination in \code{mD@Ordinations}, in the same order. Only used if \code{mD} is supplied. Default is "Ordination.log".
+#' @param ord.list list; a list of ordinations, required if \code{mD} is NULL. Ordination type is inferred from the class of each element, so this does not need to be named. Default is NULL.
 #' @param metadata array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.
 #' @param feature.coords logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' #' @param assignment.tbl array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.
+#' @param assignment.tbl array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.
 #' @param constraint.coords logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.
 #' @param combine logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.
+#' @param axes integer; a vector of length 2 giving the indices of the ordination axes to extract coordinates for. Default is \code{1:2}.
+#' @param axis.digits integer; the number of decimal places to round percentage variance explained to in the axis labels. Default is 2.
 #' @seealso \code{\link[vegan]{scores}}, \code{\link[vegan]{eigenvals}}
 #' @export
 
@@ -16,7 +18,7 @@
 ordination.coords <- function(
   mD = NULL,
   ord.list  = NULL,
-  ord.list.name = "Ordinations",
+  log.name = "Ordination.log",
   metadata = NULL,
   feature.coords = FALSE,
   assignment.tbl = NULL,
@@ -31,8 +33,10 @@ ordination.coords <- function(
       "Either `mD' or `ord.list' must be supplied to get ordination coordinates."
       )
   }
+  ord.log <- NULL
   if (!is.null(mD)) {
-    ord.list <- mD@Other.data[[ord.list.name]]
+    ord.list <- mD@Ordinations
+    ord.log <- mD@Other.data[[log.name]]
     metadata <- mD@Metadata
     smpl.col.name <- mD@Sample.col
   }
@@ -57,33 +61,34 @@ ordination.coords <- function(
   }
   ord.dts <- lapply(seq_along(ord.list), function(i) {
     sections <- NULL
-    if (combine) {
-      if (str_detect(names(ord.list)[i], "NMDS$|PCoA$|dbRDA$")) {
-        dist.name <- str_split(names(ord.list)[i], "\\_") %>%
-          unlist() %>% head(1)
-        ord.type <- str_split(names(ord.list)[i], "\\_") %>%
-          unlist() %>% tail(1)
-      } else {
-        ord.class <- class(ord.list[[i]])
-        ord.type <- ifelse(
-          "metaMDS" %in% ord.class,
-          "NMDS",
-          ifelse(
-            "capscale" %in% ord.class,
-            "dbRDA",
-            ifelse("pcoa" == ord.class, "pcoa", NA)
-          )
+    dist.name <- NA_character_
+    ord.class <- class(ord.list[[i]])
+    ord.type <- ifelse(
+      "metaMDS" %in% ord.class,
+      "NMDS",
+      ifelse(
+        "capscale" %in% ord.class,
+        "dbRDA",
+        ifelse(
+          "pcoa" %in% ord.class,
+          "PCoA",
+          ifelse("prcomp" %in% ord.class, "PCA", NA)
         )
-        if (is.na(ord.type)) {
-          rlang::abort(
-            paste("The ordination supplied at element", i, "is not supported.")
-          )
-        }
-      }
+      )
+    )
+    if (is.na(ord.type)) {
+      rlang::abort(
+        paste("The ordination supplied at element", i, "is not supported.")
+      )
+    }
+    if (combine && !is.null(ord.log)) {
+      dist.name <- ord.log$Distance.metric[i]
     }
     ord <- ord.list[[i]]
     if (ord.type == "PCoA") {
       smpl.mat <- ord$vectors[, axes]
+    } else if (ord.type == "PCA") {
+      smpl.mat <- ord$x[, axes]
     } else {
       smpl.mat <- vegan::scores(ord, display = "sites", choices = axes)
     }
@@ -93,6 +98,8 @@ ordination.coords <- function(
     } else {
       if (ord.type == "PCoA") {
         pct.explained <- setNames(ord$values$Relative_eig[axes], orig.axis.names)
+      } else if (ord.type == "PCA") {
+        pct.explained <- setNames((ord$sdev^2 / sum(ord$sdev^2))[axes], orig.axis.names)
       } else {
         pct.explained <- { vegan::eigenvals(ord)/sum(vegan::eigenvals(ord)) }[1:2]
       }
@@ -162,7 +169,11 @@ ordination.coords <- function(
       ]
     }
     if (feature.coords) {
-      assign.mat <- vegan::scores(ord, display = "species")
+      assign.mat <- if (ord.type == "PCA") {
+        ord$rotation[, axes]
+      } else {
+        vegan::scores(ord, display = "species")
+      }
       colnames(assign.mat)[1:2] <- c("Axis1", "Axis2")
       if (!is.null(assignment.tbl)) {
         if ("sorted" %in% names(attributes(assignment.tbl))) {
@@ -260,7 +271,6 @@ ordination.coords <- function(
       }) %>% rbindlist()
     }) %>% return()
   } else {
-    names(ord.dts) <- names(ord.list)
     return(ord.dts)
   }
 }

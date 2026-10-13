@@ -9,7 +9,7 @@
 merge_mDs <- function(mD1, mD2) {
   if (mD1@Sample.col != mD2@Sample.col) {
     rlang::abort(
-      "The Sample Column names for these two microbData object do not match, and therefore cannot be merged"
+      "The Sample Column names for these two microbData objects do not match, and therefore cannot be merged"
     )
   }
   merged.abunds.dt <- rbindlist(
@@ -27,7 +27,7 @@ merge_mDs <- function(mD1, mD2) {
     metadata = rbindlist(list(mD1@Metadata, mD2@Metadata), fill = TRUE),
     abundances = merged.abunds.mat
   )
-  if (!is.null(mD1@Assignments) & !is.null(mD2@Assignments)) {
+  if (!is.null(mD1@Assignments) && !is.null(mD2@Assignments)) {
     merged.features <- merge(mD1@Assignments, mD2@Assignments, by = mD1@Feature.col, all = TRUE)
     new.mD <- add.assignments(assignments = merged.features, mD = new.mD)
   } else if (!is.null(mD1@Assignments) | !is.null(mD2@Assignments)) {
@@ -35,7 +35,7 @@ merge_mDs <- function(mD1, mD2) {
       "One of the supplied microbData objects had a Assignments table, but the other did not, so none has been included in the merged microbData object."
     )
   }
-  if (!is.null(mD1@Phylogeny) & !is.null(mD2@Phylogeny)) {
+  if (!is.null(mD1@Phylogeny) && !is.null(mD2@Phylogeny)) {
     if (identical(mD1@Phylogeny, mD2@Phylogeny)) {
       new.mD <- add.phylogeny(mD1@Phylogeny)
     } else {

@@ -1,7 +1,7 @@
 Package: microbData
 Type: Package
 Title: Data Wrangling for Microbiome Analyses
-Version: 1.1
+Version: 2.0
 Date: `Sys.Date()`
 Author: Keaton Stagaman
 Maintainer: Keaton Stagaman <kstagaman@gmail.com>
@@ -21,12 +21,15 @@ Depends:
   usedist,
   vegan
 Suggests:
-  biomformat,
-  CoDaSeq,
-  DESeq2,
-  doParallel,
-  picante,
-  phyloseq,
-  seqinr,
-  zCompositions
-RoxygenNote: 7.3.2
+    biomformat,
+    CoDaSeq,
+    DESeq2,
+    doParallel,
+    picante,
+    phyloseq,
+    seqinr,
+    tibble,
+    zCompositions,
+    testthat (>= 3.0.0)
+Config/roxygen2/version: 8.1.0
+Config/testthat/edition: 3

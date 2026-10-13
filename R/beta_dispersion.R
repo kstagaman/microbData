@@ -30,7 +30,9 @@ beta.dispersion <- function(
     update.mD = TRUE
 ) {
   if (is.null(mD@Distance.matrices)) {
-    rlang::abort("The Distance.matrices slot of the supplied microbData object must not by empty. See ?microbData::beta.diversity to generate distance matrices")
+    rlang::abort(
+      "The Distance.matrices slot of the supplied microbData object must not by empty. See ?microbData::beta.diversity to generate distance matrices"
+    )
   }
   if (is.null(metrics)) {
     metrics <- mD@Other.data$Beta.metrics
@@ -47,7 +49,13 @@ beta.dispersion <- function(
   if (is.na(add)) { bad.logical("add") }
   update.mD <- as.logical(update.mD)
   if (is.na(update.mD)) { bad.logical("update.mD") }
-  res.dt <- mD@Metadata
+  meta.class <- class(mD@Metadata)[1]
+  if (meta.class == "data.table") {
+    res.dt <- get.metadata(mD)
+  } else {
+    res.dt <- get.metadata(mD, return.as = "data.table") %>%
+      setkeyv(mD@Sample.col)
+  }
   bd.list <- NULL
   for (beta in metrics) {
     bd <- vegan::betadisper(
@@ -64,6 +72,10 @@ beta.dispersion <- function(
       merge(x = res.dt, y = .)
     bd.list[[paste(beta, group, type, sep = "_")]] <- bd
   }
+  if (meta.class != "data.table") {
+    res.dt %<>% converters[[meta.class]](rn = mD@Sample.col)
+  }
+
   if (update.mD) {
     replace.metadata(mD, res.dt) %>%
       add.other.data(name = "Beta.dispersion", x = bd.list) %>%

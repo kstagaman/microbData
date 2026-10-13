@@ -1,8 +1,42 @@
+####################################
+#' @title Type converters
+#' @description A dictionary of functions to convert to specific data types in the mD context
+#' @noRd
+
+make_converter <- function(to, fn) {
+  force(to); force(fn)
+  function(x, ...) {
+    tryCatch(
+      fn(x, ...),
+      error = function(e) {
+        rlang::abort(
+          sprintf("Object of class <%s> cannot be converted to a %s", class(x)[1], to),
+          parent = e
+          )
+      }
+    )
+  }
+}
+
+return.as.choices <- c("self", "data.table", "tibble", "data.frame", "matrix", "list")
+
+converters <- list(
+  data.table = make_converter("data.table", function(x, rn) as.data.table(x, keep.rownames = rn)),
+  tibble = make_converter("tibble", function(x, rn) tibble::as_tibble(x, rownames = rn)),
+  tbl_df = make_converter("tbl_df", function(x, rn) tibble::as_tibble(x, rownames = rn)),
+  data.frame = make_converter("data.frame", function(x, rn) as.data.frame(x, row.names = rn)),
+  matrix = make_converter("matrix", function(x, rn) as.matrix(x, rownames = rn)),
+  list = make_converter("list", function(x) as.list(x))
+)
+
+
+
 #' @name get.microbData
 #' @title Get data from appropriate slot of a \code{microbData} object
 #' @description Functions grabbing features, phylogeny, distance matrices, or other data from a \code{microbData} object. The function \code{get.microbData} allows the user to programmatically get data from various slots as it takes the slot name as a character and returns the data in that slot. The other functions are very simple wrappers for the \code{@} extraction operator to make code more human-readable, or just because they may be easier to understand.
 #' @aliases get.abundances
 #' @aliases get.distance.matrices
+#' @aliases get.ordinations
 #' @aliases get.assignments
 #' @aliases get.feature.col
 #' @aliases get.feature.names
@@ -14,25 +48,25 @@
 #' @aliases get.covariate.names
 #' @param mD required; the \code{microbData} object to get data from.
 #' @param slot.name required for \code{get.microbData}; the name of the slot (e.g., Metadata, Abundances, ...) you wish to extract from the \code{mD}. To see what slot names are valid, use the function \code{\link{slotNames}} on the mD.
-#' @param as.DT logical; for \code{get.microbData} and \code{get.abundances}. The Abundances table is the only one stored as a matrix in the microbData. However, if you would like to retrieve it and convert it to a data.table, you can set this to TRUE. Default is FALSE.
+#' @param return.as character; one of "self", "data.table", "tibble", "data.frame", "matrix", or "list"; for \code{get.microbData}, \code{get.abundances}, \code{get.assignments}, and \code{get.metadata}. "self" returns the table in whatever class it is currently stored as; any other choice coerces it to that class. Default is to accept any of these choices.
 #' @param location required for \code{get.other.data}; the index or name of the list element to get from the Other.data slot.
 #' @details There are two ways to access slots in an object that has them. One can use the \code{slot} function or the \code{@} operator. These functions provide wrappers for these two basic functions that make code a bit more human readable. The \code{get.microbData} function is included in case users want to programmatically grab data from a slot (i.e., store the slot name in a variable and use that to retrieve the data). These functions also have an option to coerce the results in to a \code{data.table} if it is not already stored as that class.
 #' @details The rest of the functions are equivalent to using the \code{@} operator. For example \code{get.metadata(mD)} is the same as \code{mD@Metadata}. Neither should cause the user any problem, it is just a matter of preference.
 #' @details The \code{get.covariate.names} function is a little bit different in that it doesn't grab an object from a slot, but rather returns the column names from the Metadata table (excluding the sample IDs column).
-#' @seealso \code{\link{slot}}, \code{\link{\@}}
-
+#' @seealso \code{\link{slot}}, \code{\@}
 ####################################
 #' @title Get Abundances
 #' @description Get the abundance table from a \code{microbData} object.
 #' @rdname get.microbData
 #' @export
 
-get.microbData <- function(mD, slot.name, as.DT = FALSE) {
+get.microbData <- function(mD, slot.name, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
   tbl <- slot(mD, slot.name)
-  if (as.DT & !{c("data.table", "phylo") %in% class(tbl)} ) {
-    return(as.data.table(tbl, keep.rownames = mD@Sample.col))
-  } else {
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
     return(tbl)
+  } else {
+    return(converters[[return.as]](tbl, rn = mD@Sample.col))
   }
 }
 
@@ -43,11 +77,13 @@ get.microbData <- function(mD, slot.name, as.DT = FALSE) {
 #' @rdname get.microbData
 #' @export
 
-get.abundances <- function(mD, as.DT = FALSE) {
-  if (as.DT) {
-    return(as.data.table(mD@Abundances, keep.rownames = mD@Sample.col))
+get.abundances <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Abundances
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl)
   } else {
-    return(mD@Abundances)
+    return(converters[[return.as]](tbl))
   }
 }
 
@@ -63,14 +99,31 @@ get.distance.matrices <- function(mD) {
 }
 
 ####################################
+#' @name get.ordinations
+#' @title Get Ordinations
+#' @description Get the (unnamed) list of ordination results from a \code{microbData} object. See \code{Other.data$Ordination.log} (or \code{\link{get.other.data}(mD, "Ordination.log")}) for a table tracking the method, distance metric, and formula used for each ordination.
+#' @rdname get.microbData
+#' @export
+
+get.ordinations <- function(mD) {
+  return(mD@Ordinations)
+}
+
+####################################
 #' @name get.assignments
 #' @title Get Assignments
 #' @description Get the feature assignments table from a \code{microbData} object.
 #' @rdname get.microbData
 #' @export
 
-get.assignments <- function(mD) {
-  return(mD@Assignments)
+get.assignments <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Assignments
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl)
+  } else {
+    return(converters[[return.as]](tbl))
+  }
 }
 
 ####################################
@@ -102,8 +155,14 @@ get.feature.names <- function(mD) {
 #' @rdname get.microbData
 #' @export
 
-get.metadata <- function(mD) {
-  return(mD@Metadata)
+get.metadata <- function(mD, return.as = return.as.choices) {
+  return.as <- rlang::arg_match(return.as)
+  tbl <- mD@Metadata
+  if (return.as == "self" | { return.as %in% class(tbl) }) {
+    return(tbl)
+  } else {
+    return(converters[[return.as]](tbl))
+  }
 }
 
 ####################################

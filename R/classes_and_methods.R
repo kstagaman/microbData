@@ -43,6 +43,7 @@ phylo <- structure(list(), class = "phylo")
 #' @rdname phylo-class
 #' @exportClass phylo
 setOldClass("phylo")
+
 ################################################################################
 # Taken from phyloseq:
 # Use setClassUnion to define the unholy NULL-data union as a virtual class.
@@ -52,7 +53,7 @@ setOldClass("phylo")
 ################################################################################
 setOldClass("dist")
 #' @keywords internal
-setClassUnion("data.tableOrNULL", c("data.table", "NULL"))
+setClassUnion("data.frameOrMatrixOrNULL", c("data.frame", "matrix", "NULL"))
 #' @keywords internal
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @keywords internal
@@ -66,13 +67,14 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 ################################################################################
 #' @title The class for microbData
 #'
-#' @slot Metadata a \code{\link{data.table}} of sample metadata, must be keyed by sample name
+#' @slot Metadata a \code{table} (\code{\link{data.table}}, \code{\link[tibble]{tibble}}, \code{\link{data.frame}}, or \code{\link{matrix}}) of sample metadata
 #' @slot Abundances a \code{\link{matrix}} of abundance counts by sample
-#' @slot Assignments a \code{\link{data.table}} of assignments/annotations for the features
+#' @slot Assignments a \code{table} (\code{\link{data.table}}, \code{\link[tibble]{tibble}}, \code{\link{data.frame}}, or \code{\link{matrix}}) of assignments/annotations for the features
 #' @slot Phylogeny a \code{\link{phylo}} class phylogeny of features
 #' @slot Sample.names a \code{character} vector of sample names/IDs
 #' @slot Feature.names a \code{character} vector of feature names/IDs
 #' @slot Distance.matrices = a \code{\link{dist}} object (or \code{list} of them) of distance metrics pairwise by sample
+#' @slot Ordinations = an \strong{unnamed} \code{list} of ordination results. Automatically populated by the \code{\link{ordinate}} function; a parallel tracking table describing each ordination's method, distance metric (if any), and formula (if any) is kept at \code{Other.data$Ordination.log}
 #' @slot Sample.col = the name of the sample column in the \code{Metadata} slot (\code{character})
 #' @slot Feature.col = the name of the sample column in the \code{Assignments} slot (\code{character})
 #' @slot Other.data = a \code{list} of any other information to be associated with the microbData object
@@ -84,13 +86,14 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 setClass(
   Class = "microbData",
   representation(
-    Metadata = "data.tableOrNULL",
+    Metadata = "data.frameOrMatrixOrNULL",
     Abundances = "matrixOrNULL",
-    Assignments = "data.tableOrNULL",
+    Assignments = "data.frameOrMatrixOrNULL",
     Phylogeny = "phyloOrNULL",
     Sample.names = "characterOrNULL",
     Feature.names = "characterOrNULL",
     Distance.matrices = "listOrDistOrNULL",
+    Ordinations = "listOrNULL",
     Sample.col = "characterOrNULL",
     Feature.col = "characterOrNULL",
     Other.data = "listOrNULL"
@@ -103,6 +106,7 @@ setClass(
     Sample.names = NULL,
     Feature.names = NULL,
     Distance.matrices = NULL,
+    Ordinations = NULL,
     Sample.col = NULL,
     Feature.col = NULL,
     Other.data = NULL
@@ -114,6 +118,7 @@ setClass(
 #' @title Method extensions to `show` for microbData object
 #' @seealso \code{\link[methods]{show}}
 #' @inheritParams methods::show
+#' @aliases show,microbData-method
 #' @rdname show-methods
 #' @export
 
@@ -197,6 +202,16 @@ setMethod(
       cat("", sep = "\n")
     }
 
+    if (!is.null(object@Ordinations)) {
+      cat(paste("Ordinations:", length(object@Ordinations), "stored"), sep = "\n")
+      ord.log <- object@Other.data[["Ordination.log"]]
+      if (!is.null(ord.log)) {
+        cat("Preview:", sep = "\n")
+        display.table(ord.log, 4)
+      }
+      cat("", sep = "\n")
+    }
+
     cat(paste("Sample Names:", display.vector(object@Sample.names)), sep = "\n")
     cat("", sep = "\n")
     cat(paste("Feature Names:", display.vector(object@Feature.names)), sep = "\n")
@@ -208,8 +223,10 @@ setMethod(
         item <- names(object@Other.data)[i]
         vals <- object@Other.data[[i]]
         item.line <- paste0("  ", item, ":")
-        if (is.vector(vals) & !is.list(vals)) {
+        if (is.vector(vals) && !is.list(vals)) {
           cat(paste(item.line, display.vector(vals)), sep = "\n")
+        } else if (is.data.frame(vals)) {
+          cat(paste(item.line, nrow(vals), "rows x", ncol(vals), "cols"), sep = "\n")
         } else if (is.list(vals)) {
           cat(paste(item.line, display.list(vals)), sep = "\n")
         } else if (class(vals) == "function") {

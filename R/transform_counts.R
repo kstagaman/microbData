@@ -18,6 +18,8 @@
 #' @param beta.metrics character; for \code{rarefy}, which beta-diversity metrics, if any should be applied to the iterations of abundance subsamplings and the results averaged (mean). Default is NULL.
 #' @param trim.features logical; for \code{rarefy}, should features that are no longer present in any samples after rarefaction be dropped from the \code{microbData} object? Default is TRUE.
 #' @param user.seed integer; for \code{rarefy}, a user-supplied random seed to make the random subsampling process repeatable. If NULL, will just use the default \code{\link{.Random.seed}}, which will be reported at the end. Default is NULL.
+#' @param debug logical; for \code{rarefy}, should \code{.verbose} be set to TRUE in the underlying \code{\link[foreach]{foreach}} calls for troubleshooting? Default is FALSE.
+#' @param threads integer; for \code{subsample.features}, the number of threads to use for parallel subsampling across samples. Default is 1.
 #' @param min.prop numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.
 #' @param min.occur numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.
 #' @param smpls.by.row logical; for \code{center.log.ratio}, TRUE if rows contain samples, FALSE if rows contain variables. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is TRUE.
@@ -313,7 +315,7 @@ subsample.features <- function(
 ####################################
 #' @name center.log.ratio
 #' @title Center-log Ratio Transform Feature Counts
-#' @description Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \code{\link{zCompositions}}.
+#' @description Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \pkg{zCompositions}.
 #' @rdname transform_counts
 #' @export
 
@@ -365,7 +367,7 @@ center.log.ratio <- function(
 ####################################
 #' @name variance.stabilize
 #' @title Variance Stabilize Feature Counts
-#' @description Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
+#' @description Transform feature counts using the variance-stabilized method. This function requires package \pkg{DESeq2}.
 #' @rdname transform_counts
 #' @export
 

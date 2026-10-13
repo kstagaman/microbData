@@ -3,11 +3,14 @@
 #' @description Creates an object with associated microbiome data of class \code{microbData}
 #' @param metadata required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{sample.names} will be set from the keyed column.
 #' @param abundances required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.
+#' @param sample.names.col character or integer; the name (or index) of the column in \code{metadata} that contains the sample names. Only needed if \code{metadata} is not a keyed data.table and \code{sample.names} is not supplied directly. Default is NULL.
+#' @param sample.names character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.
 #' @param assignments data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.
+#' @param feature.names.col character or integer; the name (or index) of the column in \code{assignments} that contains the feature names. Only needed if \code{assignments} is not a keyed data.table and \code{feature.names} is not supplied directly. Default is NULL.
+#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.
 #' @param phylogeny phylo; a phylogenetic tree of features (taxonomic). Default is NULL.
 #' @param distance.matrices dist or list; a single distance matrix of class "dist" or a list of distance matrices. Default is NULL.
-#' @param sample.names character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.
-#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.
+#' @param ordinations list; an ordination result, or an (optionally unnamed) list of ordination results, to be stored in the Ordinations slot. Default is NULL.
 #' @param other.data list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the \code{microbData} package.
 #' @details This function creates a \code{microbData} object that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The \code{microbData} object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, \code{microbData} objects utilize the power of \code{data.table}s for fast filtering, summarizing and merging.
 #' @returns A \code{microbData} object.
@@ -44,36 +47,39 @@
 microbData <- function(
     metadata,
     abundances,
+    sample.names.col = NULL,
+    sample.names = NULL,
     assignments = NULL,
+    feature.names.col = NULL,
+    feature.names = NULL,
     phylogeny = NULL,
     distance.matrices = NULL,
-    sample.names = NULL,
-    feature.names = NULL,
+    ordinations = NULL,
     other.data = NULL
 ) {
-  table.classes <- c("matrix", "data.frame", "data.table")
+  table.classes <- c("matrix", "data.frame", "data.table", "tbl_df")
   feat.col <- NULL
   if (!any(class(metadata) %in% table.classes)) {
     rlang::abort(
-      "The table supplied to `metadata' must be of class `data.table', `data.frame', or `matrix'"
+      "The table supplied to `metadata' must be of class `data.table`, `data.frame`, `tbl_df`, or `matrix`"
     )
   }
   if (!{"matrix" %in% class(abundances)}) {
     rlang::abort(
-      "The table supplied to `abundances' must be of class `matrix'"
+      "The table supplied to `abundances` must be of class `matrix`"
     )
   }
   if (!is.null(assignments)) {
     if (!any(class(assignments) %in% table.classes)) {
       rlang::abort(
-        "The table supplied to `assignments' must be of class `data.table', `data.frame', or `matrix'"
+        "The table supplied to `assignments' must be of class `data.table`, `data.frame`, `tbl_df`, or `matrix`"
       )
     }
   }
   if (!is.null(phylogeny)) {
     if (!{"phylo" %in% class(phylogeny)}) {
       rlang::abort(
-        "The tree supplied to `phylogeny' must be of class `phylo'"
+        "The tree supplied to `phylogeny` must be of class `phylo`"
       )
     }
   }
@@ -83,7 +89,7 @@ microbData <- function(
         if (class(distance.matrices[[i]]) != "dist") {
           rlang::abort(
             paste(
-              "The elements in the list supplied to `distance.matrices' must all be of class `dist'.",
+              "The elements in the list supplied to `distance.matrices` must all be of class `dist`.",
               "Element at index", i, "is of class", class(distance.matrices[[i]])
             )
           )
@@ -91,80 +97,174 @@ microbData <- function(
       }
     } else if (class(distance.matrices) != "dist") {
       rlang::abort(
-        "The object supplied to `distance.matrices' must be of class `dist' or `list'"
+        "The object supplied to `distance.matrices` must be of class `dist` or `list`"
       )
     }
   }
+  if (!is.null(ordinations)) {
+    if (!{ "list" %in% class(ordinations) }) {
+      ordinations <- list(ordinations)
+    }
+  }
+
   if (!is.null(other.data)) {
     if (class(other.data) != "list") {
       rlang::abort(
-        "The data supplied to `other.data' must be of class `list'"
+        "The data supplied to `other.data` must be of class `list`"
       )
     }
     if (is.null(names(other.data))) {
       rlang::abort(
-        "The list supplied to `other.data' must have names"
+        "The list supplied to `other.data` must have names"
       )
     }
   }
+  metadata.checker <- table.checkers[[class(metadata)[1]]]
+  metadata.check <- metadata.checker(metadata, sample.names.col, sample.names, slot = "metadata")
 
-  if (!{"data.table" %in% class(metadata)}) {
-    metadata <- as.data.table(metadata, keep.rownames = "Sample")
-    setkey(metadata, Sample)
-    smpl.col <- "Sample"
-  }
   if (!is.null(assignments)) {
-    if (!{"data.table" %in% class(assignments)}) {
-      assignments <- as.data.table(assignments, keep.rownames = "Feature")
-      setkey(assignments, Feature)
-    }
-  }
-
-  if (!{"sorted" %in% names(attributes(metadata))} & is.null(sample.names)) {
-    rlang::abort(
-      "The data.table supplied to `metadata' is not keyed by sample names and `sample.names' is also NULL, please supply sample names by either using `data.table::setkey' on the data.table or providing a character vector of sample names."
-    )
+    assignments.checker <- table.checkers[[class(assignments)[1]]]
+    assignments.check <- assignments.checker(assignments, feature.names.col, feature.names, slot = "assignments")
   } else {
-    smpl.col <- attributes(metadata)$sorted
-  }
-  if (!is.null(assignments)) {
-    if (!{"sorted" %in% names(attributes(assignments))} & is.null(feature.names)) {
-      rlang::abort(
-        "The data.table supplied to `assignments' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
-      )
-    } else {
-      feat.col <- attributes(assignments)$sorted
-    }
+    assignments.check <- list(TBL = NULL, NC = NULL, NS = NULL)
   }
 
-  if (is.null(sample.names)) {
-    sample.names <- as.character(metadata[[attributes(metadata)$sorted]])
-  }
-  if (!identical(sort(sample.names), sort(rownames(abundances)))) {
-    if (identical(sort(sample.names), sort(colnames(abundances)))) {
+  if (!identical(sort(metadata.check$NS), sort(rownames(abundances)))) {
+    if (identical(sort(metadata.check$NS), sort(colnames(abundances)))) {
       abundances <- t(abundances)
     } else {
       rlang::abort(
-        "The sample names supplied in either `sample.names' or the key column of `metadata' do no match the sample names in the `abundances' matrix"
+        "The sample names supplied in either `sample.names` or the key column of `metadata` do no match the sample names in the `abundances' matrix"
       )
     }
   }
-  if (is.null(feature.names)) {
-    feature.names <- colnames(abundances)[order(colSums(abundances), decreasing = T)]
-  }
+
   return(
     new(
       "microbData",
-      Metadata = metadata,
+      Metadata = metadata.check$TBL,
       Abundances = abundances[, order(colSums(abundances), decreasing = T)],
-      Assignments = assignments,
+      Sample.col = metadata.check$NC,
+      Sample.names = metadata.check$NS,
+      Assignments = assignments.check$TBL,
+      Feature.col = assignments.check$NC,
+      Feature.names = assignments.check$NS,
       Phylogeny = phylogeny,
       Distance.matrices = distance.matrices,
-      Sample.names = sample.names,
-      Feature.names = feature.names,
-      Sample.col = smpl.col,
-      Feature.col = feat.col,
+      Ordinations = ordinations,
       Other.data = other.data
     )
   )
 }
+
+
+####################################
+#' @title Table checkers
+#' @description A dictionary of functions to check that certain table are in the correct mD format
+#' @noRd
+
+table.checkers <- list(
+  data.table = function(tbl, nc = NULL, ns = NULL, slot = c("metadata", "assignments")) {
+    if ("sorted" %in% names(attributes(tbl))) {
+      smpl.col <- attributes(tbl)$sorted
+    } else if (!is.null(nc)) {
+      smpl.col <- nc
+      setkeyv(tbl, nc)
+    } else if (!is.null(ns)) {
+      smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+      setkeyv(tbl, smpl.col)
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "The data.table supplied to `%1$s` is not keyed by %2$s names and both `%2$s.names.col` & `%2$s.names` are NULL, please use `data.table::setkey` on the data.table or provide the name of the appropriate column or a character vector of names.",
+          slot,
+          type
+        )
+      )
+    }
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  tbl_df = function(tbl, nc = NULL, ns = NULL, slot = c("metadata", "assignments")) {
+    if (!is.null(nc)) {
+      smpl.col <- nc
+    } else if (!is.null(ns)) {
+      smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  data.frame = function(tbl, nc = NULL, ns = NULL) {
+    if (!is.null(nc)) {
+      if (nc == 0 | nc == "rn") {
+        tbl %<>% as.data.table(keep.rownames = "Sample")
+        setkey(tbl, Sample)
+        smpl.col <- "Sample"
+      } else {
+        tbl %<>% as.data.table()
+        setkeyv(tbl, nc)
+        smpl.col <- nc
+      }
+    } else if (!is.null(ns)) {
+      if (setequal(row.names(tbl), ns)) {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+      } else {
+        smpl.col <- names(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+        tbl %<>% as.data.table()
+      }
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    setkeyv(tbl, smpl.col)
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  },
+  matrix = function(tbl, nc = NULL, ns = NULL) {
+    if (!is.null(nc)) {
+      if (nc == 0 | nc == "rn") {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+        setkeyv(tbl, smpl.col)
+      } else {
+        tbl %<>% as.data.table()
+        setkeyv(tbl, nc)
+        smpl.col <- nc
+      }
+    } else if (!is.null(ns)) {
+      if (setequal(rownames(tbl), ns)) {
+        smpl.col <- "Sample"
+        tbl %<>% as.data.table(keep.rownames = smpl.col)
+      } else {
+        smpl.col <- colnames(tbl)[vapply(tbl, function(col) setequal(col, ns), logical(1))]
+        tbl %<>% as.data.table()
+      }
+    } else {
+      type <- ifelse(slot == "metadata", "sample", "feature")
+      rlang::abort(
+        sprintf(
+          "Both `%1$s.names.col` & `%1$s.names` are NULL, please supply sample names by either providing the name of the appropriate column or a character vector of names.",
+          type
+        )
+      )
+    }
+    setkeyv(tbl, smpl.col)
+    smpl.names <- as.character(tbl[[smpl.col]])
+    return(list(TBL = tbl, NC = smpl.col, NS = smpl.names))
+  }
+)

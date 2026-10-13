@@ -4,6 +4,7 @@
 \alias{get.microbData}
 \alias{get.abundances}
 \alias{get.distance.matrices}
+\alias{get.ordinations}
 \alias{get.assignments}
 \alias{get.feature.col}
 \alias{get.feature.names}
@@ -15,19 +16,21 @@
 \alias{get.covariate.names}
 \title{Get data from appropriate slot of a \code{microbData} object}
 \usage{
-get.microbData(mD, slot.name, as.DT = FALSE)
+get.microbData(mD, slot.name, return.as = return.as.choices)
 
-get.abundances(mD, as.DT = FALSE)
+get.abundances(mD, return.as = return.as.choices)
 
 get.distance.matrices(mD)
 
-get.assignments(mD)
+get.ordinations(mD)
+
+get.assignments(mD, return.as = return.as.choices)
 
 get.feature.col(mD)
 
 get.feature.names(mD)
 
-get.metadata(mD)
+get.metadata(mD, return.as = return.as.choices)
 
 get.other.data(mD, location)
 
@@ -44,7 +47,7 @@ get.covariate.names(mD)
 
 \item{slot.name}{required for \code{get.microbData}; the name of the slot (e.g., Metadata, Abundances, ...) you wish to extract from the \code{mD}. To see what slot names are valid, use the function \code{\link{slotNames}} on the mD.}
 
-\item{as.DT}{logical; for \code{get.microbData} and \code{get.abundances}. The Abundances table is the only one stored as a matrix in the microbData. However, if you would like to retrieve it and convert it to a data.table, you can set this to TRUE. Default is FALSE.}
+\item{return.as}{character; one of "self", "data.table", "tibble", "data.frame", "matrix", or "list"; for \code{get.microbData}, \code{get.abundances}, \code{get.assignments}, and \code{get.metadata}. "self" returns the table in whatever class it is currently stored as; any other choice coerces it to that class. Default is to accept any of these choices.}
 
 \item{location}{required for \code{get.other.data}; the index or name of the list element to get from the Other.data slot.}
 }
@@ -56,6 +59,8 @@ Get the abundance table from a \code{microbData} object.
 Get the abundance table from a \code{microbData} object.
 
 Get the distance matrices from a \code{microbData} object.
+
+Get the (unnamed) list of ordination results from a \code{microbData} object. See \code{Other.data$Ordination.log} (or \code{\link{get.other.data}(mD, "Ordination.log")}) for a table tracking the method, distance metric, and formula used for each ordination.
 
 Get the feature assignments table from a \code{microbData} object.
 
@@ -83,5 +88,5 @@ The rest of the functions are equivalent to using the \code{@} operator. For exa
 The \code{get.covariate.names} function is a little bit different in that it doesn't grab an object from a slot, but rather returns the column names from the Metadata table (excluding the sample IDs column).
 }
 \seealso{
-\code{\link{slot}}, \code{\link{\@}}
+\code{\link{slot}}, \code{\@}
 }

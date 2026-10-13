@@ -18,23 +18,26 @@ ordinate(
 \arguments{
 \item{mD}{required; \code{microbData} object from which data will be read.}
 
-\item{method}{character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), and "dbRDA" (distance-based redundancy analysis; \code{\link[vegan]{capscale}}). The last requires a formula, as it is a constrained ordination method. Default is "dbRDA".}
+\item{method}{character; the name of the ordination method to be used. Currently supported methods are "PCoA" (principal coordinate analysis; \code{\link[ape]{pcoa}}), "NMDS" (nonmetric multidimensional scaling; \code{\link[vegan]{metaMDS}}), "dbRDA" (distance-based redundancy analysis; \code{\link[vegan]{capscale}}), and "PCA" (principal components analysis; \code{\link[stats]{prcomp}}). "dbRDA" requires a formula, as it is a constrained ordination method. "PCA" operates on the abundance table directly rather than a distance matrix. Default is "dbRDA".}
 
 \item{formula}{formula; in the form of e.g., \code{~ Var1 + Var2 * Var3}. This is only required for and used by the dbRDA method. Default is NULL.}
 
 \item{optimize}{logical; should \code{\link[vegan]{ordistep}} be run on the dbRDA model and the results returned in place of the full model? Default is FALSE.}
 
-\item{only.for}{character or integer; a vector of the names or the indices of the matrices contained in the Distance.matrices slot of the microbData. If NULL, will make an ordination for all matrices. Default is NULL.}
+\item{only.for}{character or integer; a vector of the names or the indices of the matrices contained in the Distance.matrices slot of the microbData. If NULL, will make an ordination for all matrices. Ignored for methods that do not operate on distance matrices (e.g., PCA). Default is NULL.}
 
 \item{include.feature.scores}{logical; some ordination methods, like "NMDS" and "dbRDA" allow feature (often referred to a 'species') scores as well as site scores. If true, these will be calculated. Default is FALSE.}
 
-\item{update.mD}{logical; should this function return a new \code{microbData} object with the ordinations list (called "Ordinations") added to Other.data (TRUE) or just a list of the results (FALSE)? Default is TRUE.}
+\item{update.mD}{logical; should this function return a new \code{microbData} object with the new ordinations appended (unnamed) to the \code{Ordinations} slot and a tracking table appended to \code{Other.data$Ordination.log} (TRUE), or just a \code{list} with elements \code{Ordinations} (the unnamed list of results) and \code{Log} (the tracking table for just this call) (FALSE)? Default is TRUE.}
 
 \item{...}{other arguments passed to ordination methods. See their documentation for appropriate arguments.}
 }
 \description{
-Create an ordination from a \code{microbData} object. The \code{microbData} must have Distance Matrices (can be created with \code{\link[microbData]{beta.diversity}}), and an ordination will be created for each matrix unless otherwise specified.
+Create an ordination from a \code{microbData} object. Methods that operate on distance matrices (PCoA, NMDS, dbRDA) require the \code{microbData} to have Distance Matrices (can be created with \code{\link[microbData]{beta.diversity}}), and an ordination will be created for each matrix unless otherwise specified. Methods that operate directly on the abundance table (PCA) do not require distance matrices.
+}
+\details{
+Ordinations are stored as an \strong{unnamed} list in the \code{Ordinations} slot, since, e.g., multiple dbRDA ordinations with different formulas can be run on the same distance matrix, making a naming scheme based on method and distance metric alone ambiguous/colliding. Instead, a tracking table is kept in \code{Other.data$Ordination.log} with one row per ordination (in the same order as the \code{Ordinations} list) recording the \code{Index} into the \code{Ordinations} list, the \code{Method} used, the \code{Distance.metric} it was computed from (\code{NA} for methods like PCA that do not use one), the \code{Formula} used (\code{NA} if not applicable), and whether it was \code{Optimized} via \code{\link[vegan]{ordistep}}.
 }
 \seealso{
-\code{\link[ape]{pcoa}}, \code{\link[vegan]{metaMDS}}, \code{\link[vegan]{capscale}}, \code{\link[ape]{pcoa}},  \code{\link[vegan]{sppscores}}
+\code{\link[ape]{pcoa}}, \code{\link[vegan]{metaMDS}}, \code{\link[vegan]{capscale}}, \code{\link[stats]{prcomp}}, \code{\link[vegan]{sppscores}}
 }

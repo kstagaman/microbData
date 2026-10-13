@@ -80,6 +80,10 @@ relative.abundance(mD, update.mD = TRUE)
 
 \item{quiet}{logical; should informational output (not warnings or errors) be suppressed? Default is FALSE.}
 
+\item{debug}{logical; for \code{rarefy}, should \code{.verbose} be set to TRUE in the underlying \code{\link[foreach]{foreach}} calls for troubleshooting? Default is FALSE.}
+
+\item{threads}{integer; for \code{subsample.features}, the number of threads to use for parallel subsampling across samples. Default is 1.}
+
 \item{min.prop}{numeric; for \code{center.log.ratio}, the minimum proportional abundance of a read in any sample. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.001.}
 
 \item{min.occur}{numeric; for \code{center.log.ratio}, the minimum fraction of non-0 reads for each variable in all samples. (See \code{\link[CoDaSeq]{codaSeq.filter}}). Default is 0.}
@@ -101,9 +105,9 @@ Rarefy feature counts in a \code{microbData} object to the same depth over multi
 
 Subsample feature counts in a \code{microbData} object to the same depth.
 
-Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \code{\link{zCompositions}}.
+Transform feature counts using the center log-ratio method. This function requires packages [CoDaSeq](https://github.com/ggloor/CoDaSeq) and \pkg{zCompositions}.
 
-Transform feature counts using the variance-stabilized method. This function requires package \code{\link{DESeq2}}.
+Transform feature counts using the variance-stabilized method. This function requires package \pkg{DESeq2}.
 
 Transform feature counts to relative abundance. This function is the equivalent of \code{transform_counts(mD = mD, f = function(x) x / sum(x))}, but because it's a popular method of transformation, it has its own wrapper here.
 }

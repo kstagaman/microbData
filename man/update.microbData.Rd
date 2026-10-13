@@ -11,13 +11,13 @@
 \alias{replace.phylogeny}
 \title{Add or replace data in appropriate slot of a \code{microbData} object}
 \usage{
-replace.metadata(mD, new.tbl)
+replace.metadata(mD, new.tbl, new.sample.names.col = NULL)
 
 replace.abundances(mD, new.tbl)
 
 add.distance.matrices(mD, distance.matrices)
 
-add.assignments(mD, assignments, feature.names = NULL)
+add.assignments(mD, assignments, feature.names.col = NULL)
 
 add.phylogeny(mD, phylo)
 
@@ -28,9 +28,13 @@ add.other.data(mD, name, x, replace = FALSE)
 
 \item{new.tbl}{required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.}
 
+\item{new.sample.names.col}{character; if the replacement table has samples under a different column name than the one its replacing, it can supplied here so the \code{microbData} object gets updated correctly. If the replacement table is a \code{data.table}, it can be keyed by the correct column to acheive the same effect.}
+
 \item{distance.matrices}{required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".}
 
 \item{assignments}{required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature". If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.}
+
+\item{feature.names.col}{character; for \code{add.assignments}, if the replacement table has features under a different column name than the one it's replacing, it can be supplied here so the \code{microbData} object gets updated correctly. If the replacement table is a \code{data.table}, it can be keyed by the correct column to achieve the same effect.}
 
 \item{phylo}{required for \code{add.phylogeny}; phylo, a phylogenetic tree object.}
 
