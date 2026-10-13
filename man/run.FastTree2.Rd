@@ -18,6 +18,10 @@ run.FastTree2(
 \item{output.file}{required; file name to write output, should have the '.nwk' extension. If not, it will be added.}
 
 \item{fasttree.path}{character; path to \code{mothur} executable if it is not in your system PATH variable. Default is NULL.}
+
+\item{log.file}{character; path to a file to write FastTree2's log output to. If NULL, no log is written. Default is NULL.}
+
+\item{ncores}{integer; the number of threads to use (requires \code{FastTreeMP} to be available). Default is 1.}
 }
 \description{
 Build an approximately-maximum-likelihood with FastTree2 (http://www.microbesonline.org/fasttree/)

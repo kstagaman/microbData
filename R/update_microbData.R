@@ -10,8 +10,10 @@
 #' @aliases replace.phylogeny
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param new.tbl required for \code{replace.metadata} and \code{replace.abundances}; a data.table or matrix to replace the current Metadata or Abundances slot. Must have the same samples and/or features names as table it replaces.
+#' @param new.sample.names.col character; if the replacement table has samples under a different column name than the one its replacing, it can supplied here so the \code{microbData} object gets updated correctly. If the replacement table is a \code{data.table}, it can be keyed by the correct column to acheive the same effect.
 #' @param distance.matrices required for \code{add.distance.matrices}; a single distance matrix  of class "dist" or a list of distance matrices of class "dist".
 #' @param assignments required for \code{add.assignments}; data.table, data.frame, or matrix table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature". If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column.
+#' @param feature.names.col character; for \code{add.assignments}, if the replacement table has features under a different column name than the one it's replacing, it can be supplied here so the \code{microbData} object gets updated correctly. If the replacement table is a \code{data.table}, it can be keyed by the correct column to achieve the same effect.
 #' @param phylo required for \code{add.phylogeny}; phylo, a phylogenetic tree object.
 #' @param x required; a list, vector, or array (data.frame, data.table, matrix, ...) to add to \code{microbData} object in the appropriate (usually Other.data) slot.
 #' @param name required for \code{add.other.data}; the name to give the object in the Other.data list (e.g., "Ordinations" or "Beta.metrics").
@@ -27,30 +29,35 @@
 #' @rdname update.microbData
 #' @export
 
-replace.metadata <- function (mD, new.tbl){
+replace.metadata <- function(mD, new.tbl, new.sample.names.col = NULL) {
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
-  if (!{"data.table" %in% class(new.tbl)}) {
-    new.tbl <- as.data.table(metadata, keep.rownames = mD@Sample.col) %>% 
-      setkeyv(mD@Sample.col)
-  } else if (!{
-    "sorted" %in% names(attributes(new.tbl))
-  }) {
-    rlang::abort(
-      "The data.table supplied to `new.tbl' is not keyed by sample names, please supply sample names by using `data.table::setkey'."
-      )
+  new.class <- class(new.tbl)[1]
+  if (new.class == "data.table" && "sorted" %in% names(attributes(new.tbl))) {
+    new.sample.names.col <- attributes(new.tbl)$sorted
+  }
+  if (new.class == "matrix") {
+    new.names <- colnames(new.tbl)
   } else {
-    new.smpl.col <- attributes(new.tbl)$sorted
+    new.names <- names(new.tbl)
   }
-  if (!identical(sort(mD@Sample.names), sort(as.character(new.tbl[[new.smpl.col]])))) {
+  if (is.null(new.sample.names.col) && !{ mD@Sample.col %in% new.names }) {
+    rlang::abort("The old sample names column is not in the new table a new sample names column has not been provided")
+  }
+
+  checker <- table.checkers[[new.class]]
+  data.checked <- checker(new.tbl, nc = new.sample.names.col, slot = "metadata")
+
+  if (!identical(sort(mD@Sample.names), sort(as.character(data.checked$TBL[[data.checked$NC]])))) {
     rlang::abort(
-      "The data.table supplied to `new.tbl' does not have the same samples as the Metadata table it is replacing."
+      "The table supplied to `new.tbl` does not have the same samples as the Metadata table it is replacing."
       )
   } else {
     mD@Metadata <- new.tbl
-    if (mD@Sample.col != new.smpl.col) {
-      mD@Sample.col <- new.smpl.col
+    if (mD@Sample.col != new.sample.names.col) {
+      mD@Sample.col <- new.sample.names.col
+      colnames(mD@Abundances)[str_which(colnames(mD@Abundances), new.sample.names.col)] <- new.sample.names.col
     }
     return(mD)
   }
@@ -64,18 +71,18 @@ replace.metadata <- function (mD, new.tbl){
 #' @rdname update.microbData
 #' @export
 
-replace.abundances <- function (mD, new.tbl) {
+replace.abundances <- function(mD, new.tbl) {
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   if (!{
     "matrix" %in% class(new.tbl)
   }) {
-    rlang::abort("The table supplied to `new.tbl' must be a matrix.")
+    rlang::abort("The table supplied to `new.tbl` must be a matrix.")
   }
   else if (!identical(sort(rownames(mD@Abundances)), sort(rownames(new.tbl)))) {
     rlang::abort(
-      "The matrix supplied to `new.tbl' does not have the same samples as the Abundances table it is replacing."
+      "The matrix supplied to `new.tbl` does not have the same samples as the Abundances table it is replacing."
       )
   }
   else {
@@ -110,14 +117,14 @@ replace.abundances <- function (mD, new.tbl) {
 
 add.distance.matrices <- function(mD, distance.matrices) {
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   if (class(distance.matrices) == "list") {
     for (i in seq_along(distance.matrices)) {
       if (class(distance.matrices[[i]]) != "dist") {
         rlang::abort(
           paste(
-            "The elements in the list supplied to `distance.matrices' must all be of class `dist'.",
+            "The elements in the list supplied to `distance.matrices` must all be of class `dist`.",
             "Element at index", i, "is of class", class(distance.matrices[[i]])
           )
         )
@@ -125,7 +132,7 @@ add.distance.matrices <- function(mD, distance.matrices) {
     }
   } else if (class(distance.matrices) != "dist") {
     rlang::abort(
-      "The object supplied to `distance.matrices' must be of class `dist' or `list'"
+      "The object supplied to `distance.matrices` must be of class `dist` or `list`"
     )
   } else {
     mD@Distance.matrices <- distance.matrices
@@ -140,37 +147,41 @@ add.distance.matrices <- function(mD, distance.matrices) {
 #' @rdname update.microbData
 #' @export
 
-add.assignments <- function(mD, assignments, feature.names = NULL) {
-  table.classes <- c("matrix", "data.frame", "data.table")
+add.assignments <- function(mD, assignments, feature.names.col = NULL) {
+  table.classes <- c("matrix", "data.frame", "tbl_df", "data.table")
   if (!any(class(assignments) %in% table.classes)) {
     rlang::abort(
-      "The table supplied to `assignments' must be of class `data.table', `data.frame', or `matrix'"
+      "The table supplied to `assignments` must be of class `data.table`, `tbl_df`, `data.frame`, or `matrix`"
     )
   }
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   feat.col <- ifelse(is.null(mD@Assignments), "Feature", mD@Feature.col)
-  if (!{"data.table" %in% class(assignments)}) {
-    assignments <- as.data.table(assignments, keep.rownames = feat.col) %>%
-      setkeyv(feat.col)
-  } else if (is.null(feature.names)) {
-    if (!{"sorted" %in% names(attributes(assignments))}) {
-      rlang::abort(
-        "The data.table supplied to `assignments' is not sorted by feature names and `feature.names' is also NULL, please supply feature names by either using `data.table::setkey' on the data.table or providing a character vector of feature names."
-      )
-    } else {
-      feat.col <- attributes(assignments)$sorted
-    }
+  tbl.class <- class(assignments)[1]
+  if (tbl.class == "data.table" && "sorted" %in% names(attributes(assignments))) {
+    feature.names.col <- attributes(assignments)$sorted
   }
+  if (tbl.class == "matrix") {
+    new.names <- colnames(assignments)
+  } else {
+    new.names <- names(assignments)
+  }
+  if (is.null(feature.names.col) && !{ feat.col %in% new.names }) {
+    rlang::abort("The old sample names column is not in the new table a new sample names column has not been provided")
+  }
+
+  checker <- table.checkers[[tbl.class]]
+  data.checked <- checker(assignments, nc = feature.names.col, slot = "assignments")
+
   if (!is.null(mD@Assignments)) {
-    if (!identical(sort(mD@Feature.names), sort(assignments[[feat.col]]))) {
+    if (!identical(sort(mD@Feature.names), sort(data.checked$TBL[[data.checked$NC]]))) {
       rlang::abort(
-        "The data.table supplied to `assignments' does not have the same feature names as the Assignments table it is replacing."
+        "The data.table supplied to `assignments` does not have the same feature names as the Assignments table it is replacing."
       )
     }
   }
-  mD@Assignments <- assignments
+  mD@Assignments <- data.checked$TBL
   if (is.null(mD@Feature.col) || mD@Feature.col != feat.col) { mD@Feature.col <- feat.col }
   return(mD)
 }
@@ -189,18 +200,18 @@ replace.assignments <- add.assignments
 add.phylogeny <- function(mD, phylo) {
   if (!any(class(phylo) %in% "phylo")) {
     rlang::abort(
-      "The tree supplied to `phylo' must be of class `phylo'"
+      "The tree supplied to `phylo` must be of class `phylo`"
     )
   }
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   if (identical(sort(phylo$tip.label), sort(colnames(mD@Abundances)))) {
     mD@Phylogeny <- phylo
     return(mD)
   } else {
     rlang::abort(
-      "The tip labels in the provided `phylo' do NOT match the feature names in the `mD' abundance table"
+      "The tip labels in the provided `phylo` do NOT match the feature names in the `mD` abundance table"
     )
   }
 }
@@ -219,11 +230,11 @@ replace.phylogeny <- add.phylogeny
 add.other.data <- function(mD, name, x, replace = FALSE) {
   if (class(name) != "character") {
     rlang::abort(
-      "The argument supplied to `name' must be of class `character'"
+      "The argument supplied to `name` must be of class `character`"
     )
   }
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   if (is.null(mD@Other.data[[name]]) || replace) {
     mD@Other.data[[name]] <- x

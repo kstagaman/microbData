@@ -11,7 +11,7 @@
 
 glom.assignments <- function(mD, level, decreasing.assignments = TRUE) {
   if (class(mD) != "microbData") {
-    rlang::abort("Argument `mD' must be an object of class `microbData'")
+    rlang::abort("Argument `mD` must be an object of class `microbData`")
   }
   if (is.null(mD@Assignments)) {
     rlang::abort("There is no Assignments table in this microbData object. Please add a Assignments table and retry.")
@@ -19,34 +19,34 @@ glom.assignments <- function(mD, level, decreasing.assignments = TRUE) {
   if (!{level %in% names(mD@Assignments)}) {
     rlang::abort(
       paste0(
-        "The argument supplied to `level' must match a column name in the Assignments table. For this microbData object, the following are available:\n",
+        "The argument supplied to `level` must match a column name in the Assignments table. T he following are available:\n",
         paste(paste0('  "', names(mD@Assignments), '"'), collapse = "\n")
       )
     )
   }
-
-  assignments <- unique(mD@Assignments[[level]])
-  abund.dt <- get.abundances(mD = mD, as.DT = T) %>% setkeyv(mD@Sample.col)
+  assignments0 <- get.abundances(mD, return.as = "data.table")
+  assignments <- unique(assignments0[[level]])
+  abund.dt <- get.abundances(mD = mD, return.as = "data.table") %>% setkeyv(mD@Sample.col)
   res.dt <- copy(abund.dt[, .SD, .SDcols = mD@Sample.col])
   new.assignments <- NULL
   for (assignment in assignments) {
-    a.assignments <- mD@Assignments[get(level) == assignment][[mD@Feature.col]]
+    a.assignments <- assignments0[get(level) == assignment][[mD@Feature.col]]
     res.dt <- abund.dt[, .(get(mD@Sample.col), rowSums(.SD)), .SDcols = a.assignments] %>%
       set_names(c(mD@Sample.col, assignment)) %>%
       setkeyv(mD@Sample.col) %>%
       merge(x = res.dt, y = ., all.x = T)
     if (is.null(decreasing.assignments)) {
-      keep.col <- names(mD@Assignments)
+      keep.col <- names(assignments0)
     } else {
       if (decreasing.assignments) {
-        keep.cols <- names(mD@Assignments)[1:str_which(names(mD@Assignments), level)]
+        keep.cols <- names(assignments0)[1:str_which(names(assignments0), level)]
       } else {
-        keep.cols <- names(mD@Assignments)[str_which(names(mD@Assignments), level):ncol(mD@Assignments)]
+        keep.cols <- names(assignments0)[str_which(names(assignments0), level):ncol(assignments0)]
       }
     }
     new.assignments <- rbind(
       new.assignments,
-      mD@Assignments[get(level) == assignment][1, ..keep.cols]
+      assignments0[get(level) == assignment][1, ..keep.cols]
     )
   }
 

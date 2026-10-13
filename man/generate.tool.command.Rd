@@ -28,6 +28,16 @@ build.py.bash.command(cmd.base, flags, no.double.dashes = FALSE)
 \item{no.double.dashes}{logical; some command line tools don't use double dashes for flag names longer than 1 character. Setting this to true gives all flags a single dash prefix. Default is FALSE.}
 
 \item{...}{other commands to pass to appropriate tool. Names must match short or long version found in that tool's help page. If the flag takes no argument in the tool, pass "flag" to the argument. E.g. for bash command \code{ls -l} you could run \code{generate.tool.command(tool = "ls", l = "flag")}.}
+
+\item{mothur.path}{required for \code{build.mothur.command}; path to the \code{mothur} executable.}
+
+\item{mothur.function}{required for \code{build.mothur.command}; the name of the \code{mothur} function to call.}
+
+\item{args}{required for \code{build.mothur.command}; a named list of arguments to pass to the \code{mothur} function.}
+
+\item{cmd.base}{required for \code{build.py.bash.command}; the base command/executable path to which flags are appended.}
+
+\item{flags}{required for \code{build.py.bash.command}; a named list of flags to pass to the command. If the flag takes no argument, use "flag" as its value.}
 }
 \description{
 This function generates a character string of a command given a tool and its arguments.

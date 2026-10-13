@@ -1,18 +1,3 @@
-#' @name alpha.diversity
-#' @title Estimate Alpha-diversity
-#' @description This function take a \code{microbData} object and estimates alpha-diversity (see `metrics`) from the abundance table.
-#' @param mD required; \code{microbData} object from which data will be read.
-#' @param metrics character; a vector of alpha-diveristy metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the \code{microbData} object), and "Fisher".
-#' @param update.mD logical; should this function return a new \code{microbData} object with the alpha-diversity results added to the Metadata table and add \code{metrics} to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.
-#' @details This function utilizes \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, and/or \code{\link[picante]{pd}} to estimate common alpha-diversity metrics for microbial data.
-#' @returns A \code{microbData} object with estimated alpha-diversity scores added to the Metadata table, OR a table of the estimated alpha-diversity scores for each sample.
-#' @seealso \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, \code{\link[picante]{pd}}
-#' @examples
-#' data("mD_rar")
-#' mD.new <- alpha.diversity(mD.rar)
-#' print(mD.new)
-#' @export
-
 # this function is a fix of picante::pd(), which would sometimes get unrooted subtrees, and throw an error
 phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
   require(phytools)
@@ -72,6 +57,19 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
   return(PDout)
 }
 
+#' @name alpha.diversity
+#' @title Estimate Alpha-diversity
+#' @description This function take a \code{microbData} object and estimates alpha-diversity (see `metrics`) from the abundance table.
+#' @param mD required; \code{microbData} object from which data will be read.
+#' @param metrics character; a vector of alpha-diversity metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the \code{microbData} object), and "Fisher".
+#' @param update.mD logical; should this function return a new \code{microbData} object with the alpha-diversity results added to the Metadata table and add \code{metrics} to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.
+#' @details This function utilizes \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, and/or \code{\link[picante]{pd}} to estimate common alpha-diversity metrics for microbial data.
+#' @returns A \code{microbData} object with estimated alpha-diversity scores added to the Metadata table, OR a table of the estimated alpha-diversity scores for each sample.
+#' @seealso \code{\link[vegan]{diversity}}, \code{\link[vegan]{estimateR}}, \code{\link[picante]{pd}}
+#' @examples
+#' data("mD_rar")
+#' mD.new <- alpha.diversity(mD.rar)
+#' print(mD.new)
 #' @export
 
 alpha.diversity <- function(
@@ -168,7 +166,14 @@ alpha.diversity <- function(
     }
   }
   if (update.mD) {
-    mD@Metadata <- merge(mD@Metadata, results, by = mD@Sample.col)
+    meta.class <- class(mD@Metadata)
+    if (!{ "data.table" %in% meta.class }) {
+      new.tbl <- get.metadata(mD, return.as = "data.table") %>%
+        merge(results, by = mD@Sample.col)
+      new.tbl %<>% converters[[meta.class[1]]](rn = mD@Sample.col)
+    } else {
+      mD@Metadata <- merge(mD@Metadata, results, by = mD@Sample.col)
+    }
     mD@Other.data[["Alpha.metrics"]] <- metrics
     return(mD)
   } else {

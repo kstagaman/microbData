@@ -10,7 +10,7 @@
 numbered.features <- function(mD, prefix, old.IDs.file = NULL) {
   if (prefix == "" | length(prefix) == 0 | is.logical(prefix)) {
     rlang::abort(
-      "Argument `prefix' must be a non-numeric-only string of length greater than 0 and not logical (TRUE/FALSE)"
+      "Argument `prefix` must be a non-numeric-only string of length greater than 0 and not logical (TRUE/FALSE)"
     )
   }
   old.ids <- copy(mD@Feature.names)

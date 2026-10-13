@@ -4,6 +4,8 @@
 #' @param aligned.seqs.file required; FASTA file containing aligned sequences to build tree with.
 #' @param output.file required; file name to write output, should have the '.nwk' extension. If not, it will be added.
 #' @param fasttree.path character; path to \code{mothur} executable if it is not in your system PATH variable. Default is NULL.
+#' @param log.file character; path to a file to write FastTree2's log output to. If NULL, no log is written. Default is NULL.
+#' @param ncores integer; the number of threads to use (requires \code{FastTreeMP} to be available). Default is 1.
 #' @seealso \code{\link[microbData]{generate.tool.command}}, \code{\link{system}}
 #' @export
 

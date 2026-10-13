@@ -6,7 +6,7 @@
 #' @aliases remove.eukarya
 #' @param mD required; the \code{microbData} object to be updated.
 #' @param features character or logical; a vector of feature names to keep or drop. Also can be a logical vector that is either named or in the exact same order as those in the Feature Names slot.
-#' #' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.
+#' @param track logical; should the names of the dropped samples be added to Other.data? Default is TRUE.
 #' @param ... logical expression(s) by which to filter features based on the Assignments table, e.g. \code{Kingdom == "Bacteria" & Family != "Mitochondria"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}
 

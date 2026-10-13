@@ -10,11 +10,11 @@ The class for microbData
 \section{Slots}{
 
 \describe{
-\item{\code{Metadata}}{a \code{\link{data.table}} of sample metadata, must be keyed by sample name}
+\item{\code{Metadata}}{a \code{table} (\code{\link{data.table}}, \code{\link[tibble]{tibble}}, \code{\link{data.frame}}, or \code{\link{matrix}}) of sample metadata}
 
 \item{\code{Abundances}}{a \code{\link{matrix}} of abundance counts by sample}
 
-\item{\code{Assignments}}{a \code{\link{data.table}} of assignments/annotations for the features}
+\item{\code{Assignments}}{a \code{table} (\code{\link{data.table}}, \code{\link[tibble]{tibble}}, \code{\link{data.frame}}, or \code{\link{matrix}}) of assignments/annotations for the features}
 
 \item{\code{Phylogeny}}{a \code{\link{phylo}} class phylogeny of features}
 
@@ -23,6 +23,8 @@ The class for microbData
 \item{\code{Feature.names}}{a \code{character} vector of feature names/IDs}
 
 \item{\code{Distance.matrices}}{= a \code{\link{dist}} object (or \code{list} of them) of distance metrics pairwise by sample}
+
+\item{\code{Ordinations}}{= an \strong{unnamed} \code{list} of ordination results. Automatically populated by the \code{\link{ordinate}} function; a parallel tracking table describing each ordination's method, distance metric (if any), and formula (if any) is kept at \code{Other.data$Ordination.log}}
 
 \item{\code{Sample.col}}{= the name of the sample column in the \code{Metadata} slot (\code{character})}
 

@@ -7,7 +7,7 @@
 ordination.coords(
   mD = NULL,
   ord.list = NULL,
-  ord.list.name = "Ordinations",
+  log.name = "Ordination.log",
   metadata = NULL,
   feature.coords = FALSE,
   assignment.tbl = NULL,
@@ -18,20 +18,25 @@ ordination.coords(
 )
 }
 \arguments{
-\item{mD}{microbData; a \code{microbData} object that includes ordination results (typically labelled "Ordinations" in the Other.data slot). Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.}
+\item{mD}{microbData; a \code{microbData} object that includes ordination results in its \code{Ordinations} slot. Required if \code{ord.list} and \code{metadata} are NULL. Default is NULL.}
 
-\item{ord.list}{list; a list of ordinations, required if \code{mD} is NULL. This list **must** be named if \code{combine} is TRUE. Default is NULL.}
+\item{ord.list}{list; a list of ordinations, required if \code{mD} is NULL. Ordination type is inferred from the class of each element, so this does not need to be named. Default is NULL.}
 
-\item{ord.list.name}{character; required if \code{mD} has an list of ordinations stores under something other than Other.data$Ordinations. Default is "Ordinations".}
+\item{log.name}{character; the name of the tracking table in \code{Other.data} that records the method and distance metric (if any) for each ordination in \code{mD@Ordinations}, in the same order. Only used if \code{mD} is supplied. Default is "Ordination.log".}
 
 \item{metadata}{array; a data.frame/data.table/matrix with metadata for the samples used in the ordination(s). Default is NULL.}
 
-\item{feature.coords}{logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.
-#' @param assignment.tbl array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.}
+\item{feature.coords}{logical; if FALSE will only get coordinates for samples. If TRUE, will also get coordinates for features (e.g. ASVs, KOs, ...). Default is FALSE.}
+
+\item{assignment.tbl}{array; a data.frame/data.table/matrix with assignment data for the features used in the ordination(s). This is only necessary if there is no \code{mD} and \code{feature.coords} is TRUE. Default is NULL.}
 
 \item{constraint.coords}{logical; only relevant for dbRDA ordinations. If FALSE, will only get coordinates for samples. If TRUE, will also get coordinates for constraining variables to plot as vectors. Default is FALSE.}
 
 \item{combine}{logical; if TRUE, will combine related results into data.tables and add columns of ordination names so results can all be plotted together, e.g. by using the \code{\link[ggplot2]{facet_wrap}} or \code{\link[ggplot2]{facet_grid}} functions with \code{\link[ggplot2]{ggplot}}. If FALSE, will return a list of data.tables with coordinates. Default is TRUE.}
+
+\item{axes}{integer; a vector of length 2 giving the indices of the ordination axes to extract coordinates for. Default is \code{1:2}.}
+
+\item{axis.digits}{integer; the number of decimal places to round percentage variance explained to in the axis labels. Default is 2.}
 }
 \description{
 Get the appropriate coordinates to plot the results of one or more ordinations. This also returns axis labels with percentage variance explained for relevant ordination methods (i.e., for all supported methods but NMDS).

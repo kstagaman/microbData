@@ -2,15 +2,18 @@
 % Please edit documentation in R/alpha_diversity.R
 \name{alpha.diversity}
 \alias{alpha.diversity}
-\alias{phylogenetic.diversity}
 \title{Estimate Alpha-diversity}
 \usage{
-phylogenetic.diversity(samp, tree, include.root = TRUE)
+alpha.diversity(
+  mD,
+  metrics = c("Chao1", "Shannon", "Simpson", "Phylogenetic"),
+  update.mD = TRUE
+)
 }
 \arguments{
 \item{mD}{required; \code{microbData} object from which data will be read.}
 
-\item{metrics}{character; a vector of alpha-diveristy metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the \code{microbData} object), and "Fisher".}
+\item{metrics}{character; a vector of alpha-diversity metrics to be estimated from the Abundances table in the \code{microbData} object. Supported metrics include "Richness" (a.k.a observed feature counts),"Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Phylogenetic" (requires a Phylogeny to be present in the \code{microbData} object), and "Fisher".}
 
 \item{update.mD}{logical; should this function return a new \code{microbData} object with the alpha-diversity results added to the Metadata table and add \code{metrics} to Other.data (TRUE) or just the results of the alpha-diversity estimation (FALSE)? Default is TRUE.}
 }

@@ -3,11 +3,14 @@
 #' @description Creates an object with associated microbiome data of class \code{microbData}
 #' @param metadata required; must be a data.table, data.frame, or matrix with sample metadata. If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Sample" (which will be used to infer sample names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{sample.names} will be set from the keyed column.
 #' @param abundances required; must be a matrix of feature (taxon/function) abundance values, either counts or relative. This table will be coerced to have sample names as row names since that is more often the required orientation for other tools.
+#' @param sample.names.col character or integer; the name (or index) of the column in \code{metadata} that contains the sample names. Only needed if \code{metadata} is not a keyed data.table and \code{sample.names} is not supplied directly. Default is NULL.
+#' @param sample.names character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.
 #' @param assignments data.table, data.frame, or matrix; the table containing taxonomic or functional assignments for each feature (taxon/function). If not already a data.table, the data will be converted to a data.table and the row names will be saved under a column called "Feature" (which will be used to infer feature names). If a keyed data.table (see \code{\link[data.table]{setkey}}), \code{feature.names} will be set from the keyed column. Default is NULL.
+#' @param feature.names.col character or integer; the name (or index) of the column in \code{assignments} that contains the feature names. Only needed if \code{assignments} is not a keyed data.table and \code{feature.names} is not supplied directly. Default is NULL.
+#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.
 #' @param phylogeny phylo; a phylogenetic tree of features (taxonomic). Default is NULL.
 #' @param distance.matrices dist or list; a single distance matrix of class "dist" or a list of distance matrices. Default is NULL.
-#' @param sample.names character; a vector of the sample names. If not provided directly here, will be inferred from \code{metadata}. Default is NULL.
-#' @param feature.names character; a vector of feature (taxon/function) names. If not provided directly here, will be inferred from \code{abundances}. Default is NULL.
+#' @param ordinations list; an ordination result, or an (optionally unnamed) list of ordination results, to be stored in the Ordinations slot. Default is NULL.
 #' @param other.data list; a named list of other data to associate with the microbiome data. Can be things like covariate categories of interest or alpha- and beta-diveristy metrics to be included in the analysis. This is for your reference only and will not be implicitly used by any of the associated functions in the \code{microbData} package.
 #' @details This function creates a \code{microbData} object that is designed to make it simple for the user to perform basic microbiome analyses such as alpha- and beta-diversity estimation, sample and feature filtering, ordination, etc. The \code{microbData} object stores information like what metrics have been estimated from the data as well as the option to store distance matrices and ordinations in association with the underlying data to make it simple for the user to keep track of analysis steps as well as sharing data and results with colleagues. Furthermore, \code{microbData} objects utilize the power of \code{data.table}s for fast filtering, summarizing and merging.
 #' @returns A \code{microbData} object.
@@ -51,6 +54,7 @@ microbData <- function(
     feature.names = NULL,
     phylogeny = NULL,
     distance.matrices = NULL,
+    ordinations = NULL,
     other.data = NULL
 ) {
   table.classes <- c("matrix", "data.frame", "data.table", "tbl_df")
@@ -97,6 +101,12 @@ microbData <- function(
       )
     }
   }
+  if (!is.null(ordinations)) {
+    if (!{ "list" %in% class(ordinations) }) {
+      ordinations <- list(ordinations)
+    }
+  }
+
   if (!is.null(other.data)) {
     if (class(other.data) != "list") {
       rlang::abort(
@@ -114,13 +124,13 @@ microbData <- function(
 
   if (!is.null(assignments)) {
     assignments.checker <- table.checkers[[class(assignments)[1]]]
-    assignments.check <- assignments.checker(metadata, sample.names.col, sample.names, slot = "assignments")
+    assignments.check <- assignments.checker(assignments, feature.names.col, feature.names, slot = "assignments")
   } else {
     assignments.check <- list(TBL = NULL, NC = NULL, NS = NULL)
   }
 
-  if (!identical(sort(metadata.check$ns), sort(rownames(abundances)))) {
-    if (identical(sort(metadata.check$ns), sort(colnames(abundances)))) {
+  if (!identical(sort(metadata.check$NS), sort(rownames(abundances)))) {
+    if (identical(sort(metadata.check$NS), sort(colnames(abundances)))) {
       abundances <- t(abundances)
     } else {
       rlang::abort(
@@ -134,13 +144,14 @@ microbData <- function(
       "microbData",
       Metadata = metadata.check$TBL,
       Abundances = abundances[, order(colSums(abundances), decreasing = T)],
+      Sample.col = metadata.check$NC,
+      Sample.names = metadata.check$NS,
       Assignments = assignments.check$TBL,
+      Feature.col = assignments.check$NC,
+      Feature.names = assignments.check$NS,
       Phylogeny = phylogeny,
       Distance.matrices = distance.matrices,
-      Sample.names = metadata.check$SN,
-      Feature.names = assignments.check$SN,
-      Sample.col = metadata.check$NC,
-      Feature.col = assignments.check$NC,
+      Ordinations = ordinations,
       Other.data = other.data
     )
   )
