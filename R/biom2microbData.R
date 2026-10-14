@@ -16,7 +16,7 @@ biom2microbData <- function(
 ) {
   require(biomformat)
   vargs <- rlang::list2(...)
-  if (!{"biom" %in% class(biom)}) {
+  if ("biom" %notin% class(biom)) {
     rlang::abort("Object supplied to argument `biom' must be of class 'biom'.")
   }
   smpl.dt <- as(biomformat::sample_metadata(biom), "data.frame") %>%

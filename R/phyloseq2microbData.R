@@ -15,7 +15,7 @@ phyloseq2microbData <- function(
     ...
 ) {
   vargs <- rlang::list2(...)
-  if (!{"phyloseq" %in% class(physeq)}) {
+  if ("phyloseq" %notin% class(physeq)) {
     rlang::abort("Object supplied to argument `physeq' must be of class 'phyloseq'.")
   }
   smpl.dt <- as(physeq@sam_data, "data.frame") %>%

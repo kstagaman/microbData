@@ -42,7 +42,7 @@ keep.features <- function (mD, features, track = TRUE) {
     mD <- add.other.data(
       mD = mD,
       name = "Dropped.features",
-      x = mD@Feature.names[!{mD@Feature.names %in% to.keep}]
+      x = mD@Feature.names[mD@Feature.names %notin% to.keep]
     )
   }
   keep.order <- order(colSums(mD@Abundances[, to.keep]), decreasing = T)
@@ -84,7 +84,7 @@ drop.features <- function(mD, features, track = TRUE) {
       to.drop <- names(features)[features]
     }
   } else {
-    to.keep <- mD@Feature.names[!{mD@Feature.names %in% features}]
+    to.keep <- mD@Feature.names[mD@Feature.names %notin% features]
     to.drop <- mD@Feature.names[mD@Feature.names %in% features]
   }
   if (!all(to.keep %in% mD@Feature.names)) {

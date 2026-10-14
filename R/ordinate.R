@@ -91,7 +91,7 @@ ordinate <- function(
     update.mD = TRUE,
     ...
 ) {
-  if (!{"microbData" %in% class(mD)}) {
+  if ("microbData" %notin% class(mD)) {
     rlang::abort("Object supplied to `mD` must be of class 'microbData`")
   }
   method <- rlang::arg_match(method, values = names(ordination.registry))

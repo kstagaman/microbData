@@ -8,6 +8,14 @@
 #' @param sort character; either "increasing", "decreasing", or NULL. Increasing will set \code{sort(decreasing = FALSE)} and decreasing will set \code{sort(decreasing = TRUE)}. NULL will not sort output. Default is NULL.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link{colSums}}, \code{\link{rowSums}}
 
+#' @name %notin%
+#' @title Value Not in a Set
+#' @description Negated version of \code{data.table::\%in\%}; returns \code{TRUE} for elements not present in the given set. Re-exported from \code{data.table}.
+#' @rdname utilities
+#' @importFrom data.table %notin%
+#' @export
+NULL
+
 #' @name nsamples
 #' @title Number of Samples
 #' @description Get the number of samples in a \code{microbData} object.

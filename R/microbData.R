@@ -64,7 +64,7 @@ microbData <- function(
       "The table supplied to `metadata' must be of class `data.table`, `data.frame`, `tbl_df`, or `matrix`"
     )
   }
-  if (!{"matrix" %in% class(abundances)}) {
+  if ("matrix" %notin% class(abundances)) {
     rlang::abort(
       "The table supplied to `abundances` must be of class `matrix`"
     )
@@ -77,7 +77,7 @@ microbData <- function(
     }
   }
   if (!is.null(phylogeny)) {
-    if (!{"phylo" %in% class(phylogeny)}) {
+    if ("phylo" %notin% class(phylogeny)) {
       rlang::abort(
         "The tree supplied to `phylogeny` must be of class `phylo`"
       )
@@ -102,7 +102,7 @@ microbData <- function(
     }
   }
   if (!is.null(ordinations)) {
-    if (!{ "list" %in% class(ordinations) }) {
+    if ("list" %notin% class(ordinations)) {
       ordinations <- list(ordinations)
     }
   }

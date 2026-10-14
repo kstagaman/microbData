@@ -42,7 +42,7 @@ replace.metadata <- function(mD, new.tbl, new.sample.names.col = NULL) {
   } else {
     new.names <- names(new.tbl)
   }
-  if (is.null(new.sample.names.col) && !{ mD@Sample.col %in% new.names }) {
+  if (is.null(new.sample.names.col) && mD@Sample.col %notin% new.names) {
     rlang::abort("The old sample names column is not in the new table a new sample names column has not been provided")
   }
 
@@ -167,7 +167,7 @@ add.assignments <- function(mD, assignments, feature.names.col = NULL) {
   } else {
     new.names <- names(assignments)
   }
-  if (is.null(feature.names.col) && !{ feat.col %in% new.names }) {
+  if (is.null(feature.names.col) && feat.col %notin% new.names) {
     rlang::abort("The old sample names column is not in the new table a new sample names column has not been provided")
   }
 

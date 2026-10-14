@@ -16,7 +16,7 @@ glom.assignments <- function(mD, level, decreasing.assignments = TRUE) {
   if (is.null(mD@Assignments)) {
     rlang::abort("There is no Assignments table in this microbData object. Please add a Assignments table and retry.")
   }
-  if (!{level %in% names(mD@Assignments)}) {
+  if (level %notin% names(mD@Assignments)) {
     rlang::abort(
       paste0(
         "The argument supplied to `level` must match a column name in the Assignments table. T he following are available:\n",

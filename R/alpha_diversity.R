@@ -8,7 +8,9 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
   }
   if (include.root) {
     if (!is.rooted(tree)) {
-      stop("Rooted tree required to calculate PD with include.root=TRUE argument")
+      stop(
+        "Rooted tree required to calculate PD with include.root=TRUE argument"
+      )
     }
     tree <- picante::node.age(tree)
   }
@@ -19,8 +21,7 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
   PDs <- rep(NA, nlocations)
   for (i in 1:nlocations) {
     present <- species[samp[i, ] > 0]
-    treeabsent <- tree$tip.label[which(!(tree$tip.label %in%
-                                           present))]
+    treeabsent <- tree$tip.label[which(!(tree$tip.label %in% present))]
     if (length(present) == 0) {
       PDs[i] <- 0
     } else if (length(present) == 1) {
@@ -30,21 +31,28 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
         )
         PDs[i] <- NA
       } else {
-        PDs[i] <- tree$ages[which(tree$edge[, 2] == which(tree$tip.label ==
-                                                            present))]
+        PDs[i] <- tree$ages[which(
+          tree$edge[, 2] == which(tree$tip.label == present)
+        )]
       }
     } else if (length(treeabsent) == 0) {
       PDs[i] <- sum(tree$edge.length)
     } else {
       sub.tree <- drop.tip(tree, treeabsent)
-      if (!is.rooted(sub.tree)) { sub.tree <- phytools::midpoint.root(sub.tree) }
+      if (!is.rooted(sub.tree)) {
+        sub.tree <- phytools::midpoint.root(sub.tree)
+      }
       if (include.root) {
         if (!is.rooted(tree)) {
-          stop("Rooted tree required to calculate PD with include.root=TRUE argument")
+          stop(
+            "Rooted tree required to calculate PD with include.root=TRUE argument"
+          )
         }
         sub.tree.depth <- max(node.age(sub.tree)$ages)
         orig.tree.depth <- max(
-          tree$ages[which(tree$edge[, 2] %in% which(tree$tip.label %in% present))]
+          tree$ages[which(
+            tree$edge[, 2] %in% which(tree$tip.label %in% present)
+          )]
         )
         PDs[i] <- sum(sub.tree$edge.length) + (orig.tree.depth - sub.tree.depth)
       } else {
@@ -73,9 +81,9 @@ phylogenetic.diversity <- function(samp, tree, include.root = TRUE) {
 #' @export
 
 alpha.diversity <- function(
-    mD,
-    metrics = c("Chao1", "Shannon", "Simpson", "Phylogenetic"),
-    update.mD = TRUE
+  mD,
+  metrics = c("Chao1", "Shannon", "Simpson", "Phylogenetic"),
+  update.mD = TRUE
 ) {
   diversity.metrics <- c("Shannon", "Simpson", "InvSimpson")
   estimateR.metrics <- c("ACE", "Chao1")
@@ -145,7 +153,10 @@ alpha.diversity <- function(
     }
   }
   if (pd.metric %in% metrics) {
-    res.dt <- phylogenetic.diversity(samp = mD@Abundances, tree = mD@Phylogeny) %>%
+    res.dt <- phylogenetic.diversity(
+      samp = mD@Abundances,
+      tree = mD@Phylogeny
+    ) %>%
       as.data.table(keep.rownames = mD@Sample.col)
     res.dt[, SR := NULL]
     names(res.dt)[2] <- pd.metric
@@ -167,7 +178,11 @@ alpha.diversity <- function(
   }
   if (update.mD) {
     meta.class <- class(mD@Metadata)
-    if (!{ "data.table" %in% meta.class }) {
+    if (
+      !{
+        "data.table" %in% meta.class
+      }
+    ) {
       new.tbl <- get.metadata(mD, return.as = "data.table") %>%
         merge(results, by = mD@Sample.col)
       new.tbl %<>% converters[[meta.class[1]]](rn = mD@Sample.col)

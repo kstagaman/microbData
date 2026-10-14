@@ -9,7 +9,6 @@
 #' @param ... logical expression(s) by which to filter samples based on Metadata, e.g. \code{Weight > 10 & Genotype != "WT"}.
 #' @seealso \code{\link[microbData]{microbData}}, \code{\link[ape]{drop.tip}}, \code{\link[usedist]{dist_subset}}
 
-
 #' @name keep.samples
 #' @title Keep Samples
 #' @description Create a new \code{microbData} objects with just the specified samples
@@ -33,20 +32,29 @@ keep.samples <- function(mD, samples, track = TRUE) {
     to.keep <- samples
   }
   if (!all(to.keep %in% mD@Sample.names)) {
-    rlang::abort("One or more of the samples supplied to `samples' is not in the microbData Sample Names")
+    rlang::abort(
+      "One or more of the samples supplied to `samples' is not in the microbData Sample Names"
+    )
   }
   if (track) {
     mD <- add.other.data(
       mD = mD,
       name = "Dropped.samples",
-      x = mD@Sample.names[!{mD@Sample.names %in% to.keep}]
+      x = mD@Sample.names[
+        !{
+          mD@Sample.names %in% to.keep
+        }
+      ]
     )
   }
   mD@Metadata <- copy(mD@Metadata)[to.keep]
   mD@Abundances <- mD@Abundances[to.keep, ]
   if (!is.null(mD@Distance.matrices)) {
     if (class(mD@Distance.matrices) == "dist") {
-      mD@Distance.matrices <- usedist::dist_subset(mD@Distance.matrices, to.keep)
+      mD@Distance.matrices <- usedist::dist_subset(
+        mD@Distance.matrices,
+        to.keep
+      )
     } else {
       mD@Distance.matrices <- lapply(mD@Distance.matrices, function(dist.mat) {
         usedist::dist_subset(dist.mat, to.keep) %>%
@@ -78,10 +86,16 @@ drop.samples <- function(mD, samples, track = TRUE) {
       to.keep <- names(samples)[!samples]
     }
   } else {
-    to.keep <- mD@Sample.names[!{mD@Sample.names %in% samples}]
+    to.keep <- mD@Sample.names[
+      !{
+        mD@Sample.names %in% samples
+      }
+    ]
   }
   if (!all(to.keep %in% mD@Sample.names)) {
-    rlang::abort("One or more of the samples to be kept is not in the microbData Sample Names")
+    rlang::abort(
+      "One or more of the samples to be kept is not in the microbData Sample Names"
+    )
   }
   if (track) {
     mD <- add.other.data(mD = mD, name = "Dropped.samples", x = samples)
@@ -90,7 +104,10 @@ drop.samples <- function(mD, samples, track = TRUE) {
   mD@Abundances <- mD@Abundances[to.keep, ]
   if (!is.null(mD@Distance.matrices)) {
     if (class(mD@Distance.matrices) == "dist") {
-      mD@Distance.matrices <- usedist::dist_subset(mD@Distance.matrices, to.keep)
+      mD@Distance.matrices <- usedist::dist_subset(
+        mD@Distance.matrices,
+        to.keep
+      )
     } else {
       mD@Distance.matrices <- lapply(mD@Distance.matrices, function(dist.mat) {
         usedist::dist_subset(dist.mat, to.keep) %>%
@@ -112,7 +129,11 @@ filter.samples <- function(mD, ..., track = TRUE) {
   mD.return <- copy(mD@Metadata)[...][[mD@Sample.col]] %>%
     keep.samples(mD = mD, samples = ., track = FALSE)
   if (track) {
-    mD.return <- add.other.data(mD = mD.return, name = "Sample.filter", x = deparse(substitute(...)))
+    mD.return <- add.other.data(
+      mD = mD.return,
+      name = "Sample.filter",
+      x = deparse(substitute(...))
+    )
   }
   return(mD.return)
 }
