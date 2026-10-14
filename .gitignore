@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rprofile
 .DS_[Ss]tore
 testing.R
 header_example.R
